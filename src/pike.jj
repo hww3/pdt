@@ -157,6 +157,7 @@ TOKEN :
 | < FINAL: "final" >
 | < FLOAT: "float" >
 | < FOR: "for" >
+| < FOREACH: "foreach" >
 | < FUNCTION: "function" >
 | < GOTO: "goto" >
 | < IF: "if" >
@@ -164,12 +165,14 @@ TOKEN :
 | < INHERIT: "inherit" >
 | < INT: "int" >
 | < MAPPING: "mapping" >
+| < MIXED: "mixed" >
 | < MULTISET: "multiset" >
 | < OBJECT: "object" >
 | < PRIVATE: "private" >
 | < PUBLIC: "public" >
 | < RETURN: "return" >
 | < STATIC: "static" >
+| < STRING: "string" >
 | < SWITCH: "switch" >
 | < THIS: "this" >
 | < THROW: "throw" >
@@ -363,8 +366,6 @@ void TypeDeclaration() :
   LOOKAHEAD( (( "private" | "static" | "public" | "optional" )* "class")*)
   ClassDeclaration()
 |
-  InterfaceDeclaration()
-|
   ";"
 }
 
@@ -383,7 +384,7 @@ void ClassDeclaration() :
 void UnmodifiedClassDeclaration() :
 {}
 {
-  "class" <IDENTIFIER> [ "(" ConstructorDeclaration ")" ]
+  "class" <IDENTIFIER> [ "(" ConstructorDeclaration() ")" ]
   ClassBody()
 }
 
@@ -396,7 +397,7 @@ void ClassBody() :
 void NestedClassDeclaration() :
 {}
 {
-  ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp")*
+  ( "static" | "final" | "public" | "protected" | "private" )*
   UnmodifiedClassDeclaration()
 }
 
@@ -406,11 +407,8 @@ void ClassBodyDeclaration() :
   LOOKAHEAD(2)
   Initializer()
 |
-  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp")* "class" )
+  LOOKAHEAD( ( "static" | "final" | "public" | "protected" | "private" )* "class" )
   NestedClassDeclaration()
-|
-  LOOKAHEAD( ( "static" | "abstract" | "final" | "public" | "protected" | "private" | "strictfp")* "interface" )
-  NestedInterfaceDeclaration()
 |
   LOOKAHEAD( [ "public" | "protected" | "private" ] Name() "(" )
   ConstructorDeclaration()
@@ -425,8 +423,8 @@ void ClassBodyDeclaration() :
 void MethodDeclarationLookahead() :
 {}
 {
-  ( "public" | "protected" | "private" | "static" | "abstract" | "final" | "native" | "synchronized" | "strictfp")*
-  ResultType() <IDENTIFIER> "("
+  ( "public" | "protected" | "private" | "static" | "final" )*
+  CompoundReturnType() <IDENTIFIER> "("
 }
 
 
@@ -483,7 +481,7 @@ void MethodDeclaration() :
 {}
 {
   ( "public" | "protected" | "private" | "static" | "final")*
-  ResultType() MethodDeclarator() 
+  CompoundReturnType() MethodDeclarator() 
   ( Block() | ";" )
 }
 
@@ -541,13 +539,13 @@ void CompoundReturnType() :
 void Type() :
 {}
 {
-  ( PrimitiveType() | Name() )*
+  ( PrimitiveType() | Name() )
 }
 
 void ReturnType() :
 {}
 {
-  ( PrimitiveReturnType() | Name() )*
+  ( PrimitiveReturnType() | Name() )
 }
 
 void PrimitiveReturnType() :
@@ -684,7 +682,7 @@ void AndExpression() :
 void EqualityExpression() :
 {}
 {
-  InstanceOfExpression() ( ( "==" | "!=" ) InstanceOfExpression() )*
+  RelationalExpression() ( ( "==" | "!=" ) RelationalExpression() )*
 }
 
 
@@ -807,9 +805,6 @@ void PrimarySuffix() :
   "." "this"
 |
   LOOKAHEAD(2)
-  "." "super"  
-|
-  LOOKAHEAD(2)
   "." AllocationExpression()
 |
   "[" Expression() "]"
@@ -829,7 +824,6 @@ void Literal() :
   <CHARACTER_LITERAL>
 |
   <STRING_LITERAL>
-|
 }
 
 void Arguments() :
@@ -848,7 +842,7 @@ void AllocationExpression() :
 {}
 {
   LOOKAHEAD(2)
-    PrimitiveType() ArrayDimsAndInits()
+    PrimitiveType()
 |
   Name()
     (

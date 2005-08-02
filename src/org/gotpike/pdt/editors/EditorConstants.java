@@ -24,6 +24,14 @@ public  interface EditorConstants {
 
 	public final static String[] PIKE_RESERVED_KEYWORDS = 
 		{ "this", "for", "foreach", "do", "while", "if", "else", "return", 
-			"public", "private", "static", "protected", "class",
-			"switch", "case", "default", "break", "continue", "catch" };
+			"public", "private", "static", "protected", "class", "optional",
+			"switch", "case", "default", "break", "continue", "catch", "gauge" };
+	
+	public final static String[] PIKE_RESERVED_DATATYPES = 
+		{ "int", "float", "string", "array", "mapping", "multiset", "mixed", 
+			"object", "function", "void"};
+	
+	public final static String[] PIKE_RESERVED_CPP = 
+	{ "#define", "#if", "#pragma", "#else", "#pike"};
+
 }

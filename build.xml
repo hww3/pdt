@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="build" default="plugin_export">
+	<target name="plugin_export">
+		<pde.exportPlugins plugins="org.gotpike.pdt" destination="C:\temp\eclipse" filename="pdt.zip" exportType="zip" exportSource="false"/>
+	</target>
+</project>

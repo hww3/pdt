@@ -2,9 +2,13 @@ package org.gotpike.pdt.editors;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.text.rules.*;
-import org.gotpike.pdt.editors.rule.CppMultiLineConstructRule;
-import org.gotpike.pdt.editors.rule.PreprocessorRule;
+import org.eclipse.jface.text.rules.EndOfLineRule;
+import org.eclipse.jface.text.rules.IPredicateRule;
+import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.MultiLineRule;
+import org.eclipse.jface.text.rules.RuleBasedPartitionScanner;
+import org.eclipse.jface.text.rules.SingleLineRule;
+import org.eclipse.jface.text.rules.Token;
 
 public class PikePartitionScanner extends RuleBasedPartitionScanner {
 	public PikePartitionScanner() {

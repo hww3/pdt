@@ -4,15 +4,19 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextDoubleClickStrategy;
 import org.eclipse.jface.text.presentation.IPresentationReconciler;
 import org.eclipse.jface.text.presentation.PresentationReconciler;
+import org.eclipse.jface.text.reconciler.IReconciler;
+import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 
 public class PikeConfiguration extends SourceViewerConfiguration {
 	private PikeDoubleClickStrategy doubleClickStrategy;
 	private ColorManager colorManager;
-
-	public PikeConfiguration(ColorManager colorManager) {
+	private PikeEditor editor;
+	
+	public PikeConfiguration(ColorManager colorManager, PikeEditor editor) {
 		this.colorManager = colorManager;
+		this.editor = editor;
 	}
 	
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
@@ -38,4 +42,12 @@ public class PikeConfiguration extends SourceViewerConfiguration {
 		// return null;
 	}
 
+	public IReconciler getReconciler(ISourceViewer sourceViewer)
+    {
+        PikeReconciliationStrategy strategy = new PikeReconciliationStrategy();
+        strategy.setEditor(editor);
+  
+        MonoReconciler reconciler = new MonoReconciler(strategy,false);
+        return reconciler;
+    }
 }

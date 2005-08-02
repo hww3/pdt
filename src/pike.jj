@@ -31,7 +31,7 @@ public class PikeParser
 // modified main Andrea Gini 24/02/2002
 // modified main. DW, 7/99
     public static void main (String [] args) {
-        JavaParser parser;
+        PikeParser parser;
         String filename = null;
         long initTime = 0;
         long parseTime = 0;
@@ -342,9 +342,11 @@ TOKEN :
 void CompilationUnit() :
 {}
 {
+  ( TypeDeclaration() )*
   ( InheritDeclaration() )*
   ( ImportDeclaration() )*
-  ( TypeDeclaration() )*
+  ( ClassBodyDeclaration() )*
+
   <EOF>
 }
 
@@ -454,8 +456,10 @@ void VariableInitializer() :
 | 
   MappingInitializer()
 |
+  LOOKAHEAD(3)
   MultisetInitializer()  
 |
+  LOOKAHEAD(3)
   Expression()
 }
 
@@ -790,9 +794,10 @@ void PrimaryPrefix() :
 |
   "(" Expression() ")"
 |
-  AllocationExpression()
-|
   Name()
+|
+  AllocationExpression()
+
 }
 
 /* Add "." "super" to be compatible with Java 1.2, 
@@ -801,15 +806,9 @@ void PrimaryPrefix() :
 void PrimarySuffix() :
 {}
 {
-  LOOKAHEAD(2)
-  "." "this"
+   "[" Expression() "]"
 |
-  LOOKAHEAD(2)
-  "." AllocationExpression()
-|
-  "[" Expression() "]"
-|
-  "." <IDENTIFIER>
+  "->" <IDENTIFIER>
 |
   Arguments()
 }
@@ -824,6 +823,26 @@ void Literal() :
   <CHARACTER_LITERAL>
 |
   <STRING_LITERAL>
+|
+  MultisetLiteral()
+}
+
+void MultisetLiteral() :
+{}
+{
+  "(<" (ArgumentList()) ">)"
+}
+
+void MappingLiteral() :
+{}
+{
+  "([" (ArgumentList()) "])"
+}
+
+void ArrayLiteral() :
+{}
+{
+  "(<" (ArgumentList()) ">)"
 }
 
 void Arguments() :

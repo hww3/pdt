@@ -217,8 +217,7 @@ TOKEN :
   < #OCTAL_LITERAL: "0" (["0"-"7"])* >
 |
   < FLOATING_POINT_LITERAL:
-        (["0"-"9"])+ "." (["0"-"9"])* (<EXPONENT>)? (["f","F","d","D"])?
-      | "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
+        (["0"-"9"])+ "." (["0"-"9"])+ (<EXPONENT>)? (["f","F","d","D"])?
       | (["0"-"9"])+ <EXPONENT> (["f","F","d","D"])?
       | (["0"-"9"])+ (<EXPONENT>)? ["f","F","d","D"]
   >
@@ -287,6 +286,7 @@ TOKEN :
 | < SEMICOLON: ";" >
 | < COMMA: "," >
 | < DOT: "." >
+| < DOTDOT: ".." >
 | < INDIRECT: "->" >
 }
 
@@ -581,7 +581,7 @@ void PrimitiveSpecificType() :
   
   (CompoundType()
     |
-    LOOKAHEAD(3) <INTEGER_LITERAL> ".." <INTEGER_LITERAL>
+    LOOKAHEAD(4) <INTEGER_LITERAL> <DOTDOT> <INTEGER_LITERAL>
   )
   
    ")" ]  
@@ -590,7 +590,7 @@ void PrimitiveSpecificType() :
 void ReturnType() :
 {}
 {
-  ( PrimitiveReturnType() | Name() )
+  ( PrimitiveSpecificType() | Name() )
 }
 
 void PrimitiveReturnType() :

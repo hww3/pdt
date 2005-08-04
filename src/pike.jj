@@ -238,7 +238,20 @@ TOKEN :
   >
 |
   < STRING_LITERAL:
-      "\""
+      
+      
+      ("#" (" ")* "\""
+      (   (~["\"","\\"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\"")
+      |
+      ("\""
       (   (~["\"","\\","\n","\r"])
         | ("\\"
             ( ["n","t","b","r","f","\\","'","\""]
@@ -247,7 +260,7 @@ TOKEN :
             )
           )
       )*
-      "\""
+      "\"")
   >
 }
 
@@ -537,7 +550,7 @@ void FormalParameters() :
 void FormalParameter() :
 {}
 {
-  Type() VariableDeclaratorId()
+  CompoundParameterType() VariableDeclaratorId()
 }
 
 void Initializer() :
@@ -550,6 +563,14 @@ void Initializer() :
 /*
  * Type, name and expression syntax follows.
  */
+
+void CompoundParameterType() :
+{}
+{
+   Type() 
+   (LOOKAHEAD(2) "|" Type())* 
+
+}
 
 void CompoundType() :
 {String s = "";}
@@ -593,29 +614,6 @@ void ReturnType() :
   ( PrimitiveSpecificType() | Name() )
 }
 
-void PrimitiveReturnType() :
-{}
-{
-  "string"
-|
-  "int"
-|
-  "void"
-|
-  "float"
-|
-  "array"
-|
-  "mapping"
-|
-  "multiset"
-|
-  "function"
-| 
-  "object"
-|
-  "mixed"
-}
 
 void PrimitiveType() :
 {}
@@ -637,6 +635,8 @@ void PrimitiveType() :
   "object"
 |
   "mixed"
+|
+  "void"
 }
 
 void Name() :
@@ -681,6 +681,12 @@ void AssignmentOperator() :
 {}
 {
   "=" | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
+}
+
+void CatchExpression() :
+{}
+{
+  (<CATCH>"(") ConditionalExpression()
 }
 
 void ConditionalExpression() :
@@ -923,6 +929,8 @@ void Statement() :
 |
   StatementExpression() ";"
 |
+  CatchStatement()
+|
   SwitchStatement()
 |
   IfStatement()
@@ -963,10 +971,20 @@ void BlockStatement() :
   LOOKAHEAD(Type() <IDENTIFIER>)
   LocalVariableDeclaration() ";"
 |
+  LOOKAHEAD(Statement())
   Statement()
 |
   UnmodifiedClassDeclaration()
+|
+  CatchBlock()
 }
+
+void CatchBlock() :
+{}
+{
+  <CATCH> "{" ( BlockStatement() )* "}"
+}
+
 
 void LocalVariableDeclaration() :
 {}
@@ -1011,6 +1029,13 @@ void SwitchStatement() :
     ( SwitchLabel() ( BlockStatement() )* )*
   "}"
 }
+
+void CatchStatement() :
+{}
+{
+  <CATCH> "(" Expression() ")"
+}
+
 
 void SwitchLabel() :
 {}

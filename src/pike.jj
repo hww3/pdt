@@ -29,8 +29,15 @@ options {
 
 PARSER_BEGIN(PikeParser)
 
+import java.util.LinkedList;
+
+
+
 public class PikeParser
 {
+static LinkedList typeParsingQueue = new LinkedList();
+static LinkedList typeIdentifierQueue = new LinkedList();
+static String var_def_type;
 // modified main Andrea Gini 24/02/2002
 // modified main. DW, 7/99
     public static void main (String [] args) {
@@ -40,6 +47,9 @@ public class PikeParser
         long parseTime = 0;
         long startTime = 0;
         long stopTime = 0;
+        LinkedList typeParsingQueue = new LinkedList();
+        String var_def_type;
+        
         if (args.length == 0)
         {
             System.out.println("Pike Parser Version 1.0:  Reading from standard input . . .");
@@ -89,6 +99,10 @@ public class PikeParser
 
 PARSER_END(PikeParser)
 
+TOKEN_MGR_DECLS :
+{
+  
+}
 
 /* WHITE SPACE */
 
@@ -263,7 +277,8 @@ TOKEN :
 
 TOKEN :
 {
-  < LPAREN: "(" >
+  < OCTOTHORPE: "#" >
+| < LPAREN: "(" >
 | < RPAREN: ")" >
 | < LBRACE: "{" >
 | < RBRACE: "}" >
@@ -335,8 +350,7 @@ void LowCompilationUnit() :
   |
   ImportDeclaration() 
   |
-  ClassBodyDeclaration()
-  
+  ClassBodyDeclaration()	 
 }
 
 void InheritDeclaration() :
@@ -408,6 +422,10 @@ void LowClassBodyDeclaration() :
   MethodDeclaration()
 |
   FieldDeclaration()
+  {
+     System.out.println(typeParsingQueue.removeLast().toString());
+     System.out.println(typeParsingQueue.removeLast().toString());
+  }
 }
 
 // This production is to determine lookahead only.
@@ -423,7 +441,16 @@ void FieldDeclaration() :
 {}
 {
   ( "public" | "private" | "static" )*
-  CompoundType() VariableDeclarator() ( "," VariableDeclarator() )* (";")+
+  CompoundType()
+  {    
+  }
+   VariableDeclarator() ( "," VariableDeclarator() )* (";")+
+   {
+     String x = "";
+     while(typeIdentifierQueue.size()>0)
+       x = x +   typeIdentifierQueue.removeLast();
+     typeParsingQueue.add(x);
+   }
 }
 
 void VariableDeclarator() :
@@ -436,6 +463,9 @@ void VariableDeclaratorId() :
 {}
 {
   <IDENTIFIER> 
+  {
+    typeIdentifierQueue.add(token.image);
+  }
 }
 
 void VariableInitializer() :
@@ -522,9 +552,13 @@ void Initializer() :
  */
 
 void CompoundType() :
-{}
+{String s = "";}
 {
-   Type() (LOOKAHEAD(2) "|" Type() )* 
+   Type() 
+   { s = s + token.image;}
+   (LOOKAHEAD(2) "|" Type() {s = s + "|" + token.image; })* 
+
+   {typeParsingQueue.add(s);}
 }
 
 void CompoundReturnType() :
@@ -536,7 +570,21 @@ void CompoundReturnType() :
 void Type() :
 {}
 {
-  ( PrimitiveType() | Name() )
+  ( "constant" | PrimitiveSpecificType() | Name() )
+}
+
+void PrimitiveSpecificType() :
+{}
+{
+  PrimitiveType() 
+  [ "(" 
+  
+  (CompoundType()
+    |
+    LOOKAHEAD(3) <INTEGER_LITERAL> ".." <INTEGER_LITERAL>
+  )
+  
+   ")" ]  
 }
 
 void ReturnType() :
@@ -923,7 +971,9 @@ void BlockStatement() :
 void LocalVariableDeclaration() :
 {}
 {
-  Type() VariableDeclarator() ( "," VariableDeclarator() )*
+  Type() 
+  VariableDeclarator() 
+  (LOOKAHEAD(2)  "," VariableDeclarator() )*
 }
 
 void EmptyStatement() :
@@ -1002,7 +1052,15 @@ void ForStatement() :
 void ForeachStatement() :
 {}
 {
-  "foreach" "(" [ ForInit() ] ";" [ ForInit() ] ";" [ LocalVariableDeclaration() ] ")" Statement()
+  "foreach" "(" [ ForInit() ] 
+  (
+  ";" [LOOKAHEAD(2) ForInit() ]
+  |
+  ","
+  )
+
+  LocalVariableDeclaration() ")" Statement()
+
 }
 
 void ForInit() :
@@ -1017,7 +1075,7 @@ void ForInit() :
 void StatementExpressionList() :
 {}
 {
-  StatementExpression() ( "," StatementExpression() )*
+  StatementExpression() (LOOKAHEAD(2) "," StatementExpression() )*
 }
 
 void ForUpdate() :

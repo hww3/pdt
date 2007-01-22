@@ -300,6 +300,7 @@ TOKEN :
 | < COMMA: "," >
 | < DOT: "." >
 | < DOTDOT: ".." >
+| < COLONCOLON: "::" >
 | < INDIRECT: "->" >
 }
 
@@ -342,7 +343,7 @@ TOKEN :
 
 
 /*****************************************
- * THE JAVA LANGUAGE GRAMMAR STARTS HERE *
+ * THE PIKE LANGUAGE GRAMMAR STARTS HERE *
  *****************************************/
 
 /*
@@ -352,41 +353,90 @@ TOKEN :
 void CompilationUnit() :
 {}
 {
-  (LowCompilationUnit())*
+ Program()
+}
+
+void Program() :
+{}
+{
+  (Definition())+
   <EOF>
 }
 
-void LowCompilationUnit() :
+void Definition() :
 {}
 {
+	
+  LOOKAHEAD(3)
   InheritDeclaration() 
   |
+  LOOKAHEAD(3)
   ImportDeclaration() 
   |
+  LOOKAHEAD(3)
+  Constant()
+  |
+  LOOKAHEAD(400)
+  Function()
+  |
+  LOOKAHEAD(3)
+  VariableDeclaration()
+  |
+  LOOKAHEAD(3)
   ClassBodyDeclaration()	 
+    
+ 
+}
+
+void VariableDeclaration() :
+{}
+{
+  Modifiers() LocalVariableDeclaration() ";"	
 }
 
 void InheritDeclaration() :
 {}
 {
-  "inherit" Name() (":" <IDENTIFIER>) ";"
+  Modifiers() "inherit" (Name() | <STRING_LITERAL>) (":" <IDENTIFIER>)? ";"
 }
 
 void ImportDeclaration() :
 {}
 {
-  "import" Name() ";"
+  Modifiers() "import" (Name() | <STRING_LITERAL>) ";"
 }
 
 void TypeDeclaration() :
 {}
 {
-  LOOKAHEAD( (( "private" | "static" | "public" | "optional" )* "class")*)
+  LOOKAHEAD( (Modifiers() "class")*)
   ClassDeclaration()
 |
   ";"
 }
 
+void Constant() :
+{}
+{
+	Modifiers()
+	"constant"
+	ConstantNames()
+	";"
+}
+
+void ConstantNames() :
+{}
+{
+  ConstantName() ("," ConstantName())*	
+}
+
+void ConstantName() :
+{}
+{
+  <IDENTIFIER>
+  "=" Expression()
+  	
+}
 
 /*
  * Declaration syntax follows.
@@ -395,8 +445,14 @@ void TypeDeclaration() :
 void ClassDeclaration() :
 {}
 {
-  ( "private" | "static" | "public" | "optional")*
+  Modifiers()
   UnmodifiedClassDeclaration()
+}
+
+void Modifiers() :
+{}
+{
+	( "private" | "static" | "public" | "optional" | "final" | "inline" | "local" | "nomask" | "protected" | "variant" )*
 }
 
 void UnmodifiedClassDeclaration() :
@@ -431,8 +487,8 @@ void LowClassBodyDeclaration() :
   LOOKAHEAD( ( "static" | "final" | "public" | "protected" | "private" )* "class" )
   NestedClassDeclaration()
 |
-  LOOKAHEAD( MethodDeclarationLookahead() )
-  MethodDeclaration()
+  LOOKAHEAD( FunctionLookahead() )
+  Function()
 |
   FieldDeclaration()
   {
@@ -442,7 +498,7 @@ void LowClassBodyDeclaration() :
 }
 
 // This production is to determine lookahead only.
-void MethodDeclarationLookahead() :
+void FunctionLookahead() :
 {}
 {
   ( "public" | "protected" | "private" | "static" | "final" )*
@@ -453,7 +509,7 @@ void MethodDeclarationLookahead() :
 void FieldDeclaration() :
 {}
 {
-  ( "public" | "private" | "static" )*
+  Modifiers()
   CompoundType()
   {    
   }
@@ -520,11 +576,11 @@ void MultisetInitializer() :
   "(<" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ] ">)"
 }
 
-void MethodDeclaration() :
+void Function() :
 {}
 {
-  ( "public" | "protected" | "private" | "static" | "final")*
-  CompoundReturnType() MethodDeclarator() 
+  Modifiers()
+  CompoundReturnType() FunctionDeclarator() 
   ( Block() | ";" )
 }
 
@@ -535,7 +591,7 @@ void ImplicitConstructorDeclaration() :
 
 }
 
-void MethodDeclarator() :
+void FunctionDeclarator() :
 {}
 {
   <IDENTIFIER> FormalParameters() 
@@ -576,10 +632,9 @@ void CompoundType() :
 {String s = "";}
 {
    Type() 
-   { s = s + token.image;}
+     { s = s + token.image;}
    (LOOKAHEAD(2) "|" Type() {s = s + "|" + token.image; })* 
-
-   {typeParsingQueue.add(s);}
+     {typeParsingQueue.add(s);}
 }
 
 void CompoundReturnType() :
@@ -591,21 +646,18 @@ void CompoundReturnType() :
 void Type() :
 {}
 {
-  ( "constant" | PrimitiveSpecificType() | Name() )
+  ( Name() | PrimitiveSpecificType() )
 }
 
 void PrimitiveSpecificType() :
 {}
 {
   PrimitiveType() 
-  [ "(" 
+  ( "(" 
   
-  (CompoundType()
-    |
-    LOOKAHEAD(4) <INTEGER_LITERAL> <DOTDOT> <INTEGER_LITERAL>
-  )
-  
-   ")" ]  
+  CompoundType()   
+
+   ")" )?
 }
 
 void ReturnType() :
@@ -642,8 +694,20 @@ void PrimitiveType() :
 void Name() :
 {}
 {
-  <IDENTIFIER>
-  ("." <IDENTIFIER>)*
+  (<IDENTIFIER> ("." <IDENTIFIER>)*)
+}
+
+void Name2() :
+{}
+{
+	LOOKAHEAD(2) InheritName() | Name()
+}
+
+void InheritName() :
+{}
+{
+  
+  (LOOKAHEAD(2) (<IDENTIFIER> "::" <IDENTIFIER>) | ("::" <IDENTIFIER>))
 }
 
 void NameList() :
@@ -827,7 +891,7 @@ void PrimaryExpression() :
 void PrimaryPrefix() :
 {}
 {
-  Name()
+  Name2()
 |	
   LOOKAHEAD(2) Literal()
 |

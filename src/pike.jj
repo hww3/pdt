@@ -194,7 +194,7 @@ TOKEN :
 | < STATIC: "static" >
 | < STRING: "string" >
 | < SWITCH: "switch" >
-| < THIS: "this" >
+//| < THIS: "this" >
 | < THROW: "throw" >
 | < VOID: "void" >
 | < WHILE: "while" >
@@ -278,7 +278,7 @@ TOKEN :
       ]
   >
 |
-  < #DIGIT:
+  < DIGIT:
       [
         "0"-"9"
       ]
@@ -354,13 +354,14 @@ void CompilationUnit() :
 {}
 {
  Program()
+ <EOF>
 }
 
 void Program() :
 {}
 {
   (Definition())+
-  <EOF>
+
 }
 
 void Definition() :
@@ -374,54 +375,53 @@ void Definition() :
   ImportDeclaration() 
   |
   LOOKAHEAD(3)
-  Constant()
+  ConstantDeclaration()
   |
   LOOKAHEAD(400)
-  Function()
+  FunctionDeclaration()
+  |
+  LOOKAHEAD(400)
+  FunctionDefinition()
   |
   LOOKAHEAD(3)
   VariableDeclaration()
   |
   LOOKAHEAD(3)
-  ClassBodyDeclaration()	 
-    
- 
+  ClassDef()	 
 }
 
-void VariableDeclaration() :
-{}
-{
-  Modifiers() LocalVariableDeclaration() ";"	
-}
 
 void InheritDeclaration() :
 {}
 {
-  Modifiers() "inherit" (Name() | <STRING_LITERAL>) (":" <IDENTIFIER>)? ";"
+  Modifiers() "inherit" (ProgramSpecifier()) (":" <IDENTIFIER>)? ";"
 }
 
 void ImportDeclaration() :
 {}
 {
-  Modifiers() "import" (Name() | <STRING_LITERAL>) ";"
+  Modifiers() "import" (ConstantIdentifier() | <STRING_LITERAL>) ";"
 }
 
-void TypeDeclaration() :
-{}
-{
-  LOOKAHEAD( (Modifiers() "class")*)
-  ClassDeclaration()
-|
-  ";"
-}
-
-void Constant() :
+void ConstantDeclaration() :
 {}
 {
 	Modifiers()
 	"constant"
 	ConstantNames()
 	";"
+}
+
+void FunctionDeclaration() :
+{}
+{
+  Modifiers() 
+  Type()
+  <IDENTIFIER>
+  "("
+  (Arguments() | ProtArguments())? 
+  ")"
+  ";"
 }
 
 void ConstantNames() :
@@ -434,19 +434,159 @@ void ConstantName() :
 {}
 {
   <IDENTIFIER>
-  "=" Expression()
-  	
+  "=" Expression()  	
 }
 
+void Arguments() :
+{}
+{
+	( (Argument() ("," Argument())* (Varargs())?) | Varargs() ) (",")?
+}
+
+void Argument() :
+{}
+{
+  Type() <IDENTIFIER>	
+}
+
+void Varargs() :
+{}
+{
+  Type() "..." <IDENTIFIER>	
+}
+
+void ProtArguments() :
+{}
+{
+	( (Type() ("," Type())* (Type() "...")?) | (Type() "...") ) (",")?
+}
+
+void Type() :
+{}
+{
+	IntType() 
+	| 
+	"string" 
+	| 
+	"float" 
+	| 
+	"program" 
+	| 
+	ObjectType() 
+	| 
+	ProgramSpecifier() 
+	| 
+	MappingType() 
+	|
+	ArrayType()
+	|
+	MultisetType()
+	|
+    FunctionType()
+}
+
+void IntType() :
+{}
+{
+  "int" ( "(" ( (<DIGIT>)+ | ".." (<DIGIT>)+ | (<DIGIT>)+ ".." | (<DIGIT>)+ ".." (<DIGIT>)+ ) ")" )?	
+}
+
+void ObjectType() :
+{}
+{
+  "object" ( "(" ProgramSpecifier() ")" )?	
+}
+
+void ProgramSpecifier() :
+{}
+{
+	StringConstant() | ConstantIdentifier()
+}
+
+void MappingType() : 
+{}
+{
+  "mapping" ( "(" Type() ":" Type() ")" )?	
+}
+
+void ArrayType() :
+{}
+{
+  "array" ( "(" Type() ")" )?
+}
+
+void MultisetType() :
+{}
+{
+  "multiset" ( "(" Type() ")" )?	
+}
+
+void FunctionType() :
+{}
+{
+  "function" ( "(" Type() ( "," Type() )* ("...")? ":" Type() ")" )?
+}
+
+void StringConstant() :
+{}
+{
+	<STRING_LITERAL>
+}
+
+void ConstantIdentifier() :
+{}
+{
+	( "." )? <IDENTIFIER> ( "." <IDENTIFIER> )*
+}
+
+void FunctionDefinition() :
+{}
+{
+	Modifiers()
+    Type()
+    <IDENTIFIER>
+    "("
+    (Arguments())?
+    ")"
+    Block()
+}
+
+void VariableDeclaration() :
+{}
+{
+	Modifiers()
+	Type()
+	VariableNames()
+	";"
+}
+	
+void VariableNames() :
+{}
+{
+	VariableName() ( "," VariableName() )*
+}
+
+void VariableName() :
+{}
+{
+  	<IDENTIFIER> ( "=" Expression2() )?
+}
 /*
  * Declaration syntax follows.
  */
 
-void ClassDeclaration() :
+void ClassDef() :
 {}
 {
   Modifiers()
-  UnmodifiedClassDeclaration()
+  Class()
+  ( ";" )?
+}
+
+void Class() :
+{}
+{
+	"class" (<IDENTIFIER>)? ( "(" Arguments() ")" )? "{" Program() "}"
 }
 
 void Modifiers() :
@@ -455,744 +595,227 @@ void Modifiers() :
 	( "private" | "static" | "public" | "optional" | "final" | "inline" | "local" | "nomask" | "protected" | "variant" )*
 }
 
-void UnmodifiedClassDeclaration() :
-{}
-{
-  "class" <IDENTIFIER> [ "(" ImplicitConstructorDeclaration() ")" ]
-  ClassBody()
-}
-
-void ClassBody() :
-{}
-{
-  "{" ( ClassBodyDeclaration() )* "}"
-}
-
-void NestedClassDeclaration() :
-{}
-{
-  ( "static" | "final" | "public" | "protected" | "private" )*
-  UnmodifiedClassDeclaration()
-}
-
-void ClassBodyDeclaration() :
-{}
-{
-  (LOOKAHEAD(2) LowClassBodyDeclaration())+
-}
-
-void LowClassBodyDeclaration() :
-{}
-{
-  LOOKAHEAD( ( "static" | "final" | "public" | "protected" | "private" )* "class" )
-  NestedClassDeclaration()
-|
-  LOOKAHEAD( FunctionLookahead() )
-  Function()
-|
-  FieldDeclaration()
-  {
-     System.out.println(typeParsingQueue.removeLast().toString());
-     System.out.println(typeParsingQueue.removeLast().toString());
-  }
-}
-
-// This production is to determine lookahead only.
-void FunctionLookahead() :
-{}
-{
-  ( "public" | "protected" | "private" | "static" | "final" )*
-  CompoundReturnType() <IDENTIFIER> "("
-}
-
-
-void FieldDeclaration() :
-{}
-{
-  Modifiers()
-  CompoundType()
-  {    
-  }
-   VariableDeclarator() ( "," VariableDeclarator() )* (";")+
-   {
-     String x = "";
-     while(typeIdentifierQueue.size()>0)
-       x = x +   typeIdentifierQueue.removeLast();
-     typeParsingQueue.add(x);
-   }
-}
-
-void VariableDeclarator() :
-{}
-{
-  VariableDeclaratorId() [ "=" VariableInitializer() ]
-}
-
-void VariableDeclaratorId() :
-{}
-{
-  <IDENTIFIER> 
-  {
-    typeIdentifierQueue.add(token.image);
-  }
-}
-
-void VariableInitializer() :
-{}
-{
-  LOOKAHEAD(3)
-  ArrayInitializer()
-| 
-  LOOKAHEAD(3)
-  MappingInitializer()
-|
-  LOOKAHEAD(3)
-  MultisetInitializer()  
-|
-  Expression()
-}
-
-void ArrayInitializer() :
-{}
-{
-  "({" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ] "})"
-}
-
-void MappingInitializer() :
-{}
-{
-  <LPAREN> <LBRACKET> [ MappingEntry() ( LOOKAHEAD(2) "," MappingEntry() )* ] <RBRACKET> <RPAREN>
-}
-
-void MappingEntry() :
-{}
-{
-  Expression() ":" VariableInitializer()
-}
-
-void MultisetInitializer() :
-{}
-{
-  "(<" [ VariableInitializer() ( LOOKAHEAD(2) "," VariableInitializer() )* ] ">)"
-}
-
-void Function() :
-{}
-{
-  Modifiers()
-  CompoundReturnType() FunctionDeclarator() 
-  ( Block() | ";" )
-}
-
-void ImplicitConstructorDeclaration() :
-{}
-{
-  FormalParameters() 
-
-}
-
-void FunctionDeclarator() :
-{}
-{
-  <IDENTIFIER> FormalParameters() 
-}
-
-void FormalParameters() :
-{}
-{
-  "(" [ FormalParameter() ( "," FormalParameter() )* ] ")"
-}
-
-void FormalParameter() :
-{}
-{
-  CompoundParameterType() VariableDeclaratorId()
-}
-
-void Initializer() :
-{}
-{
-  Block()
-}
-
-
-/*
- * Type, name and expression syntax follows.
- */
-
-void CompoundParameterType() :
-{}
-{
-   Type() 
-   (LOOKAHEAD(2) "|" Type())* 
-
-}
-
-void CompoundType() :
-{String s = "";}
-{
-   Type() 
-     { s = s + token.image;}
-   (LOOKAHEAD(2) "|" Type() {s = s + "|" + token.image; })* 
-     {typeParsingQueue.add(s);}
-}
-
-void CompoundReturnType() :
-{}
-{
-   ReturnType() (LOOKAHEAD(2) "|" ReturnType() )* 
-}
-
-void Type() :
-{}
-{
-  ( Name() | PrimitiveSpecificType() )
-}
-
-void PrimitiveSpecificType() :
-{}
-{
-  PrimitiveType() 
-  ( "(" 
-  
-  CompoundType()   
-
-   ")" )?
-}
-
-void ReturnType() :
-{}
-{
-  ( PrimitiveSpecificType() | Name() )
-}
-
-
-void PrimitiveType() :
-{}
-{
-  "string"
-|
-  "int"
-|
-  "float"
-|
-  "array"
-|
-  "mapping"
-|
-  "multiset"
-|
-  "function"
-| 
-  "object"
-|
-  "mixed"
-|
-  "void"
-}
-
-void Name() :
-{}
-{
-  ((".")? <IDENTIFIER> ("." <IDENTIFIER>)*)
-}
-
-void Name2() :
-{}
-{
-	LOOKAHEAD(2) InheritName() | Name()
-}
-
-void InheritName() :
-{}
-{
-  
-  (LOOKAHEAD(2) (<IDENTIFIER> "::" <IDENTIFIER>) | ("::" <IDENTIFIER>))
-}
-
-void NameList() :
-{}
-{
-  Name()
-  ( "," Name()
-  )*
-}
-
-
-/*
- * Expression syntax follows.
- */
-
-void Expression() :
-/*
- * This expansion has been written this way instead of:
- *   Assignment() | ConditionalExpression()
- * for performance reasons.
- * However, it is a weakening of the grammar for it allows the LHS of
- * assignments to be any conditional expression whereas it can only be
- * a primary expression.  Consider adding a semantic predicate to work
- * around this.
- */
-{}
-{
-  ConditionalExpression()
-  [
-    AssignmentOperator() Expression()
-  ]
-}
-
-void AssignmentOperator() :
-{}
-{
-  "=" | "*=" | "/=" | "%=" | "+=" | "-=" | "<<=" | ">>=" | "&=" | "^=" | "|="
-}
-
-void CatchExpression() :
-{}
-{
-  (<CATCH>"(") ConditionalExpression()
-}
-
-void ConditionalExpression() :
-{}
-{
-  ConditionalOrExpression() [ "?" Expression() ":" ConditionalExpression() ]
-}
-
-void ConditionalOrExpression() :
-{}
-{
-  ConditionalAndExpression() ( "||" ConditionalAndExpression() )*
-}
-
-void ConditionalAndExpression() :
-{}
-{
-  InclusiveOrExpression() ( "&&" InclusiveOrExpression() )*
-}
-
-void InclusiveOrExpression() :
-{}
-{
-  ExclusiveOrExpression() ( "|" ExclusiveOrExpression() )*
-}
-
-void ExclusiveOrExpression() :
-{}
-{
-  AndExpression() ( "^" AndExpression() )*
-}
-
-void AndExpression() :
-{}
-{
-  EqualityExpression() ( "&" EqualityExpression() )*
-}
-
-void EqualityExpression() :
-{}
-{
-  RelationalExpression() ( ( "==" | "!=" ) RelationalExpression() )*
-}
-
-
-void RelationalExpression() :
-{}
-{
-  ShiftExpression() ( ( "<" | ">" | "<=" | ">=" ) ShiftExpression() )*
-}
-
-void ShiftExpression() :
-{}
-{
-  AdditiveExpression() ( ( "<<" | ">>" ) AdditiveExpression() )*
-}
-
-void AdditiveExpression() :
-{}
-{
-  MultiplicativeExpression() ( ( "+" | "-" ) MultiplicativeExpression() )*
-}
-
-void MultiplicativeExpression() :
-{}
-{
-  UnaryExpression() ( ( "*" | "/" | "%" ) UnaryExpression() )*
-}
-
-void UnaryExpression() :
-{}
-{
-  ( "+" | "-" ) UnaryExpression()
-|
-  PreIncrementExpression()
-|
-  PreDecrementExpression()
-|
-  UnaryExpressionNotPlusMinus()
-}
-
-void PreIncrementExpression() :
-{}
-{
-  "++" PrimaryExpression()
-}
-
-void PreDecrementExpression() :
-{}
-{
-  "--" PrimaryExpression()
-}
-
-void UnaryExpressionNotPlusMinus() :
-{}
-{
-  ( "~" | "!" ) UnaryExpression()
-|
-  LOOKAHEAD( CastLookahead() )
-  CastExpression()
-|
-  PostfixExpression()
-}
-
-// This production is to determine lookahead only.  The LOOKAHEAD specifications
-// below are not used, but they are there just to indicate that we know about
-// this.
-void CastLookahead() :
-{}
-{
-  LOOKAHEAD(3)
-  <LPAREN> PrimitiveType()
-|
-  <LPAREN> Name() <RPAREN> ( "~" | "!" | LOOKAHEAD(2) <LPAREN> | <IDENTIFIER> | Literal() )
-}
-
-void PostfixExpression() :
-{}
-{
-  PrimaryExpression() [ "++" | "--" ]
-}
-
-void CastExpression() :
-{}
-{
-  LOOKAHEAD("(" PrimitiveType())
-  "(" Type() ")" UnaryExpression()
-|
-  "(" Type() ")" UnaryExpressionNotPlusMinus()
-}
-
-void PrimaryExpression() :
-{}
-{
-  PrimaryPrefix() ( PrimarySuffix() )*
-}
-
-void PrimaryPrefix() :
-{}
-{
-  Name2()
-|	
-  LOOKAHEAD(2) Literal()
-|
-  "(" Expression() ")"
-
-}
-
-void PrimarySuffix() :
-{}
-{
-  Indexing()
-|
-  "->" <IDENTIFIER>
-|
-  Arguments()
-}
-
-void Indexing() :
-{}
-{
-  <LBRACKET> Expression() <RBRACKET>
-}
-
-void Literal() :
-{}
-{
-  <INTEGER_LITERAL>
-|
-  <FLOATING_POINT_LITERAL>
-|
-  <CHARACTER_LITERAL>
-|
-  <STRING_LITERAL>
-|
-  LOOKAHEAD(3)
-  MultisetLiteral()
-|
-  MappingLiteral()
-|
-  ArrayLiteral()
-}
-
-void ArrayLiteral() :
-{}
-{
-  "({" (ArgumentList()) "})"
-}
-
-void MappingLiteral() :
-{}
-{
-  <LPAREN> <LBRACKET> (ArgumentList()) <RBRACKET> <RPAREN>
-}
-
-void MultisetLiteral() :
-{}
-{
-  "(<" (ArgumentList()) ">)"
-}
-
-void Arguments() :
-{}
-{
-  "(" [ ArgumentList() ] ")"
-}
-
-void ArgumentList() :
-{}
-{
-  Expression() ( "," Expression() )*
-}
-
-void AllocationExpression() :
-{}
-{
-  LOOKAHEAD(2)
-    PrimitiveType()
-|
-  Name()
-    (
-        Arguments() [ ClassBody() ]
-    )
-}
-
-
-/*
- * Statement syntax follows.
- */
-
-void Statement() :
-{}
-{
-  LOOKAHEAD(2)
-  LabeledStatement()
-|
-  Block()
-|
-  EmptyStatement()
-|
-  StatementExpression() ";"
-|
-  CatchStatement()
-|
-  SwitchStatement()
-|
-  IfStatement()
-|
-  WhileStatement()
-|
-  DoStatement()
-|
-  ForeachStatement()
-|
-  ForStatement()
-|
-  BreakStatement()
-|
-  ContinueStatement()
-|
-  ReturnStatement()
-|
-  ThrowStatement()
-
-}
-
-void LabeledStatement() :
-{}
-{
-  <IDENTIFIER> ":" Statement()
-}
 
 void Block() :
 {}
 {
-  "{" ( BlockStatement() )* "}"
+   "{" Statement() "}" 	
 }
 
-void BlockStatement() :
+void Statement() :
 {}
 {
-  LOOKAHEAD(Type() <IDENTIFIER>)
-  LocalVariableDeclaration() ";"
-|
-  LOOKAHEAD(Statement())
-  Statement()
-|
-  UnmodifiedClassDeclaration()
-|
-  CatchBlock()
+	// TODO: is this a correct interpretation of the BNF?
+   (Expression() ";")	
+   | 
+   Cond() 
+   | 
+   While() 
+   | 
+   DoWhile() 
+   | 
+   For() 
+   | 
+   Switch() 
+   | 
+   Return() 
+   | 
+   Block() 
+   | 
+   Foreach() 
+   | 
+   ";"
 }
 
-void CatchBlock() :
+void Cond() :
 {}
 {
-  <CATCH> "{" ( BlockStatement() )* "}"
+  "if" Statement() ( "else" Statement() )?	
 }
 
-
-void LocalVariableDeclaration() :
+void While() :
 {}
 {
-  Type() 
-  VariableDeclarator() 
-  (LOOKAHEAD(2)  "," VariableDeclarator() )*
+  "while" "(" Expression() ")" Statement()	
 }
 
-void EmptyStatement() :
+void DoWhile() :
 {}
 {
-  ";"
+  "do" Statement() "while" "(" Expression() ")" ";"	
 }
 
-void StatementExpression() :
-/*
- * The last expansion of this production accepts more than the legal
- * Java expansions for StatementExpression.  This expansion does not
- * use PostfixExpression for performance reasons.
- */
+void For() :
 {}
 {
-  PreIncrementExpression()
-|
-  PreDecrementExpression()
-|
-  PrimaryExpression()
-  [
-    "++"
-  |
-    "--"
-  |
-    AssignmentOperator() Expression()
-  ]
+	"for" "(" (Expression())? ";" (Expression())? ";" (Expression())? ")"
 }
 
-void SwitchStatement() :
+void Switch() :
 {}
 {
-  "switch" "(" Expression() ")" "{"
-    ( SwitchLabel() ( BlockStatement() )* )*
-  "}"
+	"switch" "(" Expression() ")" CaseBlock()
 }
 
-void CatchStatement() :
+void Return() :
 {}
 {
-  <CATCH> "(" Expression() ")"
+	"return" Expression() ";"
 }
 
-
-void SwitchLabel() :
+void Foreach() :
 {}
 {
-  "case" Expression() ":"
-|
-  "default" ":"
+	"foreach" "(" Expression() ";" (Expression())? ";" (Expression6()) ")" Statement()
 }
 
-void IfStatement() :
-/*
- * The disambiguating algorithm of JavaCC automatically binds dangling
- * else's to the innermost if statement.  The LOOKAHEAD specification
- * is to tell JavaCC that we know what we are doing.
- */
+void CaseBlock() :
 {}
 {
-  "if" "(" Expression() ")" Statement() [ LOOKAHEAD(1) "else" Statement() ]
+  	"{" ( Case() | Default() | Statement() | Break() | Continue() )* "}"
 }
 
-void WhileStatement() :
+void Case() :
 {}
 {
-  "while" "(" Expression() ")" Statement()
+	"case" Expression() [ ".." Expression() ] ":"
 }
 
-void DoStatement() :
+void Default() :
 {}
 {
-  "do" Statement() "while" "(" Expression() ")" ";"
+	"default" ":"
 }
 
-void ForStatement() :
+void Break() :
 {}
 {
-  "for" "(" [ ForInit() ] ";" [ Expression() ] ";" [ ForUpdate() ] ")" Statement()
+	"break" ";"
 }
 
-void ForeachStatement() :
+void Continue() :
 {}
 {
-  "foreach" "(" [ ForInit() ] 
-  (
-  ";" [LOOKAHEAD(2) ForInit() ]
-  |
-  ","
-  )
-
-  LocalVariableDeclaration() ")" Statement()
-
+	"continue" ";"
 }
 
-void ForInit() :
+void Expression() :
 {}
 {
-  LOOKAHEAD( Type() <IDENTIFIER> )
-  LocalVariableDeclaration()
-|
-  StatementExpressionList()
+  Expression2() ( "," Expression2() )*	
 }
 
-void StatementExpressionList() :
+void Expression2() :
 {}
 {
-  StatementExpression() (LOOKAHEAD(2) "," StatementExpression() )*
+  ( Lvalue() ("=" | "+=" | "*=" | "/=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "%=" ) )*	Expression3()
 }
 
-void ForUpdate() :
+void Expression3() :
 {}
 {
-  StatementExpressionList()
+	Expression4() "?" Expression3() ":" Expression3()
 }
 
-void BreakStatement() :
+void Expression4() :
 {}
 {
-  "break" [ <IDENTIFIER> ] ";"
+	( Expression5() ( "||" | "&&" | "|" | "^" | "&" | "==" | "!=" | ">" | "<" | ">=" | "<=" | "<<" | ">>" | "+" | "*" | "/" | "%" ) )* Expression5()
 }
 
-void ContinueStatement() :
+void Expression5() : 
 {}
 {
-  "continue" [ <IDENTIFIER> ] ";"
+	Expression6() | ("(" Type() ")" Expression5()) | ("--" Expression6()) | ("++" Expression6()) | (Expression6() "--") | (Expression6() "++") | ("~" Expression5()) | ("-" Expression5())
 }
 
-void ReturnStatement() :
+void Expression6() :
 {}
 {
-  "return" [ Expression() ] ";"
+	<STRING> | <INT> | <FLOAT> | Catch() | Gauge() | "typeof" | Sscanf() | Lambda() | Class() | ConstantIdentifier() | Call() | Index() | Mapping() | Multiset() | Array() | Parenthesis() | Arrow()
 }
 
-void ThrowStatement() :
+void Catch() :
 {}
 {
-  "throw" Expression() ";"
+	"catch" ( ( "(" Expression() ")" ) | Block() )	
 }
+
+void Gauge() :
+{}
+{
+	"gauge" ( ("(" Expression() ")") | Block() )
+}
+
+void Sscanf() :
+{}
+{
+  	"sscanf" "(" Expression2() "," Expression2() ( "," Lvalue() )* ")"
+}
+
+void Call() :
+{}
+{
+	Expression6() "(" ExpressionList() ")"
+}
+
+void Lambda() :
+{}
+{
+	"lambda" "(" ( Arguments() )? ")" Block()
+}
+
+void Index() :
+{}
+{
+	Expression6() "[" ( Expression() | ( ".." Expression() ) | ( Expression() ".." ) | ( Expression() ".." Expression() ) ) "]"
+}
+
+void Mapping() :
+{}
+{
+	"([" ( Expression() ":" Expression() ( "," Expression() ":" Expression() )* ( "," )? )? "])"
+}
+
+void Multiset() :
+{}
+{
+	"(<" ExpressionList() ">)"
+}
+
+void Array() :
+{}
+{
+	"({" ExpressionList() "})"
+}
+
+void Parenthesis() :
+{}
+{
+	"(" Expression() ")"
+}
+
+void Arrow() :
+{}
+{
+	Expression6() "->" <IDENTIFIER>
+}
+
+void ExpressionList() :
+{}
+{
+	( SpliceExpression() ( "," SpliceExpression() )* ( "," )? )?
+}
+
+void SpliceExpression() :
+{}
+{
+	("@")? Expression2()
+}
+
+void Lvalue() :
+{}
+{
+  	Expression6() | (Type() <IDENTIFIER>) | ("[" ( Lvalue() ( "," Lvalue() )* (",")? )? "]")
+}
+

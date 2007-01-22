@@ -694,7 +694,7 @@ void PrimitiveType() :
 void Name() :
 {}
 {
-  (<IDENTIFIER> ("." <IDENTIFIER>)*)
+  ((".")? <IDENTIFIER> ("." <IDENTIFIER>)*)
 }
 
 void Name2() :

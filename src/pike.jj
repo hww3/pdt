@@ -735,6 +735,12 @@ void Expression6() :
 	<STRING> | <INT> | <FLOAT> | Catch() | Gauge() | "typeof" | Sscanf() | Lambda() | Class() | ConstantIdentifier() | Call() | Index() | Mapping() | Multiset() | Array() | Parenthesis() | Arrow()
 }
 
+void Call() :
+{}
+{
+	Expression6() "(" ExpressionList() ")"
+}
+
 void Catch() :
 {}
 {
@@ -751,12 +757,6 @@ void Sscanf() :
 {}
 {
   	"sscanf" "(" Expression2() "," Expression2() ( "," Lvalue() )* ")"
-}
-
-void Call() :
-{}
-{
-	Expression6() "(" ExpressionList() ")"
 }
 
 void Lambda() :

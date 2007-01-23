@@ -1,0 +1,423 @@
+Package org.gotpike.pikeparser;
+
+Helpers
+
+    all = [0 .. 127];
+    digit = ['0' .. '9'];
+    nondigit = ['_' + [['a' .. 'z'] + ['A' .. 'Z']]];
+    digit_sequence = digit+;
+    fractional_constant = digit_sequence? '.' digit_sequence | digit_sequence '.';
+    sign = '+' | '-';
+    exponent_part = ('e' | 'E') sign? digit_sequence;
+    floating_suffix = 'f' | 'F' | 'l' | 'L';
+    simple_escape_sequence = '\' ''' | '\"' | '\?' | '\\' | 
+        '\a' | '\b' | '\f' | '\n' | '\r' | '\t' | '\v';
+    octal_digit = ['0' .. '7'];
+    octal_escape_sequence = '\' octal_digit octal_digit? octal_digit?;
+    hexadecimal_digit = [digit + [['a' .. 'f'] + ['A' .. 'F']]];
+    hexadecimal_escape_sequence = '\x' hexadecimal_digit+;
+    escape_sequence = simple_escape_sequence | octal_escape_sequence | hexadecimal_escape_sequence;
+    s_char = [all - ['"' + ['\' + [10 + 13]]]] | escape_sequence;
+    s_char_sequence = s_char+;
+    nonzero_digit = ['1' .. '9'];
+    decimal_constant = nonzero_digit digit*;
+    octal_constant = '0' octal_digit*;
+	binary_constant = ('B' | 'b') ('0'|'1')+;
+    hexadecimal_constant = '0' ('x' | 'X') hexadecimal_digit+;
+    unsigned_suffix = 'u' | 'U';
+    long_suffix = 'l' | 'L';
+    integer_suffix = unsigned_suffix long_suffix? | long_suffix unsigned_suffix?;
+    c_char = [all - [''' + ['\' + [10 + 13]]]] | escape_sequence;
+    c_char_sequence = c_char+;
+    cr = 13;
+    lf = 10;
+    not_star = [all - '*'];
+    not_star_slash = [not_star - '/'];
+    tab = 9;
+	number =
+		'-'? ( nonzero_digit digit* | hexadecimal_constant | binary_constant | octal_constant );
+	string_literal = [0x0000 - 0xffff] | '\' [0x00 - 0xff] | '\' number;
+
+Tokens
+
+    dot = '.';
+    comma = ',';
+    colon = ':';
+    semicolon = ';';
+	par_bracket = '({';
+	bracket_par = '})';
+	par_brace = '([';
+	brace_par = '])';
+	par_arrow = '(<';
+	arrow_par = '>)';
+    l_par = '(';
+    r_par = ')';
+    l_bracket = '[';
+    r_bracket = ']';
+    l_brace = '{';
+    r_brace = '}';
+    star = '*';
+    div = '/';
+    mod = '%';
+    ampersand = '&';
+	at = '@';
+    plus = '+';
+    minus = '-';
+    caret = '^';
+    tilde = '~';
+    excl_mark = '!';
+    quest_mark = '?';
+    bar = '|';
+	dotdot = '..';
+    ellipsis = '...';
+    equal = '=';
+    eq = '==';
+    neq = '!=';
+    lt = '<';
+    lteq = '<=';
+    gt = '>';
+    gteq = '>=';
+    arrow = '->';
+    plus_plus = '++';
+    minus_minus = '--';
+    shl = '<<';
+    shr = '>>';
+    ampersand_ampersand = '&&';
+    bar_bar = '||';
+    star_equal = '*=';
+    div_equal = '/=';
+    mod_equal = '%=';
+    plus_equal = '+=';
+    minus_equal = '-=';
+    shl_equal = '<<=';
+    shr_equal = '>>=';
+    ampersand_equal = '&=';
+    caret_equal = '^=';
+    bar_equal = '|=';
+    backtick_plus = '`+';
+    backtick_div = '`/'; 
+	backtick_mod = '`%'; 
+	backtick_star = '`*';
+	backtick_ampersand = '`&';
+	backtick_bar = '`|'; 
+	backtick_caret = '`^';
+	backtick_tilde = '`~';
+	backtick_lt = '`<';
+	backtick_shl = '`<<';
+	backtick_lteq = '`<=';
+	backtick_gt = '>';
+	backtick_shr = '`>>';
+	backtick_gteq = '`>=';
+	backtick_eq = '`==';
+	backtick_neq = '`!=';
+	backtick_not = '`!';
+	backtick_call = '`()';
+	backtick_minus = '`-';
+	backtick_arrow = '`->';
+	backtick_arroweq = '`->=';
+	backtick_index = '`[]';
+	backtick_indexset = '`[]=';
+	
+	class_kw = 'class';
+    case = 'case';
+    default = 'default';
+    if = 'if';
+    else = 'else';
+    switch = 'switch';
+    while = 'while';
+    do = 'do';
+    for = 'for';
+    goto = 'goto';
+    continue = 'continue';
+    break = 'break';
+    return = 'return';
+    typedef = 'typedef';
+    extern = 'extern';
+    static = 'static';
+    void = 'void';
+    int = 'int';
+    float = 'float';
+    enum = 'enum';
+	mapping = 'mapping';
+	multiset = 'multiset';
+	object = 'object';
+	function = 'function';
+	array = 'array';
+	string = 'string';
+	program = 'program';
+	foreach = 'foreach';
+	gauge = 'gauge';
+	catch = 'catch';
+	constant = 'constant';
+	public = 'public';
+	private = 'private';
+	inline = 'inline';
+	variant = 'variant';
+	optional = 'optional';
+	import = 'import';
+	inherit = 'inherit';
+	
+	tick = ''';
+	
+
+	int_num =
+		'-'? ( number | ''' c_char ''' );
+
+
+	float_num = '-'? digit+ '.' digit+ ( ( 'e' | 'E' ) '-'? digit+ )?;
+
+	 pike_string = ( 0x22 string_literal* 0x22 )+;
+	 
+	 identifier
+	  	= nondigit ( nondigit | digit )* | '`+' | '`/' | '`%' | '`*' | '`&' | '`|' | '`^' | 		
+			'`~' | '`<' | '`<<' | '`<=' | '`>' | '`>>' | '`>=' | '`==' | '`!=' | '`!' 
+			| '`()' | '`-' | '`->' | '`->=' | '`[]' | '`[]=';
+
+    floating_constant = fractional_constant exponent_part? floating_suffix? |
+        digit_sequence exponent_part floating_suffix?;
+    string_literal = 'L'? '"' s_char_sequence? '"';
+    integer_constant = decimal_constant integer_suffix? | octal_constant integer_suffix? | 
+        hexadecimal_constant integer_suffix?;
+    character_constant = 'L'? ''' c_char_sequence ''';
+    blank = (cr | lf | tab | ' ')+;
+    comment = '/*' not_star* '*'+ (not_star_slash not_star* '*'+)* '/';
+
+Ignored Tokens
+    
+    blank, 
+    comment;
+
+Productions
+
+	program = definition*;
+	
+	definition =
+		{import_definition} P.import | 
+		{inherit_definition} P.inheritance | 
+		{function_declaration} P.function_declaration | 
+		{function_definition} P.function_definition | 
+		{variable_definition} P.variables | 
+		{constant_definition} P.constant | 
+		{class_def} P.class_def;
+
+    import = {modifiers} P.modifiers+ T.import import_spec semicolon;
+	import_spec = {import_spec} constant_identifier | pike_string;
+	inheritance = 
+		{modifiers} P.modifiers+ T.inherit program_specifier inherit_spec? semicolon;
+	inherit_spec = colon identifier;
+	 function_declaration =   
+		{modifiers} modifiers+ type identifier l_par func_declaration_args? r_par semicolon;
+     func_declaration_args = {func_declaration_args} arguments | prot_arguments ;
+	 function_definition =   
+		{modifiers} modifiers+ type identifier l_par arguments? r_par block;
+	 variables =   
+		{modifiers} modifiers+ type variable_names semicolon;
+	 variable_names =   
+		variable_name more_variable_names*;
+	 more_variable_names = comma variable_name;
+	 variable_name =  
+		identifier variable_initialization?;
+     variable_initialization = equal expression2 ;
+	 constant =   
+		{modifiers} modifiers+ T.constant constant_names semicolon;
+	 constant_names =   
+		constant_name more_constant_names*;
+	 more_constant_names =  comma constant_name ;
+	 constant_name = 
+	 	identifier equal expression2;
+	 class_def = 
+		{modifiers} modifiers+ P.class_body semicolon?;
+	
+	 class_body = {class_body} class_kw identifier? class_args? l_brace program r_brace;
+	 class_args =  l_par arguments r_par ;
+	 modifiers =  {modifiers2} 
+		 extern | final | inline | local | nomask | optional | private |
+	                              protected | public | static | variant ;
+	 block =   
+		l_brace statement* r_brace;
+	 expression_statement = expression semicolon;
+	 statement =   
+		expression_statement | cond | P.while | P.do_while | P.for | P.switch | P.return | P.block | P.foreach | semicolon ;
+	 else_clause = expression semicolon;
+	 cond =   
+		T.if statement else_clause?;
+	 while =   
+		T.while l_par expression r_par statement;
+		
+	 do_while =   
+		T.do statement T.while l_par expression r_par semicolon;
+	 
+	 for =   
+		T.for l_par expression? semicolon expression? semicolon expression? r_par statement;
+		
+	 switch =   
+		T.switch l_par expression r_par case_block;
+		
+	 case_block =   
+		l_brace  case_block_contents* r_brace;
+
+	 case_block_contents = P.case | P.default | statement | P.break | P.continue ;
+	 case =   
+		T.case expression case_inclusion? colon;
+
+	case_inclusion = T.dotdot expression;
+
+	 default =   
+		T.default colon;
+	
+	/* expression6 produces something bad here. */
+	 foreach =
+		T.foreach l_par expression comma expression6 r_par statement;
+
+	 break =
+		T.break semicolon;
+		
+	 continue =
+		T.continue semicolon;
+		
+	 expression =
+		expression2 comma_expression*;
+	
+	comma_expression = comma expression2;
+	
+	expression2 = 
+		assignment * expression3;
+    assignment = lvalue assignment_operators;
+	assignment_operators = 
+	 	T.equal | T.plus_equal | T.star_equal | T.div_equal | ampersand_equal | neq | caret_equal | shl_equal | shr_equal | mod_equal ;
+	
+	 expression3 = 
+		expression4 quest_mark expression3 colon expression3;
+
+	 expression4 =
+	 	expression4a* expression5;
+	expression4a = expression5 binary_operators ;
+	binary_operators = 	 bar_bar | ampersand_ampersand | bar | caret | ampersand | eq | neq | gt | lt | gt_equal | lt_equal | shl |
+	                            shr | plus | star | div | mod ;
+	expression5 = 
+		expression6 | cast_expression | predec_expression | preinc_expression | postdec_expression |
+							                            postinc_expression | tilde_expression | negation_expression;
+    predec_expression = minus_minus expression6;
+    preinc_expression = plus_plus expression6;
+    postdec_expression = expression6 minus_minus;
+    postinc_expression = expression6 plus_plus;
+    tilde_expression = tilde expression5;
+	negation_expression = minus expression5;
+	cast_expression = l_par type r_par expression5;
+	expression6 =
+		pike_string | T.int_num | T.float_num | P.catch | P.gauge | P.typeof | P.sscanf | P.lambda | P.class | P.constant_identifier | 	
+			P.call | P.index | P.mapping | P.multiset | P.array | P.parenthesis | P.arrow;
+		
+    blockable_statement = paren_statement | block;
+    paren_statement = l_par expression r_par;
+	catch =
+		T.catch blockable_statement;
+
+	gauge =   
+		T.gauge blockable_statement;
+	
+	more_sscanf_assignment = comma lvalue;
+	 sscanf = 
+		T.sscanf l_par expression2 comma expression2 more_sscanf_assignment* r_par;
+		 
+	 more_lvalues = comma lvalue;
+	 more_lvalues_clause = lvalue more_lvalues* comma? ;
+	 lvalue = 
+		expression6 | type identifier | l_bracket more_lvalues_clause? r_bracket;
+		
+	 lambda =
+		T.lambda l_par arguments? r_par block;
+		
+	 module_identifier_clause = dot identifier;
+	
+	 constant_identifier =
+		dot? identifier module_identifier_clause*;
+		
+	 call = 
+		expression6 l_par expression_list r_par;
+		 
+	 index_expression = expression | dotdot expression | expression dotdot | expresion dotdot expresion;
+	 index =
+		expression6 l_bracket index_expression r_bracket;
+
+	 array = 
+		par_brace expression_list brace_par;
+	
+	 multiset =
+		par_arrow expression_list arrow_par;
+	
+	 more_mapping_assignments = comma expression colon expression ;
+     mapping_value_clause = expression colon expression more_mapping_assignments* comma?;
+	 mapping =
+		par_bracket mapping_value_clause? brace_par;
+		
+	 arrow =
+		expression6 T.arrow identifier;
+
+	 parenthesis =
+		l_par expression r_par;
+		
+	 additional_splice_terms = comma splice_expression ;
+
+	 expression_list_component = splice_expression additional_splice_terms* comma?;
+	 expression_list =
+		expression_list_component?;
+	
+	 splice_expression =
+		at? expression2;
+		
+	 type = 
+		int_type | T.string | T.float | T.program | object_type | program_specifier |
+	    mapping_type | array_type | multiset_type | function_type;
+	
+	 digit_range = digit+ | dotdot digit+ | digit+ dotdot | digit+ dotdot digit+;
+	
+	 
+	int_type_specifier = l_par digit_range r_par;
+	
+	 int_type =
+		T.int int_type_specifier?;
+
+		object_type_specifier = l_par program_specifier r_par;
+	 object_type =
+		T.object object_type_specifier?;
+	
+	 mapping_type_specifier = l_par type colon type r_par;
+	 mapping_type =
+	 	T.mapping mapping_type_specifier?;
+	
+	 array_type_specifier = l_par type r_par;
+	 array_type =
+		T.array array_type_specifier?;
+		
+     multiset_type_specifier = l_par type r_par;
+	 multiset_type =
+		T.multiset multiset_type_specifier?;
+		
+	 additional_type = comma type;
+	 function_type_specifier = l_par type additional_type* elipsis? colon type r_par ;
+	 function_type =
+		T.function  function_type_specifier?;
+	
+	 additional_argument = comma argument ;
+	additional_argument_varargs = additional_argument* varargs_clause?;
+	varargs_clause = comma P.varargs;
+	more_arguments = additional_argument_varargs | varargs_clause ;
+	 arguments = 
+		 argument more_arguments comma?;
+		
+	 argument =
+		type identifier;
+		
+	 varargs =
+		type elipsis identifier;
+		
+	 additional_prot_argument = comma type;
+	additional_prot_arguments = additional_arguments_with_elipsis | type_elipsis;
+	additional_arguments_with_elipsis = additional_prot_argument* type_elipsis?;
+	type_elipsis = type elipsis ;
+	 prot_arguments =
+		type additional_prot_arguments? comma?;
+		
+	 program_specifier =
+		string_constant | constant_identifier;

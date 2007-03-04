@@ -148,15 +148,7 @@ public class PikeReconciliationStrategy implements IReconcilingStrategy,
                int lastNewLine = 0;
                int startOffset = 0;
                while (cNextPos < fRangeEnd) {
-               	PikeToken token = read_token();
-               	
-               }
-	   }
-       
-       
-       PikeToken read_token()
-       {
-               	while (cNextPos < fRangeEnd) {
+                       while (cNextPos < fRangeEnd) {
                                char ch = fDocument.getChar(cNextPos++);
                                switch (ch) {
                                case '(':

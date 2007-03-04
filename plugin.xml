@@ -1,46 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
-<plugin
-   id="org.gotpike.pdt"
-   name="Pike Development Tools"
-   version="1.0.0"
-   provider-name="pdt"
-   class="org.gotpike.pdt.PDTPlugin">
+<plugin>
 
-   <runtime>
-      <library name="PDT.jar">
-         <export name="*"/>
-      </library>
-   </runtime>
-
-   <requires>
-      <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.jface.text"/>
-      <import plugin="org.eclipse.ui.editors"/>
-      <import plugin="org.eclipse.ui.workbench.texteditor"/>
-      <import plugin="org.eclipse.help"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.ui.ide"/>
-   </requires>
-
-   <extension
+     <extension
          point="org.eclipse.ui.editors">
       <editor
             name="Pike Code Editor"
-            extensions="pike"
-            icon="icons/sample.gif"
+            extensions="pike, pmod"
+            icon="icons/pike.png"
             contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
             class="org.gotpike.pdt.editors.PikeEditor"
             id="org.gotpike.pdt.editors.PikeEditor">
-      </editor>
-      <editor
-            name="Sample Multi-page Editor"
-            extensions="mpe"
-            icon="icons/sample.gif"
-            contributorClass="org.gotpike.pdt.editors.MultiPageEditorContributor"
-            class="org.gotpike.pdt.editors.MultiPageEditor"
-            id="org.gotpike.pdt.editors.MultiPageEditor">
       </editor>
    </extension>
    <extension
@@ -79,17 +49,24 @@
    </extension>
    <extension
          point="org.eclipse.ui.newWizards">
-      <category
-            name="Sample Wizards"
-            id="org.gotpike.pdt">
-      </category>
       <wizard
-            name="Multi-page Editor file"
-            icon="icons/sample.gif"
             category="org.gotpike.pdt"
-            class="org.gotpike.pdt.wizards.SampleNewWizard"
-            id="org.gotpike.pdt.wizards.SampleNewWizard">
-      </wizard>
+            class="org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard"
+            finalPerspective="org.gotpike.pdt.Perspective"
+            icon="icons/pike.png"
+            id="org.gotpike.pdt.wizards.newfile"
+            name="Pike File"/>
+      <category
+            id="org.gotpike.pdt.newproject"
+            name="Pike"/>
+      <wizard
+            category="org.gotpike.pdt.newproject"
+            class="org.gotpike.pdt.PikeProjectResourceWizard"
+            finalPerspective="org.gotpike.pdt.PikePerspective"
+            icon="icons/pike.png"
+            id="org.gotpike.pdt.newproject"
+            name="Pike Project"
+            project="true"/>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
@@ -130,6 +107,10 @@
             class="org.gotpike.pdt.preferences.SamplePreferencePage"
             id="org.gotpike.pdt.preferences.SamplePreferencePage">
       </page>
+      <page
+            class="org.gotpike.pdt.preferences.PikeMainPreferencePage"
+            id="org.gotpike.pdt.preferences.PikeMainPreferencePage"
+            name="Pike Development Tools"/>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -172,6 +153,42 @@
          class="org.gotpike.pdt.popup.actions.CommentAction"> 
       </action> 
 </viewerContribution>      
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.gotpike.pdt.Perspective"
+            icon="icons/pike.png"
+            id="org.gotpike.pdt.PikePerspective"
+            name="Pike"/>
+   </extension>
+   <extension
+         id="pikenature"
+         name="Pike Nature"
+         point="org.eclipse.core.resources.natures">
+      <builder id="org.gotpike.pdt.pikebuilder"/>
+      <runtime>
+         <run class="org.gotpike.pdt.PikeProjectNature"/>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="org.gotpike.pdt.decorators.PikeDecorator"
+            id="org.gotpike.pdt.decorators.PikeDecorator"
+            label="Pike"
+            lightweight="true"
+            location="BOTTOM_LEFT"
+            objectClass="org.eclipse.core.resources.IResource"
+            state="true"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/project_folder.gif"
+            id="org.gotpike.pdt.pikeProjectNatureImage"
+            natureId="org.gotpike.pdt.pikenature"/>
    </extension>
 
 </plugin>

@@ -3,5 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="jdom.jar"/>
+	<classpathentry kind="lib" path="/Applications/eclipse/plugins/org.eclipse.core.resources.compatibility_3.2.0.v20060603.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

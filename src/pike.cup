@@ -1,0 +1,312 @@
+import java_cup.runtime.*;
+
+
+/* August 1999 - modified by Gerwin Klein <lsf@jflex.de>
+                 to interface with JFlex scanners,
+                 allows empty semicolon in class decls.
+  
+  changed productions:
+
+  class_member_declaration ::=
+	  	field_declaration
+  	|	method_declaration
+    [..]
+  	|	interface_declaration
+    | SEMICOLON
+  	;
+
+  interface_member_declaration ::=
+  		constant_declaration
+	  |	abstract_method_declaration
+  	|	class_declaration
+  	|	interface_declaration
+    | SEMICOLON
+	  ;
+
+*/
+
+
+/* Java 1.2 parser for CUP.  
+ * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
+ * This program is released under the terms of the GPL; see the file
+ * COPYING for more details.  There is NO WARRANTY on this code.
+ */
+
+/*
+JDK 1.2 Features added:
+  strictfp modifier.
+  explicit_constructor_invocation ::= ...
+        | primary DOT THIS LPAREN argument_list_opt RPAREN SEMICOLON ;
+  field_access ::= ...
+        |       name DOT SUPER DOT IDENTIFIER ;
+  method_invocation ::= ...
+        |       name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN ;
+*/
+
+parser code  {: 
+  public void report_error(String message, Object info) {
+    StringBuffer m = new StringBuffer("Error ");
+
+    if (info instanceof java_cup.runtime.Symbol) 
+      m.append( "(" +info.toString()+")" );
+     
+    m.append(" : "+message);
+   
+    System.out.println(m);
+  }
+   
+  public void report_fatal_error(String message, Object info) {
+    report_error(message, info);
+    throw new RuntimeException("Fatal Syntax Error");
+  }
+:};
+
+terminal BOOLEAN; // primitive_type
+terminal BYTE, SHORT, INT, LONG, CHAR; // integral_type
+terminal FLOAT, DOUBLE; // floating_point_type
+terminal LBRACK, RBRACK; // array_type
+terminal DOT; // qualified_name
+terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
+terminal PACKAGE; // package_declaration
+terminal IMPORT; // import_declaration
+terminal PUBLIC, PROTECTED, PRIVATE; // modifier
+terminal STATIC; // modifier
+terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
+terminal CLASS; // class_declaration
+terminal EXTENDS; // super
+terminal IMPLEMENTS; // interfaces
+terminal VOID; // method_header
+terminal THROWS; // throws
+terminal THIS, SUPER; // explicit_constructor_invocation
+terminal INTERFACE; // interface_declaration
+terminal IF, ELSE; // if_then_statement, if_then_else_statement
+terminal SWITCH; // switch_statement
+terminal CASE, DEFAULT; // switch_label
+terminal DO, WHILE; // while_statement, do_statement
+terminal FOR; // for_statement
+terminal BREAK; // break_statement
+terminal CONTINUE; // continue_statement
+terminal RETURN; // return_statement
+terminal THROW; // throw_statement
+terminal TRY; // try_statement
+terminal CATCH; // catch_clause
+terminal FINALLY; // finally
+terminal NEW; // class_instance_creation_expression
+terminal PLUSPLUS; // postincrement_expression
+terminal MINUSMINUS; // postdecrement_expression
+terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
+terminal INDIRECT;
+terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
+terminal DOTDOT, DOTDOTDOT;
+terminal MULTISET, MAPPING, FUNCTION, MIXED, ARRAY, STRING, OBJECT, CONSTANT;
+terminal LT, GT, LTEQ, GTEQ; // relational_expression
+terminal EQEQ, NOTEQ; // equality_expression
+terminal FOREACH, LAMBDA, GAUGE, SSCANF;
+terminal INHERIT;
+terminal COLONCOLON;
+terminal OPTIONAL, NOMASK, VARIANT;
+terminal AT;
+terminal AND; // and_expression
+terminal XOR; // exclusive_or_expression
+terminal OR;  // inclusive_or_expression
+terminal ANDAND; // conditional_and_expression
+terminal OROR; // conditional_or_expression
+terminal QUESTION; // conditional_expression
+terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
+terminal LSHIFTEQ, RSHIFTEQ; // assignment_operator
+terminal ANDEQ, XOREQ, OREQ; // assignment_operator
+
+terminal java.lang.Number INTEGER_LITERAL;
+terminal java.lang.Number FLOATING_POINT_LITERAL;
+terminal java.lang.Boolean BOOLEAN_LITERAL;
+terminal java.lang.Character CHARACTER_LITERAL;
+terminal java.lang.String STRING_LITERAL;
+terminal java.lang.String IDENTIFIER; // name
+terminal NULL_LITERAL;
+
+
+// Reserved but unused:
+terminal  GOTO;
+/*
+// 19.2) The Syntactic Grammar
+non terminal goal;
+// 19.3) Lexical Structure
+non terminal literal;
+// 19.4) Types, Values, and Variables
+non terminal type, primitive_type, numeric_type;
+non terminal integral_type, floating_point_type;
+non terminal reference_type;
+non terminal class_or_interface_type;
+non terminal class_type, interface_type;
+non terminal array_type;
+// 19.5) Names
+non terminal name, simple_name, qualified_name;
+// 19.6) Packages
+non terminal compilation_unit;
+non terminal package_declaration_opt, package_declaration;
+non terminal import_declarations_opt, import_declarations;
+non terminal type_declarations_opt, type_declarations;
+non terminal import_declaration;
+non terminal single_type_import_declaration;
+non terminal type_import_on_demand_declaration;
+non terminal type_declaration;
+// 19.7) Productions used only in the LALR(1) grammar
+non terminal modifiers_opt, modifiers, modifier;
+// 19.8.1) Class Declaration
+non terminal class_declaration, super, super_opt;
+non terminal interfaces, interfaces_opt, interface_type_list;
+non terminal class_body;
+non terminal class_body_declarations, class_body_declarations_opt;
+non terminal class_body_declaration, class_member_declaration;
+// 19.8.2) Field Declarations
+non terminal field_declaration, variable_declarators, variable_declarator;
+non terminal variable_declarator_id, variable_initializer;
+// 19.8.3) Method Declarations
+non terminal method_declaration, method_header, method_declarator;
+non terminal formal_parameter_list_opt, formal_parameter_list;
+non terminal formal_parameter;
+non terminal throws_opt, throws;
+non terminal class_type_list, method_body;
+// 19.8.4) Static Initializers
+non terminal static_initializer;
+// 19.8.5) Constructor Declarations
+non terminal constructor_declaration, constructor_declarator;
+non terminal constructor_body;
+non terminal explicit_constructor_invocation;
+// 19.9.1) Interface Declarations
+non terminal interface_declaration;
+non terminal extends_interfaces_opt, extends_interfaces;
+non terminal interface_body;
+non terminal interface_member_declarations_opt, interface_member_declarations;
+non terminal interface_member_declaration, constant_declaration;
+non terminal abstract_method_declaration;
+// 19.10) Arrays
+non terminal array_initializer;
+non terminal variable_initializers;
+// 19.11) Blocks and Statements
+non terminal block;
+non terminal block_statements_opt, block_statements, block_statement;
+non terminal local_variable_declaration_statement, local_variable_declaration;
+non terminal statement, statement_no_short_if;
+non terminal statement_without_trailing_substatement;
+non terminal empty_statement;
+non terminal labeled_statement, labeled_statement_no_short_if;
+non terminal expression_statement, statement_expression;
+non terminal if_then_statement;
+non terminal if_then_else_statement, if_then_else_statement_no_short_if;
+non terminal switch_statement, switch_block;
+non terminal switch_block_statement_groups;
+non terminal switch_block_statement_group;
+non terminal switch_labels, switch_label;
+non terminal while_statement, while_statement_no_short_if;
+non terminal do_statement;
+non terminal for_statement, for_statement_no_short_if;
+non terminal for_init_opt, for_init;
+non terminal for_update_opt, for_update;
+non terminal statement_expression_list;
+non terminal identifier_opt;
+non terminal break_statement, continue_statement;
+non terminal return_statement, throw_statement;
+non terminal synchronized_statement, try_statement;
+non terminal catches_opt, catches, catch_clause;
+non terminal finally;
+// 19.12) Expressions
+non terminal primary, primary_no_new_array;
+non terminal class_instance_creation_expression;
+non terminal argument_list_opt, argument_list;
+non terminal array_creation_expression;
+non terminal dim_exprs, dim_expr, dims_opt, dims;
+non terminal field_access, method_invocation, array_access;
+non terminal postfix_expression;
+non terminal postincrement_expression, postdecrement_expression;
+non terminal unary_expression, unary_expression_not_plus_minus;
+non terminal preincrement_expression, predecrement_expression;
+non terminal cast_expression;
+non terminal multiplicative_expression, additive_expression;
+non terminal shift_expression, relational_expression, equality_expression;
+non terminal and_expression, exclusive_or_expression, inclusive_or_expression;
+non terminal conditional_and_expression, conditional_or_expression;
+non terminal conditional_expression, assignment_expression;
+non terminal assignment;
+non terminal left_hand_side;
+non terminal assignment_operator;
+non terminal expression_opt, expression;
+non terminal constant_expression;
+*/
+
+non terminal goal, pdefinition;
+
+start with goal;
+
+goal              ::=   pdefinition+
+ pdefinition           ::=   import | inheritance | function_declaration | function_definition | variables | constant | class_def
+ import               ::=   modifiers+ IMPORT ( constant_identifier | string ) SEMICOLON 
+ inheritance          ::=   modifiers+ INHERIT program_specifier ( COLON identifier )? SEMICOLON 
+ function_declaration ::=   modifiers+ type identifier LPAREN ( arguments | prot_arguments )? RPAREN SEMICOLON
+ function_definition  ::=   modifiers+ type identifier LPAREN arguments? RPAREN block 
+ variables            ::=   modifiers+ type variable_names SEMICOLON
+ variable_names       ::=   variable_name ( COMMA variable_name )*
+ variable_name        ::=   identifier ( EQ expression2 )?
+ constant             ::=   modifiers+ CONSTANT constant_names SEMICOLON 
+ constant_names       ::=   constant_name ( COMMA constant_name )*
+ constant_name        ::=   identifier EQ expression2
+ class_def            ::=   modifiers+ class SEMICOLON?
+  class                ::=   CLASS identifier? ( LPAREN arguments RPAREN )? LBRACE program RBRACE
+ modifiers            ::=   ( EXTERN | FINAL | INLINE | LOCAL | NOMASK | OPTIONAL | PRIVATE |
+                              PROTECTED | PUBLIC | STATIC | VARIANT )
+ block                ::=   LBRACE statement* RBRACE
+ statement            ::=   expression SEMICOLON | cond | while | do_while | for | switch | return | block | foreach | SEMICOLON 
+ cond                 ::=   IF statement ( ELSE statement )?
+ while                ::=   WHILE LPAREN expression RPAREN statement
+ do_while             ::=   DO statement WHILE LPAREN expression RPAREN SEMICOLON 
+ for                  ::=   FOR LPAREN expression? SEMICOLON expression? SEMICOLON expression? RPAREN statement
+ switch               ::=   SWITCH LPAREN expression RPAREN block
+ case_block           ::=   LBRACE ( case | default | statement | break | continue )* RBRACE
+ case                 ::=   CASE expression [ DOTDOT expression ] COLON
+ default              ::=   DEFAULT COLON
+ foreach              ::=   FOREACH LPAREN expression COMMA expression6 RPAREN statement
+  break                ::=   BREAK SEMICOLON
+ continue             ::=   CONTINUE SEMICOLON
+ expression           ::=   expression2 ( COMMA expression2 )*
+ expression2          ::=   ( lvalue ( EQ | PLUSEQ | MULTEQ | DIVEQ | ANDEQ | OREQ | XOREQ | LSHIFTEQ | RSHIFTEQ | MODEQ ) )* expression3
+ expression3          ::=   expression4 '?' expression3 COLON expression3 
+ expression4          ::=   ( expression5 ( OROR | ANDAND | OR | XOR | AND | EQEQ | NOTEQ | GT | LT | GTEQ | LTEQ | LSHIFT |
+                            RSHIFT | PLUS | MULT | DIV | MOD ) )* expression5
+ expression5          ::=   expression6 | LPAREN type RPAREN expression5 | MINUSMINUS expression6 | PLUSPLUS expression6 | expression6 MINUSMINUS |
+                            expression6 PLUSPLUS | COMP expression5 | MINUS expression5 
+ expression6          ::=   string | int | float | catch | gauge | typeof | sscanf | lambda | class | constant_identifier | call |
+                            index | mapping | multiset | array | parenthesis | arrow 
+ int                  ::=   MINUS? ( number | "'" character "'" )
+ number               ::=   MINUS? ( ["1" - "9"] digit* | hex_number | bin_number | oct_number )
+ hex_number           ::=   "0" ( "x" | "X" ) ( digits | ["a" - "f"] | ["A" - "F"] )+
+ bin_number           ::=   "0" ( "b" | "B" ) ( "1" | "0" )+
+ oct_number           ::=   "0" ["0" - "7"]*
+ float                ::=   MINUS? digit+ DOT digit+ ( ( "e" | "E" ) MINUS? digit+ )?
+ catch                ::=   CATCH ( LPAREN expression RPAREN | block )
+ gauge                ::=   GAUGE ( LPAREN expression RPAREN | block )
+ sscanf               ::=   SSCANF LPAREN expression2 "," expression2 ( COMMA lvalue )* RPAREN 
+ lvalue               ::=   expression6 | type identifier | LBRACK ( lvalue ( COMMA lvalue )* COMMA? )? RBRACK
+ lambda               ::=   LAMBDA LPAREN arguments? RPAREN block
+ constant_identifier  ::=   DOT? identifier ( DOT identifier )*
+ call                 ::=   expression6 LPAREN expression_list RPAREN 
+ index                ::=   expression6 LBRACK ( expression | DOTDOT expression | expression DOTDOT | expresion DOTDOT expresion ) RBRACK
+ array                ::=   LPLC expression_list RCRP
+ multiset             ::=   RPLT expression_list GTLP
+ mapping              ::=   LPLB ( expression COLON expression ( COMMA expression COLON expression )* COMMA? )? RBRP
+ arrow                ::=   expression6 INDIRECT identifier
+ parenthesis          ::=   LPAREN expression RPAREN
+ expression_list      ::=   ( splice_expression ( COMMA splice_expression )* COMMA? )?
+ splice_expression    ::=   AT? expression2
+ type                 ::=   int_type | STRING | FLOAT | PROGRAM | object_type | program_specifier |
+                            mapping_type | array_type | multiset_type | function [ function_type ]
+ int_type             ::=   INT ( LPAREN ( digit+ | DOTDOT digit+ | digit+ DOTDOT | digit+ DOTDOT digit+ ) RPAREN )?
+ object_type          ::=   OBJECT ( LPAREN program_specifier RPAREN )?
+ mapping_type         ::=   MAPPING ( LPAREN type COLON type RPAREN )?
+ array_type           ::=   ARRAY ( LPAREN type RPAREN )?
+ multiset_type        ::=   MULTISET ( LPAREN type RPAREN )?
+ function_type        ::=   FUNCTION  ( LPAREN type ( COMMA type )* DOTDOTDOT? COLON type RPAREN )?
+ arguments            ::=   ( argument ( COMMA argument )* varargs? | varargs ) COMMA?
+ argument             ::=   type identifier
+ varargs              ::=   type DOTDOTDOT identifier
+ prot_arguments       ::=   ( type ( COMMA type )* ( type DOTDOTDOT )? | ( type DOTDOTDOT ) ) COMMA?
+ program_specifier    ::=   string_constant | constant_identifier

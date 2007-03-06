@@ -61,6 +61,7 @@ parser code  {:
   }
 :};
 
+terminal FLOAT_LITERAL;
 terminal BOOLEAN; // primitive_type
 terminal BYTE, SHORT, INT, LONG, CHAR; // integral_type
 terminal FLOAT, DOUBLE; // floating_point_type
@@ -98,13 +99,13 @@ terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
 terminal INDIRECT;
 terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
 terminal DOTDOT, DOTDOTDOT;
-terminal MULTISET, MAPPING, FUNCTION, MIXED, ARRAY, STRING, OBJECT, CONSTANT;
+terminal MULTISET, MAPPING, FUNCTION, MIXED, ARRAY, STRING, OBJECT, CONSTANT, PROGRAM;
 terminal LT, GT, LTEQ, GTEQ; // relational_expression
 terminal EQEQ, NOTEQ; // equality_expression
 terminal FOREACH, LAMBDA, GAUGE, SSCANF;
 terminal INHERIT;
 terminal COLONCOLON;
-terminal OPTIONAL, NOMASK, VARIANT;
+terminal OPTIONAL, NOMASK, VARIANT, EXTERN, INLINE, LOCAL;
 terminal AT;
 terminal AND; // and_expression
 terminal XOR; // exclusive_or_expression
@@ -115,10 +116,10 @@ terminal QUESTION; // conditional_expression
 terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
 terminal LSHIFTEQ, RSHIFTEQ; // assignment_operator
 terminal ANDEQ, XOREQ, OREQ; // assignment_operator
-
+terminal LPLC, RCRP, LPLB, RBRP, RPLT, GTLP;
 terminal java.lang.Number INTEGER_LITERAL;
 terminal java.lang.Number FLOATING_POINT_LITERAL;
-terminal java.lang.Character CHARACTER_LITERAL;
+terminal java.lang.Character CHARLITERAL;
 terminal java.lang.String STRING_LITERAL;
 terminal java.lang.String IDENTIFIER; // name
 terminal  GOTO;
@@ -126,83 +127,296 @@ terminal  GOTO;
 
 non terminal goal, pdefinition;
 non terminal pdefinition_part, pdefinition_opt;
-non terminal import_part, inheritance_part;
+non terminal import_, inheritance, inheritance_identifier, inheritance_identifier_part;
+non terminal constant_identifier, constant_identifier_opt, constant_identifier_part, constant_identifier_part_1;
+non terminal modifiers, modifiers_opt, modifiers_empty, modifiers_def, modifiers_part;
+non terminal program_specifier;
+non terminal function_declaration, function_definition;
+non terminal func_dec_args, func_dec_args_part;
+non terminal arguments, prot_arguments;
+non terminal func_def_args;
+non terminal variables, constant, class_def, program;
+non terminal type;
+non terminal block;
+non terminal variable_names, variable_name_opt, variable_name_part, variable_name, variable_assignment_expr, variable_assignment_part;
+non terminal expression2;
+non terminal constant_names, constant_name, constant_name_part, constant_name_opt;
+non terminal class, semicolon_opt;
+non terminal identifier_opt, class_args_part, class_args_opt;
+non terminal statement, statements, statements_opt;
+non terminal expression, cond, while, do_while, for, switch, return, foreach;
+non terminal else_opt, else_part, expression_opt;
+non terminal case_block, case_block_contents, case_block_statement, case_block_statements, case, case_expression;
+non terminal case_expression_part, case_expression_opt;
+non terminal default, break, continue;
+non terminal  expression3, expression4, expression5, expression6;
+non terminal expression2s, expression2s_cont, expression2_opt;
+non terminal lvalue, lvalue_assignments, lvalue_assignment, lvalue_assignment_part, eq_operators;
+non terminal expression5_cast, predec_expression, preinc_expression, postdec_expression, postinc_expression, comp_expression, invert_expression;
+non terminal arith_operator, larith_operation, larith_operations, larith_operations_part;
+non terminal string, int, float, array, mapping, multiset;
+non terminal catch, gauge, typeof, sscanf, lambda, call, index, arrow, parenthesis;
+non terminal number, minus_opt, character_literal, absolute_int;
+non terminal block_statement_arguments, paren_statement;
+non terminal index_toend, index_fromfront, index_inclusive;
+non terminal additional_lvalues, additional_lvalues_part, additional_lvalue;
+non terminal typed_identifier, multiple_assignment; 
+non terminal lvalues_opt_list, lvalues_list_opt, lvalues_list;
+non terminal comma_opt;
+non terminal expression_list, index_parameter;
+non terminal mapping_assignment, mapping_assignments, mapping_assignments_opt, mapping_assignments_part, additional_mapping_assignments,  additional_mapping_assignment, additional_mapping_assignments_part;
+non terminal expression_list_part, splice_expression, splice_expressions, splice_expressions_part, additional_splice_expression;
+non terminal int_type, object_type, array_type, mapping_type, multiset_type;
+non terminal multiset_type_specifier_opt, multiset_type_specifier, array_type_specifier, array_type_specifier_opt, mapping_type_specifier, mapping_type_specifier_opt, object_type_specifier, object_type_specifier_opt;
+non terminal function_type;
+non terminal digits, digits_inclusive, digits_toend, digits_fromfront, int_type_specifier, int_type_specifier_opt, int_type_specifier_body;
+non terminal function_type_specifier_opt, function_type_specifier, additional_types_opt, additional_types, additional_type;
+non terminal dotdotdot_opt;
+non terminal argument, arguments_front, varargs_opt, varargs, additional_arguments_opt, additional_arguments, additional_argument;
+non terminal type_varargs_prot_opt, type_varargs_prot, splice_opt, prot_arguments_front;
 
 start with goal;
 
 goal              ::=   pdefinition ;
  pdefinition ::= pdefinition_part pdefinition_opt ;
- pdefinition_part           ::=   import_part | inheritance_part | function_declaration | function_definition | variables | constant | class_def ;
+ pdefinition_part           ::=   import_ | inheritance | function_declaration | function_definition | variables | constant | class_def ;
  pdefinition_opt  ::= pdefinition_part | ;
 
+ 
+ import_               ::=   modifiers IMPORT program_specifier SEMICOLON ;
 
- import               ::=   modifiers+ IMPORT ( constant_identifier | string ) SEMICOLON ;
- inheritance          ::=   modifiers+ INHERIT program_specifier ( COLON identifier )? SEMICOLON ;
- function_declaration ::=   modifiers+ type identifier LPAREN ( arguments | prot_arguments )? RPAREN SEMICOLON;
- function_definition  ::=   modifiers+ type identifier LPAREN arguments? RPAREN block ;
- variables            ::=   modifiers+ type variable_names SEMICOLON ;
- variable_names       ::=   variable_name ( COMMA variable_name )*
- variable_name        ::=   identifier ( EQ expression2 )?
- constant             ::=   modifiers+ CONSTANT constant_names SEMICOLON 
- constant_names       ::=   constant_name ( COMMA constant_name )*
- constant_name        ::=   identifier EQ expression2
- class_def            ::=   modifiers+ class SEMICOLON?
-  class                ::=   CLASS identifier? ( LPAREN arguments RPAREN )? LBRACE program RBRACE
- modifiers            ::=   ( EXTERN | FINAL | INLINE | LOCAL | NOMASK | OPTIONAL | PRIVATE |
-                              PROTECTED | PUBLIC | STATIC | VARIANT )
- block                ::=   LBRACE statement* RBRACE
- statement            ::=   expression SEMICOLON | cond | while | do_while | for | switch | return | block | foreach | SEMICOLON 
- cond                 ::=   IF statement ( ELSE statement )?
- while                ::=   WHILE LPAREN expression RPAREN statement
- do_while             ::=   DO statement WHILE LPAREN expression RPAREN SEMICOLON 
- for                  ::=   FOR LPAREN expression? SEMICOLON expression? SEMICOLON expression? RPAREN statement
- switch               ::=   SWITCH LPAREN expression RPAREN block
- case_block           ::=   LBRACE ( case | default | statement | break | continue )* RBRACE
- case                 ::=   CASE expression [ DOTDOT expression ] COLON
- default              ::=   DEFAULT COLON
- foreach              ::=   FOREACH LPAREN expression COMMA expression6 RPAREN statement
-  break                ::=   BREAK SEMICOLON
- continue             ::=   CONTINUE SEMICOLON
- expression           ::=   expression2 ( COMMA expression2 )*
- expression2          ::=   ( lvalue ( EQ | PLUSEQ | MULTEQ | DIVEQ | ANDEQ | OREQ | XOREQ | LSHIFTEQ | RSHIFTEQ | MODEQ ) )* expression3
- expression3          ::=   expression4 '?' expression3 COLON expression3 
- expression4          ::=   ( expression5 ( OROR | ANDAND | OR | XOR | AND | EQEQ | NOTEQ | GT | LT | GTEQ | LTEQ | LSHIFT |
-                            RSHIFT | PLUS | MULT | DIV | MOD ) )* expression5
- expression5          ::=   expression6 | LPAREN type RPAREN expression5 | MINUSMINUS expression6 | PLUSPLUS expression6 | expression6 MINUSMINUS |
-                            expression6 PLUSPLUS | COMP expression5 | MINUS expression5 
+inheritance          ::=   modifiers INHERIT program_specifier inheritance_identifier SEMICOLON ;
+inheritance_identifier ::=  inheritance_identifier_part | ;
+inheritance_identifier_part ::= COLON IDENTIFIER ;
+
+ function_declaration ::=   modifiers type IDENTIFIER LPAREN func_dec_args RPAREN SEMICOLON;
+ func_dec_args ::= func_dec_args_part | ;
+ func_dec_args_part ::=  arguments | prot_arguments ;
+
+ function_definition  ::=   modifiers type IDENTIFIER LPAREN func_def_args RPAREN block ;
+ func_def_args ::= arguments | ;
+
+ variables            ::=   modifiers type variable_names SEMICOLON ;
+ variable_names       ::=   variable_name variable_name_opt ;
+ variable_name_opt    ::=   variable_name_part | ;
+ variable_name_part   ::=   COMMA variable_name ;
+ variable_name        ::=   IDENTIFIER variable_assignment_expr ;
+ variable_assignment_expr ::= variable_assignment_part | ;
+ variable_assignment_part ::= EQ expression2 ;
+
+ constant             ::=   modifiers CONSTANT constant_names SEMICOLON ;
+
+ constant_names       ::=   constant_name constant_name_opt ;
+ constant_name_part   ::=   COMMA constant_name ;
+ constant_name_opt    ::=   constant_name_part | ;
+ 
+ constant_name        ::=   IDENTIFIER EQ expression2 ;
+ 
+ class_def            ::=   modifiers class semicolon_opt ;
+ semicolon_opt        ::=   SEMICOLON | ;
+ 
+  class                ::=   CLASS identifier_opt class_args_opt LBRACE program RBRACE ;
+ identifier_opt        ::=   IDENTIFIER | ;
+ class_args_opt        ::=   class_args_part | ;
+ class_args_part       ::=    LPAREN arguments RPAREN ;
+
+ block                ::=   LBRACE statements_opt RBRACE ;
+ statements_opt			  ::= | statements ;
+ statements        ::=   statement | statements statement ;
+ statement            ::=   expression SEMICOLON | cond | while | do_while | for | switch | return | block | foreach | SEMICOLON ;
+
+ cond                 ::=   IF statement else_opt ;
+ else_opt			  ::=   else_part | ;
+ else_part			  ::=   ELSE statement ;
+
+ while                ::=   WHILE LPAREN expression RPAREN statement ;
+ do_while             ::=   DO statement WHILE LPAREN expression RPAREN SEMICOLON ;
+
+ for                  ::=   FOR LPAREN expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RPAREN statement ;
+ expression_opt       ::=   expression | ;
+
+ switch               ::=   SWITCH LPAREN expression RPAREN block ;
+ 
+ case_block           ::=   LBRACE case_block_contents RBRACE ;
+ case_block_contents  ::=   | case_block_statements ;
+ case_block_statements ::=  case_block_statement | case_block_statements;
+ case_block_statement  ::=   case | default | statement | break | continue ;
+ 
+ case                 ::=   CASE case_expression COLON ;
+ case_expression	  ::=   expression case_expression_opt;
+ case_expression_opt  ::=   case_expression_part | ;
+ // [ DOTDOT expression ]
+ case_expression_part ::=   DOTDOT expression ;
+ 
+ default              ::=   DEFAULT COLON ;
+ foreach              ::=   FOREACH LPAREN expression COMMA expression6 RPAREN statement ;
+ break                ::=   BREAK SEMICOLON ;
+ continue             ::=   CONTINUE SEMICOLON ;
+ expression           ::=   expression2 expression2_opt;
+ expression2_opt      ::=  | expression2s;
+ expression2s     ::=   expression2s_cont | expression2s expression2s_cont ;
+ expression2s_cont ::=  COMMA expression2 ;
+ 
+ expression2          ::=   lvalue_assignments expression3 ;
+ lvalue_assignments    ::=   | lvalue_assignment_part ;
+ 
+ lvalue_assignment_part ::=  lvalue_assignment | lvalue_assignment_part lvalue_assignment ;
+ 
+ lvalue_assignment ::=  lvalue eq_operators ;
+
+ eq_operators         ::=   EQ | PLUSEQ | MULTEQ | DIVEQ | ANDEQ | OREQ | XOREQ | LSHIFTEQ | RSHIFTEQ | MODEQ ;
+
+ expression3          ::=   expression4 QUESTION expression3 COLON expression3 ;
+ 
+ 
+ expression4          ::=   larith_operations expression5 ;
+ larith_operations    ::=   | larith_operations_part ;
+ larith_operations_part ::= larith_operation | larith_operations_part larith_operation ;
+ larith_operation     ::=   expression5 arith_operator ;
+ arith_operator       ::=    OROR | ANDAND | OR | XOR | AND | EQEQ | NOTEQ | GT | LT | GTEQ | LTEQ | LSHIFT |
+                            RSHIFT | PLUS | MULT | DIV | MOD ;
+
+ expression5          ::=   expression6 | expression5_cast | predec_expression | preinc_expression | postdec_expression |
+                            postinc_expression | comp_expression | invert_expression ;
+                            
+ expression5_cast     ::=  LPAREN type RPAREN expression5 ;
+ predec_expression    ::=  MINUSMINUS expression6 ;
+ preinc_expression    ::=  PLUSPLUS expression6 ;
+ postdec_expression   ::=  expression6 MINUSMINUS ;
+ postinc_expression   ::=  expression6 PLUSPLUS ;
+ comp_expression      ::=  COMP expression5 ;
+ invert_expression    ::=  MINUS expression5; 
+ 
  expression6          ::=   string | int | float | catch | gauge | typeof | sscanf | lambda | class | constant_identifier | call |
-                            index | mapping | multiset | array | parenthesis | arrow 
- int                  ::=   MINUS? ( number | "'" character "'" )
- number               ::=   MINUS? ( ["1" - "9"] digit* | hex_number | bin_number | oct_number )
- hex_number           ::=   "0" ( "x" | "X" ) ( digits | ["a" - "f"] | ["A" - "F"] )+
- bin_number           ::=   "0" ( "b" | "B" ) ( "1" | "0" )+
- oct_number           ::=   "0" ["0" - "7"]*
- float                ::=   MINUS? digit+ DOT digit+ ( ( "e" | "E" ) MINUS? digit+ )?
- catch                ::=   CATCH ( LPAREN expression RPAREN | block )
- gauge                ::=   GAUGE ( LPAREN expression RPAREN | block )
- sscanf               ::=   SSCANF LPAREN expression2 "," expression2 ( COMMA lvalue )* RPAREN 
- lvalue               ::=   expression6 | type identifier | LBRACK ( lvalue ( COMMA lvalue )* COMMA? )? RBRACK
- lambda               ::=   LAMBDA LPAREN arguments? RPAREN block
- constant_identifier  ::=   DOT? identifier ( DOT identifier )*
- call                 ::=   expression6 LPAREN expression_list RPAREN 
- index                ::=   expression6 LBRACK ( expression | DOTDOT expression | expression DOTDOT | expresion DOTDOT expresion ) RBRACK
- array                ::=   LPLC expression_list RCRP
- multiset             ::=   RPLT expression_list GTLP
- mapping              ::=   LPLB ( expression COLON expression ( COMMA expression COLON expression )* COMMA? )? RBRP
- arrow                ::=   expression6 INDIRECT identifier
- parenthesis          ::=   LPAREN expression RPAREN
- expression_list      ::=   ( splice_expression ( COMMA splice_expression )* COMMA? )?
- splice_expression    ::=   AT? expression2
+                            index | mapping | multiset | array | parenthesis | arrow ;
+                            
+ int                  ::=   minus_opt absolute_int ;
+ absolute_int         ::=   number | CHARLITERAL ;
+ 
+ minus_opt            ::=   MINUS | ;
+ 
+ 
+ number               ::=   minus_opt INTEGER_LITERAL ;
+// hex_number           ::=   "0" ( "x" | "X" ) ( digits | ["a" - "f"] | ["A" - "F"] )+
+// bin_number           ::=   "0" ( "b" | "B" ) ( "1" | "0" )+
+// oct_number           ::=   "0" ["0" - "7"]*
+ float                ::=   minus_opt FLOAT_LITERAL ;
+ catch                ::=   CATCH block_statement_arguments ;
+ block_statement_arguments      ::=   paren_statement | block ;
+ paren_statement      ::=   LPAREN expression RPAREN ;
+ 
+ gauge                ::=   GAUGE block_statement_arguments ;
+ 
+ sscanf               ::=   SSCANF LPAREN expression2 COMMA expression2 additional_lvalues RPAREN  ;
+ additional_lvalues   ::=   | additional_lvalues_part ;
+ additional_lvalues_part ::=  additional_lvalue | additional_lvalues_part additional_lvalue ;
+ additional_lvalue    ::=   COMMA lvalue ;
+ 
+ lvalue               ::=   expression6 | typed_identifier | multiple_assignment ;
+ multiple_assignment  ::=   LBRACK lvalues_list_opt RBRACK ;
+ lvalues_list_opt     ::=   lvalues_list | ;
+ lvalues_list         ::=   lvalue additional_lvalues comma_opt ;
+ typed_identifier     ::=   type IDENTIFIER;
+ comma_opt            ::=   COMMA | ;
+ 
+ lambda               ::=   LAMBDA LPAREN func_def_args RPAREN block ;
+ 
+ call                 ::=   expression6 LPAREN expression_list RPAREN ;
+ 
+ index                ::=   expression6 LBRACK index_parameter RBRACK ;
+ index_parameter      ::=   expression | index_fromfront | index_toend | index_inclusive ;
+ index_fromfront      ::=   DOTDOT expression ;
+ index_toend          ::=   expression DOTDOT ;
+ index_inclusive      ::=   expression DOTDOT expression ;
+ 
+ array                ::=   LPLC expression_list RCRP ;
+ multiset             ::=   RPLT expression_list GTLP ;
+ 
+ mapping              ::=   LPLB mapping_assignments_opt RBRP ;
+ mapping_assignment   ::=   expression COLON expression ;
+ mapping_assignments_opt ::=  mapping_assignments | ;
+ mapping_assignments  ::=   mapping_assignment additional_mapping_assignments comma_opt ;
+ additional_mapping_assignments ::= additional_mapping_assignments_part | ;
+ additional_mapping_assignments_part ::= additional_mapping_assignment | additional_mapping_assignments_part additional_mapping_assignment ;
+ additional_mapping_assignment ::= COMMA expression COLON expression ;
+  
+ arrow                ::=   expression6 INDIRECT IDENTIFIER ;
+ parenthesis          ::=   LPAREN expression RPAREN ;
+
+ expression_list      ::=   expression_list_part | ;
+ expression_list_part ::=   splice_expression splice_expressions comma_opt ;
+ splice_expressions   ::=   | splice_expressions_part ;
+ splice_expressions_part ::= additional_splice_expression | splice_expressions_part additional_splice_expression ;
+ additional_splice_expression ::=  COMMA splice_expression ;
+ 
  type                 ::=   int_type | STRING | FLOAT | PROGRAM | object_type | program_specifier |
-                            mapping_type | array_type | multiset_type | function [ function_type ]
- int_type             ::=   INT ( LPAREN ( digit+ | DOTDOT digit+ | digit+ DOTDOT | digit+ DOTDOT digit+ ) RPAREN )?
- object_type          ::=   OBJECT ( LPAREN program_specifier RPAREN )?
- mapping_type         ::=   MAPPING ( LPAREN type COLON type RPAREN )?
- array_type           ::=   ARRAY ( LPAREN type RPAREN )?
- multiset_type        ::=   MULTISET ( LPAREN type RPAREN )?
- function_type        ::=   FUNCTION  ( LPAREN type ( COMMA type )* DOTDOTDOT? COLON type RPAREN )?
- arguments            ::=   ( argument ( COMMA argument )* varargs? | varargs ) COMMA?
- argument             ::=   type identifier
- varargs              ::=   type DOTDOTDOT identifier
- prot_arguments       ::=   ( type ( COMMA type )* ( type DOTDOTDOT )? | ( type DOTDOTDOT ) ) COMMA?
- program_specifier    ::=   string_constant | constant_identifier
+                            mapping_type | array_type | multiset_type | function_type ;
+ 
+ int_type             ::=   INT int_type_specifier_opt ;
+ int_type_specifier_opt ::= int_type_specifier | ;
+ int_type_specifier ::=   LPAREN  int_type_specifier_body RPAREN ;
+ int_type_specifier_body ::= digits | digits_fromfront | digits_toend | digits_inclusive ;
+ digits_inclusive ::= digits DOTDOT digits ;
+ digits_fromfront ::=  DOTDOT digits ;
+ digits_toend ::=  digits DOTDOT ;
+ 
+ // this is not so good, but it will have to do for now.
+ 
+ digits ::= INTEGER_LITERAL ;
+ object_type          ::=   OBJECT object_type_specifier_opt ;
+ object_type_specifier_opt ::= object_type_specifier | ;
+ object_type_specifier ::=  LPAREN program_specifier RPAREN ;
+
+ mapping_type         ::=   MAPPING mapping_type_specifier_opt ;
+ mapping_type_specifier_opt ::= mapping_type_specifier | ;
+ mapping_type_specifier ::=  LPAREN type COLON type RPAREN ;
+
+ array_type           ::=   ARRAY array_type_specifier_opt ;
+ array_type_specifier_opt ::= array_type_specifier | ;
+ array_type_specifier ::=   LPAREN type RPAREN ;
+
+ multiset_type_specifier_opt ::= multiset_type_specifier | ;
+ multiset_type_specifier  ::=  LPAREN type RPAREN ;
+ 
+ function_type        ::=   FUNCTION  function_type_specifier_opt ;
+ function_type_specifier_opt ::= function_type_specifier | ;
+ function_type_specifier ::=   LPAREN type additional_types_opt dotdotdot_opt COLON type RPAREN ;
+ additional_types_opt   ::=  additional_types | ;
+ additional_types     ::=   additional_type | additional_types additional_type ;
+ additional_type      ::=   COMMA type ;
+ dotdotdot_opt        ::=   DOTDOTDOT | ;
+ 
+ arguments            ::=   arguments_front comma_opt ;
+ arguments_front      ::=   argument additional_arguments_opt varargs_opt | varargs ;
+ additional_arguments_opt ::= additional_arguments | ;
+ additional_arguments ::=  additional_argument | additional_arguments additional_argument ;
+ additional_argument  ::= COMMA argument ;
+  
+ varargs_opt          ::=  varargs | ;
+ 
+ prot_arguments       ::=   prot_arguments_front comma_opt ;
+ prot_arguments_front ::=  type additional_types_opt type_varargs_prot_opt |  type_varargs_prot ;
+ type_varargs_prot    ::=  type DOTDOTDOT ;
+ type_varargs_prot_opt ::= type_varargs_prot | ;
+ 
+ splice_expression    ::=   splice_opt expression2 ;
+ splice_opt           ::=   | AT ;
+
+ argument             ::=   type IDENTIFIER ;
+ varargs              ::=   type DOTDOTDOT IDENTIFIER ;
+
+ program_specifier    ::=   STRING | constant_identifier ;
+ 
+ modifiers            ::= modifiers_empty | modifiers_def ;
+ modifiers_empty	::=  modifiers_part | ;
+ modifiers_def		::= modifiers_part modifiers_opt;
+ modifiers_opt 		::= modifiers_part | ;  
+ modifiers_part		::= EXTERN | FINAL | INLINE | LOCAL | NOMASK | OPTIONAL | PRIVATE |
+                              PROTECTED | PUBLIC | STATIC | VARIANT  ;
+                               
+ constant_identifier  ::=   constant_identifier_part constant_identifier_opt;
+ constant_identifier_opt ::= constant_identifier_part_1 | ;
+ constant_identifier_part ::= constant_identifier_part_1 | IDENTIFIER;
+ constant_identifier_part_1 ::= DOT IDENTIFIER;
+ 
+ 

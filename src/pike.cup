@@ -1,47 +1,11 @@
+/* -*- c -*-
+|| This file is part of Pike. For copyright information see COPYRIGHT.
+|| Pike is distributed under GPL, LGPL and MPL. See the file COPYING
+|| for more information.
+|| $Id: pike.cup,v 1.4 2007-03-09 05:53:48 hww3 Exp $
+*/
+
 import java_cup.runtime.*;
-
-
-/* August 1999 - modified by Gerwin Klein <lsf@jflex.de>
-                 to interface with JFlex scanners,
-                 allows empty semicolon in class decls.
-  
-  changed productions:
-
-  class_member_declaration ::=
-	  	field_declaration
-  	|	method_declaration
-    [..]
-  	|	interface_declaration
-    | SEMICOLON
-  	;
-
-  interface_member_declaration ::=
-  		constant_declaration
-	  |	abstract_method_declaration
-  	|	class_declaration
-  	|	interface_declaration
-    | SEMICOLON
-	  ;
-
-*/
-
-
-/* Java 1.2 parser for CUP.  
- * Copyright (C) 1998 C. Scott Ananian <cananian@alumni.princeton.edu>
- * This program is released under the terms of the GPL; see the file
- * COPYING for more details.  There is NO WARRANTY on this code.
- */
-
-/*
-JDK 1.2 Features added:
-  strictfp modifier.
-  explicit_constructor_invocation ::= ...
-        | primary DOT THIS LPAREN argument_list_opt RPAREN SEMICOLON ;
-  field_access ::= ...
-        |       name DOT SUPER DOT IDENTIFIER ;
-  method_invocation ::= ...
-        |       name DOT SUPER DOT IDENTIFIER LPAREN argument_list_opt RPAREN ;
-*/
 
 parser code  {: 
   public void report_error(String message, Object info) {
@@ -61,362 +25,1441 @@ parser code  {:
   }
 :};
 
-terminal FLOAT_LITERAL;
-terminal BOOLEAN; // primitive_type
-terminal BYTE, SHORT, INT, LONG, CHAR; // integral_type
-terminal FLOAT, DOUBLE; // floating_point_type
+terminal TOK_ARROW ;
+
+/*
+ * Basic value pushing
+ */
+terminal TOK_CONSTANT ;
+terminal TOK_FLOAT ;
+terminal TOK_STRING ;
+terminal TOK_NUMBER ;
+
+/*
+ * These are the predefined functions that can be accessed from Pike.
+ */
+
+
+terminal TOK_INC TOK_DEC ;
+terminal TOK_RETURN ;
+
+terminal TOK_EQ ;
+terminal TOK_GE ;
+terminal TOK_LE ;
+terminal TOK_NE ;
+terminal TOK_NOT ;
+terminal TOK_LSH ;
+terminal TOK_RSH ;
+terminal TOK_LAND ;
+terminal TOK_LOR ;
+terminal TOK_INC ;
+
+terminal TOK_SWITCH ;
+terminal TOK_SSCANF ;
+terminal TOK_CATCH ;
+terminal TOK_FOREACH ;
+
+/* This is the end of file marker used by the lexer
+ * to enable nicer EOF in error handling.
+ */
+terminal TOK_LEX_EOF ;
+
+terminal TOK_ADD_EQ ;
+terminal TOK_AND_EQ ; 
+terminal TOK_ARRAY_ID ;
+terminal TOK_BREAK ;
+terminal TOK_CASE ;
+terminal TOK_CLASS ;
+terminal TOK_COLON_COLON ;
+terminal TOK_CONTINUE ;
+terminal TOK_DEFAULT ;
+terminal TOK_DIV_EQ ;
+terminal TOK_DO ;
+terminal TOK_DOT_DOT ;
+terminal TOK_DOT_DOT_DOT ;
+terminal TOK_ELSE ;
+terminal TOK_ENUM ;
+terminal TOK_EXTERN ;
+terminal TOK_FLOAT_ID ;
+terminal TOK_FOR ;
+terminal TOK_FUNCTION_ID ;
+terminal TOK_GAUGE ;
+terminal TOK_GLOBAL ;
+terminal TOK_IDENTIFIER ;
+terminal TOK_IF ;
+terminal TOK_IMPORT ;
+terminal TOK_INHERIT ;
+terminal TOK_INLINE ;
+terminal TOK_LOCAL_ID ;
+terminal TOK_FINAL_ID ;
+terminal TOK_INT_ID ;
+terminal TOK_LAMBDA ;
+terminal TOK_MULTISET_ID ;
+terminal TOK_MULTISET_END ;
+terminal TOK_MULTISET_START ;
+terminal TOK_LSH_EQ ;
+terminal TOK_MAPPING_ID ;
+terminal TOK_MIXED_ID ;
+terminal TOK_MOD_EQ ;
+terminal TOK_MULT_EQ ;
+terminal TOK_NO_MASK ;
+terminal TOK_OBJECT_ID ;
+terminal TOK_OR_EQ ;
+terminal TOK_PRIVATE ;
+terminal TOK_PROGRAM_ID ;
+terminal TOK_PROTECTED ;
+terminal TOK_PREDEF ;
+terminal TOK_PUBLIC ;
+terminal TOK_RSH_EQ ;
+terminal TOK_STATIC ;
+terminal TOK_STRING_ID ;
+terminal TOK_SUB_EQ ;
+terminal TOK_TYPEDEF ;
+terminal TOK_TYPEOF ;
+terminal TOK_VARIANT ;
+terminal TOK_VOID_ID ;
+terminal TOK_WHILE ;
+terminal TOK_XOR_EQ ;
+terminal TOK_OPTIONAL ;
+
 terminal LBRACK, RBRACK; // array_type
 terminal DOT; // qualified_name
 terminal SEMICOLON, MULT, COMMA, LBRACE, RBRACE, EQ, LPAREN, RPAREN, COLON;
-terminal PACKAGE; // package_declaration
-terminal IMPORT; // import_declaration
-terminal PUBLIC, PROTECTED, PRIVATE; // modifier
-terminal STATIC; // modifier
-terminal ABSTRACT, FINAL, NATIVE, SYNCHRONIZED, TRANSIENT, VOLATILE;
-terminal CLASS; // class_declaration
-terminal EXTENDS; // super
-terminal IMPLEMENTS; // interfaces
-terminal VOID; // method_header
-terminal THROWS; // throws
-terminal THIS, SUPER; // explicit_constructor_invocation
-terminal INTERFACE; // interface_declaration
-terminal IF, ELSE; // if_then_statement, if_then_else_statement
-terminal SWITCH; // switch_statement
-terminal CASE, DEFAULT; // switch_label
-terminal DO, WHILE; // while_statement, do_statement
-terminal FOR; // for_statement
-terminal BREAK; // break_statement
-terminal CONTINUE; // continue_statement
-terminal RETURN; // return_statement
-terminal THROW; // throw_statement
-terminal TRY; // try_statement
-terminal CATCH; // catch_clause
-terminal FINALLY; // finally
-terminal NEW; // class_instance_creation_expression
-terminal PLUSPLUS; // postincrement_expression
-terminal MINUSMINUS; // postdecrement_expression
-terminal PLUS, MINUS, COMP, NOT, DIV, MOD;
-terminal INDIRECT;
-terminal LSHIFT, RSHIFT, URSHIFT; // shift_expression
-terminal DOTDOT, DOTDOTDOT;
-terminal MULTISET, MAPPING, FUNCTION, MIXED, ARRAY, STRING, OBJECT, CONSTANT, PROGRAM;
-terminal LT, GT, LTEQ, GTEQ; // relational_expression
-terminal EQEQ, NOTEQ; // equality_expression
-terminal FOREACH, LAMBDA, GAUGE, SSCANF;
-terminal INHERIT;
-terminal COLONCOLON;
-terminal OPTIONAL, NOMASK, VARIANT, EXTERN, INLINE, LOCAL;
-terminal AT;
+terminal PLUS, MINUS, COMP, DIV, MOD;
+terminal AT, GT, LT;
 terminal AND; // and_expression
 terminal XOR; // exclusive_or_expression
 terminal OR;  // inclusive_or_expression
-terminal ANDAND; // conditional_and_expression
-terminal OROR; // conditional_or_expression
 terminal QUESTION; // conditional_expression
-terminal MULTEQ, DIVEQ, MODEQ, PLUSEQ, MINUSEQ; // assignment_operator
-terminal LSHIFTEQ, RSHIFTEQ; // assignment_operator
-terminal ANDEQ, XOREQ, OREQ; // assignment_operator
-terminal LPLC, RCRP, LPLB, RBRP, RPLT, GTLP;
-terminal java.lang.Number INTEGER_LITERAL;
-terminal java.lang.Number FLOATING_POINT_LITERAL;
-terminal java.lang.Character CHARLITERAL;
-terminal java.lang.String STRING_LITERAL;
-terminal java.lang.String IDENTIFIER; // name
-terminal  GOTO;
 
-
-non terminal goal, pdefinition;
-non terminal pdefinition_part, pdefinition_opt;
-non terminal import_, inheritance, inheritance_identifier, inheritance_identifier_part;
-non terminal constant_identifier, constant_identifier_opt, constant_identifier_part, constant_identifier_part_1;
-non terminal modifiers, modifiers_opt, modifiers_empty, modifiers_def, modifiers_part;
-non terminal program_specifier;
-non terminal function_declaration, function_definition;
-non terminal func_dec_args, func_dec_args_part;
-non terminal arguments, prot_arguments;
-non terminal func_def_args;
-non terminal variables, constant, class_def, program;
+non terminal goal;
+non terminal program;
+non terminal string_constant;
+non terminal optional_rename_inherit;
+non terminal low_program_ref;
+non terminal program_ref;
+non terminal inheritance;
+non terminal _import;
+non terminal constant_name;
+non terminal constant_list;
+non terminal constant;
+non terminal block_or_semi;
+non terminal type_or_error;
+non terminal open_paren_with_line_info;
+non terminal close_paren_or_missing;
+non terminal close_brace_or_missing;
+non terminal close_brace_or_eof;
+non terminal open_bracket_with_line_info;
+non terminal close_bracket_or_missing;
+non terminal push_compiler_frame0;
+non terminal def;
+non terminal optional_dot_dot_dot;
+non terminal optional_identifier;
+non terminal new_arg_name;
+non terminal func_args;
+non terminal arguments;
+non terminal arguments2;
+non terminal magic_identifiers;
+non terminal magic_identifier;
+non terminal modifiers;
+non terminal modifier_list;
+non terminal optional_stars;
+non terminal cast;
+non terminal soft_cast;
+non terminal full_type;
+non terminal type6;
 non terminal type;
+non terminal type7;
+non terminal simple_type;
+non terminal simple_type2;
+non terminal simple_identifier_type;
+non terminal type4;
+non terminal type2;
+non terminal type8;
+non terminal identifier_type;
+non terminal number_or_maxint;
+non terminal number_or_minint;
+non terminal expected_dot_dot;
+non terminal opt_int_range;
+non terminal opt_object_type;
+non terminal opt_function_type;
+non terminal function_type_list;
+non terminal function_type_list2;
+non terminal opt_array_type;
+non terminal opt_mapping_type;
+non terminal name_list;
+non terminal new_name;
+non terminal new_local_name;
+non terminal new_local_name2;
+non terminal line_number_info;
+non terminal end_block;
+non terminal failsafe_block;
+non terminal local_name_list;
+non terminal local_name_list2;
+non terminal local_constant_name;
+non terminal local_constant_list;
+non terminal local_constant;
+non terminal statement_with_semicolon;
+non terminal normal_label_statement;
+non terminal statement;
+non terminal labeled_statement;
+non terminal optional_label;
+non terminal break;
+non terminal default;
+non terminal continue;
+non terminal push_compiler_frame1;
+non terminal lambda;
+non terminal local_function;
+non terminal local_function2;
+non terminal create_arg;
+non terminal create_arguments2;
+non terminal create_arguments;
+non terminal push_compiler_frame01;
+non terminal optional_create_arguments;
+non terminal failsafe_program;
+non terminal class;
+non terminal simple_identifier;
+non terminal enum_value;
+non terminal enum_def;
+non terminal enum_list;
+non terminal enum;
+non terminal typedef;
+non terminal cond;
+non terminal end_cond;
+non terminal optional_else_part;
+non terminal safe_lvalue;
+non terminal safe_expr0;
+non terminal foreach_optional_lvalue;
+non terminal foreach_lvalues;
+non terminal foreach;
+non terminal do;
+non terminal expected_semicolon;
+non terminal for;
+non terminal while;
+non terminal for_expr;
+non terminal case;
+non terminal expected_colon;
+non terminal return;
+non terminal unused2;
+non terminal optional_comma_expr;
+non terminal safe_comma_expr;
+non terminal comma_expr;
+non terminal comma_expr2;
+non terminal expr00;
+non terminal expr0;
+non terminal expr01;
+non terminal assign;
+non terminal optional_comma;
+non terminal expr_list2;
+non terminal m_expr_list;
+non terminal m_expr_list2;
+non terminal assoc_pair;
+non terminal expr1;
+non terminal expr2;
+non terminal expr3;
+non terminal optional_block;
+non terminal expr4;
+non terminal idents2;
+non terminal idents;
+non terminal inherit_specifier;
+non terminal low_idents;
+non terminal comma_expr_or_zero;
+non terminal comma_expr_or_maxint;
+non terminal gauge;
+non terminal typeof;
+non terminal catch_arg;
+non terminal catch;
+non terminal sscanf;
+non terminal lvalue;
+non terminal low_lvalue_list;
+non terminal lvalue_list;
+non terminal string;
+non terminal bad_identifier;
+non terminal inherit_ref;
+non terminal modifier;
+non terminal magic_identifiers1;
+non terminal magic_identifiers2;
+non terminal magic_identifiers3;
+non terminal basic_type;
 non terminal block;
-non terminal variable_names, variable_name_opt, variable_name_part, variable_name, variable_assignment_expr, variable_assignment_part;
-non terminal expression2;
-non terminal constant_names, constant_name, constant_name_part, constant_name_opt;
-non terminal class, semicolon_opt;
-non terminal identifier_opt, class_args_part, class_args_opt;
-non terminal statement, statements, statements_opt;
-non terminal expression, cond, while, do_while, for, switch, return, foreach;
-non terminal else_opt, else_part, expression_opt;
-non terminal case_block, case_block_contents, case_block_statement, case_block_statements, case, case_expression;
-non terminal case_expression_part, case_expression_opt;
-non terminal default, break, continue;
-non terminal  expression3, expression4, expression5, expression6;
-non terminal expression2s, expression2s_cont, expression2_opt;
-non terminal lvalue, lvalue_assignments, lvalue_assignment, lvalue_assignment_part, eq_operators;
-non terminal expression5_cast, predec_expression, preinc_expression, postdec_expression, postinc_expression, comp_expression, invert_expression;
-non terminal arith_operator, larith_operation, larith_operations, larith_operations_part;
-non terminal string, int, float, array, mapping, multiset;
-non terminal catch, gauge, typeof, sscanf, lambda, call, index, arrow, parenthesis;
-non terminal number, minus_opt, character_literal, absolute_int;
-non terminal block_statement_arguments, paren_statement;
-non terminal index_toend, index_fromfront, index_inclusive;
-non terminal additional_lvalues, additional_lvalues_part, additional_lvalue;
-non terminal typed_identifier, multiple_assignment; 
-non terminal lvalues_opt_list, lvalues_list_opt, lvalues_list;
-non terminal comma_opt;
-non terminal expression_list, index_parameter;
-non terminal mapping_assignment, mapping_assignments, mapping_assignments_opt, mapping_assignments_part, additional_mapping_assignments,  additional_mapping_assignment, additional_mapping_assignments_part;
-non terminal expression_list_part, splice_expression, splice_expressions, splice_expressions_part, additional_splice_expression;
-non terminal int_type, object_type, array_type, mapping_type, multiset_type;
-non terminal multiset_type_specifier_opt, multiset_type_specifier, array_type_specifier, array_type_specifier_opt, mapping_type_specifier, mapping_type_specifier_opt, object_type_specifier, object_type_specifier_opt;
-non terminal function_type;
-non terminal digits, digits_inclusive, digits_toend, digits_fromfront, int_type_specifier, int_type_specifier_opt, int_type_specifier_body;
-non terminal function_type_specifier_opt, function_type_specifier, additional_types_opt, additional_types, additional_type;
-non terminal dotdotdot_opt;
-non terminal argument, arguments_front, varargs_opt, varargs, additional_arguments_opt, additional_arguments, additional_argument;
-non terminal type_varargs_prot_opt, type_varargs_prot, splice_opt, prot_arguments_front;
+non terminal statements;
+non terminal switch;
+non terminal unused;
+non terminal expr_list;
+non terminal bad_expr_ident;
 
-start with goal;
 
-goal              ::=   pdefinition ;
- pdefinition ::= pdefinition_part pdefinition_opt ;
- pdefinition_part           ::=   import_ | inheritance | function_declaration | function_definition | variables | constant | class_def ;
- pdefinition_opt  ::= pdefinition_part | ;
+precedence right EQ ;
+precedence right QUESTION ;
+precedence left TOK_LOR ;
+precedence left TOK_LAND ;
+precedence left OR ;
+precedence left XOR ;
+precedence left AND ;
+precedence left TOK_EQ, TOK_NE ;
+precedence left GT, TOK_GE, LT, TOK_LE ;  /* nonassoc? */
+precedence left TOK_LSH, TOK_RSH ;
+precedence left PLUS, MINUS ;
+precedence left MULT, MOD, DIV ;
+precedence right TOK_NOT, COMP ;
+precedence nonassoc TOK_INC, TOK_DEC ;
 
- 
- import_               ::=   modifiers IMPORT program_specifier SEMICOLON ;
 
-inheritance          ::=   modifiers INHERIT program_specifier inheritance_identifier SEMICOLON ;
-inheritance_identifier ::=  inheritance_identifier_part | ;
-inheritance_identifier_part ::= COLON IDENTIFIER ;
+goal::= program 
+  | program TOK_LEX_EOF
 
- function_declaration ::=   modifiers type IDENTIFIER LPAREN func_dec_args RPAREN SEMICOLON;
- func_dec_args ::= func_dec_args_part | ;
- func_dec_args_part ::=  arguments | prot_arguments ;
+  ;
 
- function_definition  ::=   modifiers type IDENTIFIER LPAREN func_def_args RPAREN block ;
- func_def_args ::= arguments | ;
+program::= program def
+  | program SEMICOLON
+  |  /* empty */
+  ;
 
- variables            ::=   modifiers type variable_names SEMICOLON ;
- variable_names       ::=   variable_name variable_name_opt ;
- variable_name_opt    ::=   variable_name_part | ;
- variable_name_part   ::=   COMMA variable_name ;
- variable_name        ::=   IDENTIFIER variable_assignment_expr ;
- variable_assignment_expr ::= variable_assignment_part | ;
- variable_assignment_part ::= EQ expression2 ;
+string_constant::= string
+  | string_constant PLUS string
+  ;
 
- constant             ::=   modifiers CONSTANT constant_names SEMICOLON ;
+optional_rename_inherit::= COLON TOK_IDENTIFIER 
+  | COLON bad_identifier 
+  | COLON error 
+  | 
+  ;
 
- constant_names       ::=   constant_name constant_name_opt ;
- constant_name_part   ::=   COMMA constant_name ;
- constant_name_opt    ::=   constant_name_part | ;
- 
- constant_name        ::=   IDENTIFIER EQ expression2 ;
- 
- class_def            ::=   modifiers class semicolon_opt ;
- semicolon_opt        ::=   SEMICOLON | ;
- 
-  class                ::=   CLASS identifier_opt class_args_opt LBRACE program RBRACE ;
- identifier_opt        ::=   IDENTIFIER | ;
- class_args_opt        ::=   class_args_part | ;
- class_args_part       ::=    LPAREN arguments RPAREN ;
+/* NOTE: This rule pushes a string "name" on the stack in addition
+ * to resolving the program reference.
+ */
+low_program_ref::= string_constant
+  | idents
+  ;
 
- block                ::=   LBRACE statements_opt RBRACE ;
- statements_opt			  ::= | statements ;
- statements        ::=   statement | statements statement ;
- statement            ::=   expression SEMICOLON | cond | while | do_while | for | switch | return | block | foreach | SEMICOLON ;
+/* NOTE: Pushes the resolved program on the stack. */
+program_ref::= low_program_ref
+  ;
 
- cond                 ::=   IF statement else_opt ;
- else_opt			  ::=   else_part | ;
- else_part			  ::=   ELSE statement ;
+inherit_ref::=
+  low_program_ref
+  ;
 
- while                ::=   WHILE LPAREN expression RPAREN statement ;
- do_while             ::=   DO statement WHILE LPAREN expression RPAREN SEMICOLON ;
+inheritance::= modifiers TOK_INHERIT inherit_ref optional_rename_inherit SEMICOLON
+  | modifiers TOK_INHERIT inherit_ref error SEMICOLON
+  | modifiers TOK_INHERIT inherit_ref error TOK_LEX_EOF
+  | modifiers TOK_INHERIT inherit_ref error RBRACE
+  | modifiers TOK_INHERIT error SEMICOLON
+  | modifiers TOK_INHERIT error TOK_LEX_EOF
+  | modifiers TOK_INHERIT error RBRACE 
+  ;
 
- for                  ::=   FOR LPAREN expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RPAREN statement ;
- expression_opt       ::=   expression | ;
+_import::= TOK_IMPORT idents SEMICOLON
+  | TOK_IMPORT string SEMICOLON
+  | TOK_IMPORT error SEMICOLON
+  | TOK_IMPORT error TOK_LEX_EOF
+  | TOK_IMPORT error RBRACE {: yyerror("Missing SEMICOLON."); :}
+  ;
 
- switch               ::=   SWITCH LPAREN expression RPAREN block ;
- 
- case_block           ::=   LBRACE case_block_contents RBRACE ;
- case_block_contents  ::=   | case_block_statements ;
- case_block_statements ::=  case_block_statement | case_block_statements;
- case_block_statement  ::=   case | default | statement | break | continue ;
- 
- case                 ::=   CASE case_expression COLON ;
- case_expression	  ::=   expression case_expression_opt;
- case_expression_opt  ::=   case_expression_part | ;
- // [ DOTDOT expression ]
- case_expression_part ::=   DOTDOT expression ;
- 
- default              ::=   DEFAULT COLON ;
- foreach              ::=   FOREACH LPAREN expression COMMA expression6 RPAREN statement ;
- break                ::=   BREAK SEMICOLON ;
- continue             ::=   CONTINUE SEMICOLON ;
- expression           ::=   expression2 expression2_opt;
- expression2_opt      ::=  | expression2s;
- expression2s     ::=   expression2s_cont | expression2s expression2s_cont ;
- expression2s_cont ::=  COMMA expression2 ;
- 
- expression2          ::=   lvalue_assignments expression3 ;
- lvalue_assignments    ::=   | lvalue_assignment_part ;
- 
- lvalue_assignment_part ::=  lvalue_assignment | lvalue_assignment_part lvalue_assignment ;
- 
- lvalue_assignment ::=  lvalue eq_operators ;
+constant_name::= TOK_IDENTIFIER EQ safe_expr0
+  | bad_identifier EQ safe_expr0
+  | error EQ safe_expr0
+  ;
 
- eq_operators         ::=   EQ | PLUSEQ | MULTEQ | DIVEQ | ANDEQ | OREQ | XOREQ | LSHIFTEQ | RSHIFTEQ | MODEQ ;
+constant_list::= constant_name
+  | constant_list COMMA constant_name
+  ;
 
- expression3          ::=   expression4 QUESTION expression3 COLON expression3 ;
- 
- 
- expression4          ::=   larith_operations expression5 ;
- larith_operations    ::=   | larith_operations_part ;
- larith_operations_part ::= larith_operation | larith_operations_part larith_operation ;
- larith_operation     ::=   expression5 arith_operator ;
- arith_operator       ::=    OROR | ANDAND | OR | XOR | AND | EQEQ | NOTEQ | GT | LT | GTEQ | LTEQ | LSHIFT |
-                            RSHIFT | PLUS | MULT | DIV | MOD ;
+constant::= modifiers TOK_CONSTANT constant_list SEMICOLON
+  | modifiers TOK_CONSTANT error SEMICOLON
+  | modifiers TOK_CONSTANT error TOK_LEX_EOF
+  | modifiers TOK_CONSTANT error RBRACE {: yyerror("Missing SEMICOLON."); :}
+  ;
 
- expression5          ::=   expression6 | expression5_cast | predec_expression | preinc_expression | postdec_expression |
-                            postinc_expression | comp_expression | invert_expression ;
-                            
- expression5_cast     ::=  LPAREN type RPAREN expression5 ;
- predec_expression    ::=  MINUSMINUS expression6 ;
- preinc_expression    ::=  PLUSPLUS expression6 ;
- postdec_expression   ::=  expression6 MINUSMINUS ;
- postinc_expression   ::=  expression6 PLUSPLUS ;
- comp_expression      ::=  COMP expression5 ;
- invert_expression    ::=  MINUS expression5; 
- 
- expression6          ::=   string | int | float | catch | gauge | typeof | sscanf | lambda | class | constant_identifier | call |
-                            index | mapping | multiset | array | parenthesis | arrow ;
-                            
- int                  ::=   minus_opt absolute_int ;
- absolute_int         ::=   number | CHARLITERAL ;
- 
- minus_opt            ::=   MINUS | ;
- 
- 
- number               ::=   minus_opt INTEGER_LITERAL ;
-// hex_number           ::=   "0" ( "x" | "X" ) ( digits | ["a" - "f"] | ["A" - "F"] )+
-// bin_number           ::=   "0" ( "b" | "B" ) ( "1" | "0" )+
-// oct_number           ::=   "0" ["0" - "7"]*
- float                ::=   minus_opt FLOAT_LITERAL ;
- catch                ::=   CATCH block_statement_arguments ;
- block_statement_arguments      ::=   paren_statement | block ;
- paren_statement      ::=   LPAREN expression RPAREN ;
- 
- gauge                ::=   GAUGE block_statement_arguments ;
- 
- sscanf               ::=   SSCANF LPAREN expression2 COMMA expression2 additional_lvalues RPAREN  ;
- additional_lvalues   ::=   | additional_lvalues_part ;
- additional_lvalues_part ::=  additional_lvalue | additional_lvalues_part additional_lvalue ;
- additional_lvalue    ::=   COMMA lvalue ;
- 
- lvalue               ::=   expression6 | typed_identifier | multiple_assignment ;
- multiple_assignment  ::=   LBRACK lvalues_list_opt RBRACK ;
- lvalues_list_opt     ::=   lvalues_list | ;
- lvalues_list         ::=   lvalue additional_lvalues comma_opt ;
- typed_identifier     ::=   type IDENTIFIER;
- comma_opt            ::=   COMMA | ;
- 
- lambda               ::=   LAMBDA LPAREN func_def_args RPAREN block ;
- 
- call                 ::=   expression6 LPAREN expression_list RPAREN ;
- 
- index                ::=   expression6 LBRACK index_parameter RBRACK ;
- index_parameter      ::=   expression | index_fromfront | index_toend | index_inclusive ;
- index_fromfront      ::=   DOTDOT expression ;
- index_toend          ::=   expression DOTDOT ;
- index_inclusive      ::=   expression DOTDOT expression ;
- 
- array                ::=   LPLC expression_list RCRP ;
- multiset             ::=   RPLT expression_list GTLP ;
- 
- mapping              ::=   LPLB mapping_assignments_opt RBRP ;
- mapping_assignment   ::=   expression COLON expression ;
- mapping_assignments_opt ::=  mapping_assignments | ;
- mapping_assignments  ::=   mapping_assignment additional_mapping_assignments comma_opt ;
- additional_mapping_assignments ::= additional_mapping_assignments_part | ;
- additional_mapping_assignments_part ::= additional_mapping_assignment | additional_mapping_assignments_part additional_mapping_assignment ;
- additional_mapping_assignment ::= COMMA expression COLON expression ;
+block_or_semi::= block
+  | SEMICOLON
+  | TOK_LEX_EOF {:  yyerror("Expected SEMICOLON."); :}
+  | error
+  ;
+
+
+type_or_error::= simple_type
+  ;
+
+open_paren_with_line_info::= LPAREN
+  ;
+
+close_paren_or_missing::= RPAREN
+  | /* empty */
+  ;
+
+close_brace_or_missing::= RBRACE
+  | /* empty */
+  {:
+    yyerror("Missing RBRACE.");
+  :}
+  ;
+
+close_brace_or_eof::= RBRACE
+  | TOK_LEX_EOF
+  {:
+    yyerror("Missing RBRACE.");
+  :}
+  ;
+
+open_bracket_with_line_info::= LBRACK
+  ;
+
+close_bracket_or_missing::= RBRACK
+  | /* empty */
+  {:
+    yyerror("Missing RBRACK.");
+  :}
+  ;
+
+push_compiler_frame0::= /* empty */
+  ;
+
+def::= modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame0
+  LPAREN arguments close_paren_or_missing
+  block_or_semi
+  | modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame0
+    error
+  | modifiers type_or_error optional_stars bad_identifier
+    LPAREN arguments RPAREN block_or_semi
+  | modifiers type_or_error name_list SEMICOLON {:}
+  | inheritance {:}
+  | _import {:}
+  | constant {:}
+  | class {: }
+  | enum {: }
+  | typedef {:}
+  | error TOK_LEX_EOF
+  {:
+    yyerror("Missing SEMICOLON.");
+    yyerror("Unexpected end of file");
+  :}
+  | error SEMICOLON
+  | error RBRACE
+  {:
+    yyerror("Missing SEMICOLON.");
+  :}
+  | modifiers
+   LBRACE 
+      program
+   close_brace_or_eof
+  ;
+
+optional_dot_dot_dot::= TOK_DOT_DOT_DOT
+  | TOK_DOT_DOT
+  {:
+    yyerror("Range indicator ('..') where elipsis ('...') expected.");
+  :}
+  | /* empty */
+  ;
+
+optional_identifier::= TOK_IDENTIFIER
+  | bad_identifier
+  | /* empty */
+  ;
+
+new_arg_name::= type7 optional_dot_dot_dot optional_identifier
+  ;
+
+func_args::= LPAREN arguments close_paren_or_missing
+  ;
+
+arguments::= /* empty */ optional_comma 
+  | arguments2 optional_comma
+  ;
+
+arguments2::= new_arg_name 
+  | arguments2 COMMA new_arg_name 
+  | arguments2 COLON new_arg_name
+  {:
+    yyerror("Unexpected ':' in argument list.");
+  :}
+  ;
+
+modifier::=
+    TOK_NO_MASK    
+  | TOK_FINAL_ID   
+  | TOK_STATIC     
+  | TOK_EXTERN     
+  | TOK_OPTIONAL   
+  | TOK_PRIVATE    
+  | TOK_LOCAL_ID   
+  | TOK_PUBLIC     
+  | TOK_PROTECTED  
+  | TOK_INLINE     
+  | TOK_VARIANT    
+  ;
+
+magic_identifiers1::=
+    TOK_NO_MASK    
+  | TOK_FINAL_ID   
+  | TOK_STATIC     
+  | TOK_EXTERN	  
+  | TOK_PRIVATE    
+  | TOK_LOCAL_ID   
+  | TOK_PUBLIC     
+  | TOK_PROTECTED  
+  | TOK_INLINE     
+  | TOK_OPTIONAL   
+  | TOK_VARIANT    
+  ;
+
+magic_identifiers2::=
+    TOK_VOID_ID       
+  | TOK_MIXED_ID      
+  | TOK_ARRAY_ID      
+  | TOK_MAPPING_ID    
+  | TOK_MULTISET_ID   
+  | TOK_OBJECT_ID     
+  | TOK_FUNCTION_ID   
+  | TOK_PROGRAM_ID    
+  | TOK_STRING_ID     
+  | TOK_FLOAT_ID      
+  | TOK_INT_ID        
+  | TOK_ENUM	      
+  | TOK_TYPEDEF       
+  ;
+
+magic_identifiers3::=
+    TOK_IF         
+  | TOK_DO         
+  | TOK_FOR        
+  | TOK_WHILE      
+  | TOK_ELSE       
+  | TOK_FOREACH    
+  | TOK_CATCH      
+  | TOK_GAUGE      
+  | TOK_CLASS      
+  | TOK_BREAK      
+  | TOK_CASE       
+  | TOK_CONSTANT   
+  | TOK_CONTINUE   
+  | TOK_DEFAULT    
+  | TOK_IMPORT     
+  | TOK_INHERIT    
+  | TOK_LAMBDA     
+  | TOK_PREDEF     
+  | TOK_RETURN     
+  | TOK_SSCANF     
+  | TOK_SWITCH     
+  | TOK_TYPEOF     
+  | TOK_GLOBAL     
+  ;
+
+magic_identifiers::= magic_identifiers1 | magic_identifiers2 | magic_identifiers3 ;
+
+magic_identifier::= TOK_IDENTIFIER 
+  | magic_identifiers
+  ;
+
+modifiers::= modifier_list
+ ;
+
+modifier_list::= /* empty */ 
+  | modifier modifier_list 
+  ;
+
+optional_stars::= optional_stars MULT 
+  | /* empty */
+  ;
+
+cast::= open_paren_with_line_info type RPAREN
+    ;
+
+soft_cast::= open_bracket_with_line_info type RBRACK
+    ;
+
+full_type::= type4
+  | full_type MULT
+  ;
+
+type6::= type | identifier_type ;
   
- arrow                ::=   expression6 INDIRECT IDENTIFIER ;
- parenthesis          ::=   LPAREN expression RPAREN ;
+type::= type MULT
+  | type2
+  ;
 
- expression_list      ::=   expression_list_part | ;
- expression_list_part ::=   splice_expression splice_expressions comma_opt ;
- splice_expressions   ::=   | splice_expressions_part ;
- splice_expressions_part ::= additional_splice_expression | splice_expressions_part additional_splice_expression ;
- additional_splice_expression ::=  COMMA splice_expression ;
- 
- type                 ::=   int_type | STRING | FLOAT | PROGRAM | object_type | program_specifier |
-                            mapping_type | array_type | multiset_type | function_type ;
- 
- int_type             ::=   INT int_type_specifier_opt ;
- int_type_specifier_opt ::= int_type_specifier | ;
- int_type_specifier ::=   LPAREN  int_type_specifier_body RPAREN ;
- int_type_specifier_body ::= digits | digits_fromfront | digits_toend | digits_inclusive ;
- digits_inclusive ::= digits DOTDOT digits ;
- digits_fromfront ::=  DOTDOT digits ;
- digits_toend ::=  digits DOTDOT ;
- 
- // this is not so good, but it will have to do for now.
- 
- digits ::= INTEGER_LITERAL ;
- object_type          ::=   OBJECT object_type_specifier_opt ;
- object_type_specifier_opt ::= object_type_specifier | ;
- object_type_specifier ::=  LPAREN program_specifier RPAREN ;
+type7::= type7 MULT
+  | type4
+  ;
 
- mapping_type         ::=   MAPPING mapping_type_specifier_opt ;
- mapping_type_specifier_opt ::= mapping_type_specifier | ;
- mapping_type_specifier ::=  LPAREN type COLON type RPAREN ;
+simple_type::= type4
+  ;
 
- array_type           ::=   ARRAY array_type_specifier_opt ;
- array_type_specifier_opt ::= array_type_specifier | ;
- array_type_specifier ::=   LPAREN type RPAREN ;
+simple_type2::= type2
+  ;
 
- multiset_type_specifier_opt ::= multiset_type_specifier | ;
- multiset_type_specifier  ::=  LPAREN type RPAREN ;
- 
- function_type        ::=   FUNCTION  function_type_specifier_opt ;
- function_type_specifier_opt ::= function_type_specifier | ;
- function_type_specifier ::=   LPAREN type additional_types_opt dotdotdot_opt COLON type RPAREN ;
- additional_types_opt   ::=  additional_types | ;
- additional_types     ::=   additional_type | additional_types additional_type ;
- additional_type      ::=   COMMA type ;
- dotdotdot_opt        ::=   DOTDOTDOT | ;
- 
- arguments            ::=   arguments_front comma_opt ;
- arguments_front      ::=   argument additional_arguments_opt varargs_opt | varargs ;
- additional_arguments_opt ::= additional_arguments | ;
- additional_arguments ::=  additional_argument | additional_arguments additional_argument ;
- additional_argument  ::= COMMA argument ;
-  
- varargs_opt          ::=  varargs | ;
- 
- prot_arguments       ::=   prot_arguments_front comma_opt ;
- prot_arguments_front ::=  type additional_types_opt type_varargs_prot_opt |  type_varargs_prot ;
- type_varargs_prot    ::=  type DOTDOTDOT ;
- type_varargs_prot_opt ::= type_varargs_prot | ;
- 
- splice_expression    ::=   splice_opt expression2 ;
- splice_opt           ::=   | AT ;
+simple_identifier_type::= identifier_type
+  ;
 
- argument             ::=   type IDENTIFIER ;
- varargs              ::=   type DOTDOTDOT IDENTIFIER ;
+type4::= type4 OR type8 
+  | type8
+  ;
 
- program_specifier    ::=   STRING | constant_identifier ;
+type2::= type2 OR type8
+  | basic_type 
+  ;
+
+type8::= basic_type | identifier_type ;
+
+basic_type::=
+    TOK_FLOAT_ID                      
+  | TOK_VOID_ID                       
+  | TOK_MIXED_ID                      
+  | TOK_STRING_ID                     
+  | TOK_INT_ID      opt_int_range     
+  | TOK_MAPPING_ID  opt_mapping_type  
+  | TOK_FUNCTION_ID opt_function_type 
+  | TOK_OBJECT_ID   opt_object_type   
+  | TOK_PROGRAM_ID  opt_object_type   
+  | TOK_ARRAY_ID    opt_array_type    
+  | TOK_MULTISET_ID opt_array_type    
+  ;
+
+identifier_type::= idents
+  ;
+
+number_or_maxint::= /* Empty */
+  | TOK_NUMBER
+  | MINUS TOK_NUMBER
+  ;
+
+number_or_minint::= /* Empty */
+  | TOK_NUMBER
+  | MINUS TOK_NUMBER
+  ;
+
+expected_dot_dot::= TOK_DOT_DOT
+  | TOK_DOT_DOT_DOT
+  {:
+    yyerror("Elipsis ('...') where range indicator ('..') expected.");
+  :}
+  ;
+
+opt_int_range::= /* Empty */
+  | LPAREN number_or_minint expected_dot_dot number_or_maxint RPAREN
+  ;
+
+opt_object_type::=  /* Empty */ 
+  |
+    LPAREN program_ref RPAREN
+  ;
+
+opt_function_type::= LPAREN
+  function_type_list optional_dot_dot_dot COLON
+  type7 RPAREN
+  | /* empty */
+  ;
+
+function_type_list::= /* Empty */ optional_comma 
+  | function_type_list2 optional_comma 
+  ;
+
+function_type_list2::= type7 
+  | function_type_list2 COMMA
+  type7
+  ;
+
+opt_array_type::= LPAREN type7 RPAREN
+  |  
+  ;
+
+opt_mapping_type::= LPAREN
+  type7 COLON
+  type7
+  RPAREN
+  | /* empty */ 
+  ;
+
+
+
+name_list::= new_name
+  | name_list COMMA new_name
+  ;
+
+new_name::= optional_stars TOK_IDENTIFIER
+  | optional_stars bad_identifier {::}
+  | optional_stars TOK_IDENTIFIER EQ
+  expr0
+  | optional_stars TOK_IDENTIFIER EQ error
+  | optional_stars TOK_IDENTIFIER EQ TOK_LEX_EOF
+  {:
+    yyerror("Unexpected end of file in variable definition.");
+  :}
+  | optional_stars bad_identifier EQ expr0
+  ;
+
+
+new_local_name::= optional_stars TOK_IDENTIFIER
+  | optional_stars bad_identifier
+  | optional_stars TOK_IDENTIFIER EQ expr0 
+  | optional_stars bad_identifier EQ expr0
+  | optional_stars TOK_IDENTIFIER EQ error
+  | optional_stars TOK_IDENTIFIER EQ TOK_LEX_EOF
+  {:
+    yyerror("Unexpected end of file in local variable definition.");
+  :}
+  ;
+
+new_local_name2::= TOK_IDENTIFIER
+  | bad_identifier
+  | TOK_IDENTIFIER EQ safe_expr0
+  | bad_identifier EQ safe_expr0
+  ;
+
+line_number_info::= /* empty */
+  ;
+
+block::= LBRACE
+  line_number_info
+  statements end_block
+  ;
+
+end_block::= RBRACE
+  | TOK_LEX_EOF
+  {:
+    yyerror("Missing '}'.");
+    yyerror("Unexpected end of file.");
+  :}
+  ;
+
+failsafe_block::= block
+              | error 
+              | TOK_LEX_EOF {: yyerror("Unexpected end of file."); :}
+              ;
+
+
+local_name_list::= new_local_name
+  | local_name_list COMMA new_local_name
+  ;
+
+local_name_list2::= new_local_name2
+  | local_name_list2 COMMA {: :} new_local_name
+  ;
+
+
+local_constant_name::= TOK_IDENTIFIER EQ safe_expr0
+  | bad_identifier EQ safe_expr0
+  | error EQ safe_expr0
+  ;
+
+local_constant_list::= local_constant_name
+  | local_constant_list COMMA local_constant_name
+  ;
+
+local_constant::= TOK_CONSTANT local_constant_list SEMICOLON
+  | TOK_CONSTANT error SEMICOLON
+  | TOK_CONSTANT error TOK_LEX_EOF
+  {:
+    yyerror("Missing SEMICOLON.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_CONSTANT error RBRACE {: yyerror("Missing ';'."); :}
+  ;
+
+
+statements::=
+  | statements statement
+  ;
+
+statement_with_semicolon::= unused2 optional_block
+;
+
+normal_label_statement::= statement_with_semicolon
+  | _import
+  | cond
+  | return
+  | local_constant
+  | block
+  | break expected_semicolon
+  | continue expected_semicolon
+  | error SEMICOLON
+  | error TOK_LEX_EOF
+  {:
+    yyerror("Missing ';'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | error RBRACE
+  {:
+    yyerror("Missing ';'.");
+  :}
+  | SEMICOLON
+  ;
+
+statement::= normal_label_statement
+  | while
+  | do
+  | for
+  | foreach
+  | switch
+  | case
+  | default
+  | labeled_statement
+  ;
+
+labeled_statement::= TOK_IDENTIFIER
+  COLON statement
+  ;
+
+optional_label::= TOK_IDENTIFIER
+  | /* empty */ 
+  ;
+
+break::= TOK_BREAK optional_label  ;
+default::= TOK_DEFAULT COLON 
+  | TOK_DEFAULT
+  {:
+    yyerror("Expected ':' after default.");
+  :}
+  ;
+
+continue::= TOK_CONTINUE optional_label ;
+
+push_compiler_frame1::= /* empty */
+  ;
+
+lambda::= TOK_LAMBDA line_number_info push_compiler_frame1
+  func_args
+  failsafe_block
+  | TOK_LAMBDA line_number_info push_compiler_frame1 error
+  ;
+
+local_function::= TOK_IDENTIFIER push_compiler_frame1 func_args 
+  failsafe_block
+  | TOK_IDENTIFIER push_compiler_frame1 error
+  ;
+
+local_function2::= optional_stars TOK_IDENTIFIER push_compiler_frame1 func_args 
+  failsafe_block
+  | optional_stars TOK_IDENTIFIER push_compiler_frame1 error
+  ;
+
+create_arg::= modifiers type_or_error optional_stars optional_dot_dot_dot TOK_IDENTIFIER
+  | modifiers type_or_error optional_stars bad_identifier
+  ;
+
+create_arguments2::= create_arg
+  | create_arguments2 COMMA create_arg 
+  | create_arguments2 COLON create_arg
+  {:
+    yyerror("Unexpected ':' in create argument list.");
+  :}
+  ;
+
+create_arguments::= /* empty */ optional_comma
+  | create_arguments2 optional_comma
+  ;
+
+push_compiler_frame01::= /* empty */
+  ;
+
+optional_create_arguments::= /* empty */ 
+  | LPAREN push_compiler_frame01 create_arguments close_paren_or_missing
+  ;
+
+failsafe_program::= LBRACE program end_block
+                | error 
+                | TOK_LEX_EOF
+                {:
+		  yyerror("End of file where program definition expected.");
+		:}
+                ;
+
+class::= modifiers TOK_CLASS line_number_info optional_identifier
+  optional_create_arguments failsafe_program
+
+  ;
+
+simple_identifier::= TOK_IDENTIFIER
+  | bad_identifier 
+  ;
+
+enum_value::= /* EMPTY */
+  | EQ safe_expr0
+  ;
+
+enum_def::= /* EMPTY */
+  | simple_identifier enum_value
+  ;
+
+enum_list::= enum_def
+  | enum_list COMMA enum_def
+  ;
+
+enum::= modifiers TOK_ENUM
+  optional_identifier LBRACE enum_list end_block
+  ;
+
+typedef::= modifiers TOK_TYPEDEF full_type simple_identifier SEMICOLON
+  ;
+
+cond::= TOK_IF
+  line_number_info
+  LPAREN safe_comma_expr end_cond statement optional_else_part
+  ;
+
+end_cond::= RPAREN
+  | RBRACE {: yyerror("Missing RPAREN."); :}
+  | TOK_LEX_EOF
+  {:
+    yyerror("Missing RPAREN.");
+    yyerror("Unexpected end of file.");
+  :}
+  ;
+
+optional_else_part::= 
+  | TOK_ELSE statement 
+  ;      
+
+safe_lvalue::= lvalue
+  | error 
+  ;
+
+safe_expr0::= expr0
+  | TOK_LEX_EOF {: yyerror("Unexpected end of file.");  :}
+  | error 
+  ;
+
+
+foreach_optional_lvalue::= /* empty */ 
+   | safe_lvalue
+   ;
+
+foreach_lvalues::=  COMMA safe_lvalue 
+  | SEMICOLON foreach_optional_lvalue SEMICOLON foreach_optional_lvalue
+  ;
+
+foreach::= TOK_FOREACH
+  line_number_info
+  LPAREN expr0 foreach_lvalues end_cond statement
+  ;
+
+do::= TOK_DO line_number_info statement
+  TOK_WHILE LPAREN safe_comma_expr end_cond expected_semicolon
+  | TOK_DO line_number_info statement TOK_WHILE TOK_LEX_EOF
+  {:
+    yyerror("Missing LPAREN in do-while loop.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_DO line_number_info statement TOK_LEX_EOF
+  {:
+    yyerror("Missing 'while' in do-while loop.");
+    yyerror("Unexpected end of file.");
+  :}
+  ;
+
+expected_semicolon::= SEMICOLON
+  | TOK_LEX_EOF
+  {:
+    yyerror("Missing ';'.");
+    yyerror("Unexpected end of file.");
+  :}
+  ;
+
+for::= TOK_FOR
+  line_number_info
+  LPAREN unused expected_semicolon for_expr expected_semicolon unused end_cond
+  statement
+  ;
+
+
+while::=  TOK_WHILE
+  line_number_info
+  LPAREN safe_comma_expr end_cond statement
+  ;
+
+for_expr::= /* EMPTY */ 
+  | safe_comma_expr
+  ;
+
+switch::=	TOK_SWITCH
+  line_number_info
+  LPAREN safe_comma_expr end_cond statement
+  ;
+
+case::= TOK_CASE safe_comma_expr expected_colon
+  | TOK_CASE safe_comma_expr expected_dot_dot optional_comma_expr expected_colon
+  | TOK_CASE expected_dot_dot safe_comma_expr expected_colon
+  ;
+
+expected_colon::= COLON
+  | SEMICOLON
+  {:
+    yyerror("Missing ':'.");
+  :}
+  | RBRACE
+  {:
+    yyerror("Missing ':'.");
+  :}
+  | TOK_LEX_EOF
+  {:
+    yyerror("Missing ':'.");
+    yyerror("Unexpected end of file.");
+  :}
+  ;
+
+return::= TOK_RETURN expected_semicolon
+  | TOK_RETURN safe_comma_expr expected_semicolon
+  ;
+	
+unused::=
+  | safe_comma_expr
+  ;
+
+unused2::= comma_expr ;
+
+optional_comma_expr::= 
+  | safe_comma_expr
+  ;
+
+safe_comma_expr::= comma_expr
+  | error 
+  ;
+
+comma_expr::= comma_expr2
+  | simple_type2 local_name_list 
+  | simple_identifier_type local_name_list2 
+  | simple_identifier_type local_function 
+  | simple_type2 local_function2 
+  ;
+          
+
+comma_expr2::= expr0
+  | comma_expr2 COMMA expr0
+  ;
+
+expr00::= expr0
+      | AT expr0 ;
+
+expr0::= expr01
+  | expr4 EQ expr0  
+  | expr4 EQ error
+  | bad_expr_ident EQ expr0 
+  | open_bracket_with_line_info low_lvalue_list RBRACK EQ expr0
+  | expr4 assign expr0  
+  | expr4 assign error 
+  | bad_expr_ident assign expr0
+  | open_bracket_with_line_info low_lvalue_list RBRACK assign expr0
+  | open_bracket_with_line_info low_lvalue_list RBRACK error
+    {:  :}
+/*  | error {: $$=0; reset_type_stack(); :} */
+  ;
+
+expr01::= expr1
+  | expr1 QUESTION expr01 COLON expr01 
+  ;
+
+assign::= TOK_AND_EQ 
+  | TOK_OR_EQ  
+  | TOK_XOR_EQ 
+  | TOK_LSH_EQ 
+  | TOK_RSH_EQ 
+  | TOK_ADD_EQ 
+  | TOK_SUB_EQ 
+  | TOK_MULT_EQ
+  | TOK_MOD_EQ 
+  | TOK_DIV_EQ 
+  ;
+
+optional_comma::=  | COMMA ;
+
+expr_list::=
+  | expr_list2 optional_comma
+  ;
+         
+
+expr_list2::= expr00
+  | expr_list2 COMMA expr00 
+  ;
+
+m_expr_list::= 
+  | m_expr_list2 optional_comma
+  ;
+
+m_expr_list2::= assoc_pair
+  | m_expr_list2 COMMA assoc_pair
+  | m_expr_list2 COMMA error
+  ;
+
+assoc_pair::=  expr0 expected_colon expr0 
+  | expr0 expected_colon error
+  ;
+
+expr1::= expr2
+  | expr1 TOK_LOR expr1  
+  | expr1 TOK_LAND expr1 
+  | expr1 OR expr1    
+  | expr1 XOR expr1    
+  | expr1 AND expr1    
+  | expr1 TOK_EQ expr1   
+  | expr1 TOK_NE expr1   
+  | expr1 GT expr1    
+  | expr1 TOK_GE expr1   
+  | expr1 LT expr1    
+  | expr1 TOK_LE expr1   
+  | expr1 TOK_LSH expr1  
+  | expr1 TOK_RSH expr1  
+  | expr1 PLUS expr1    
+  | expr1 MINUS expr1    
+  | expr1 MULT expr1    
+  | expr1 MOD expr1    
+  | expr1 DIV expr1    
+  | expr1 TOK_LOR error 
+  | expr1 TOK_LAND error
+  | expr1 OR error   
+  | expr1 XOR error   
+  | expr1 AND error   
+  | expr1 TOK_EQ error  
+  | expr1 TOK_NE error  
+  | expr1 GT error   
+  | expr1 TOK_GE error  
+  | expr1 LT error   
+  | expr1 TOK_LE error  
+  | expr1 TOK_LSH error 
+  | expr1 TOK_RSH error 
+  | expr1 PLUS error   
+  | expr1 MINUS error   
+  | expr1 MULT error   
+  | expr1 MOD error   
+  | expr1 DIV error
+  ;
+
+expr2::= expr3
+  | cast expr2
+  | soft_cast expr2
+  | TOK_INC expr4      
+  | TOK_DEC expr4      
+  | TOK_NOT expr2        
+  | COMP expr2          
+  | MINUS expr2          
+  ;
+
+expr3::= expr4
+  | expr4 TOK_INC       
+  | expr4 TOK_DEC      
+  ;
+
+/* FIXMEs
+ * It would be nice if 'return' would exit from
+ * the surrounding function rather than from the
+ * implicit lambda. (I think) So beware that the
+ * behaviour of 'return' might change some day.
+ * -Hubbe
+ *
+ * It would also be nice if it was possible to send
+ * arguments to the implicit function, but it would
+ * require using ugly implicit variables or extending
+ * the syntax, and if you extend the syntax you might
+ * as well use lambda() instead.
+ * -Hubbe
+ *
+ * We might want to allow having more than block after
+ * a function ( ie. func(args) {::} {::} {::} {::} )
+ * -Hubbe
+ */
+
+optional_block::= SEMICOLON /* EMPTY */ {:  :}
+  | LBRACE line_number_info push_compiler_frame0
+  statements end_block expected_semicolon
+  ;
+
+expr4::= string
+  | TOK_NUMBER 
+  | TOK_FLOAT
+  | catch
+  | gauge
+  | typeof
+  | sscanf
+  | lambda
+  | class
+  | enum
+  | idents2
+  | expr4 open_paren_with_line_info expr_list  RPAREN
+  | expr4 open_paren_with_line_info error RPAREN
+  | expr4 open_paren_with_line_info error TOK_LEX_EOF
+  {:
+    yyerror("Missing ')'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | expr4 open_paren_with_line_info error SEMICOLON
+  {:
+    yyerror("Missing ')'.");
+  :}
+  | expr4 open_paren_with_line_info error RBRACE
+  {:
+    yyerror("Missing ')'.");
+  :}
+  | expr4 open_bracket_with_line_info MULT RBRACK
+  | expr4 open_bracket_with_line_info expr0 RBRACK
+  | expr4 open_bracket_with_line_info
+    comma_expr_or_zero expected_dot_dot comma_expr_or_maxint RBRACK
+  | expr4 open_bracket_with_line_info error RBRACK
+  | expr4 open_bracket_with_line_info error TOK_LEX_EOF
+  {:
+    yyerror("Missing ']'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | expr4 open_bracket_with_line_info error SEMICOLON
+    {: yyerror("Missing ']'."); :}
+  | expr4 open_bracket_with_line_info error RBRACE
+    {: yyerror("Missing ']'."); :}
+  | expr4 open_bracket_with_line_info error RPAREN
+    {: yyerror("Missing ']'."); :}
+  | open_paren_with_line_info comma_expr2 RPAREN
+  | open_paren_with_line_info LBRACE expr_list close_brace_or_missing RPAREN
+  | open_paren_with_line_info
+    open_bracket_with_line_info	/* Only to avoid shift/reduce conflicts. */
+    m_expr_list close_bracket_or_missing RPAREN
+  | TOK_MULTISET_START line_number_info expr_list TOK_MULTISET_END
+  | TOK_MULTISET_START line_number_info expr_list RPAREN
+    {:
+      yyerror("Missing '>'.");
+    :}
+  | open_paren_with_line_info error RPAREN
+  | open_paren_with_line_info error TOK_LEX_EOF
+  {:
+    yyerror("Missing RPAREN.");
+    yyerror("Unexpected end of file.");
+  :}
+  | open_paren_with_line_info error SEMICOLON {: yyerror("Missing RPAREN."); :}
+  | open_paren_with_line_info error RBRACE {: yyerror("Missing RPAREN."); :}
+  | TOK_MULTISET_START line_number_info error TOK_MULTISET_END 
+  | TOK_MULTISET_START line_number_info error RPAREN {:
+    yyerror("Missing '>'.");
+  :}
+  | TOK_MULTISET_START line_number_info error TOK_LEX_EOF
+  {:
+    yyerror("Missing '>)'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_MULTISET_START line_number_info error SEMICOLON {: yyerror("Missing '>)'."); :}
+  | TOK_MULTISET_START line_number_info error RBRACE {: yyerror("Missing '>)'."); :}
+  | expr4 TOK_ARROW line_number_info magic_identifier
+  | expr4 TOK_ARROW line_number_info error 
+  ;
+
+idents2::= idents
+  | TOK_LOCAL_ID TOK_COLON_COLON TOK_IDENTIFIER
+  | TOK_LOCAL_ID TOK_COLON_COLON bad_identifier
+  ;
+
+idents::= low_idents
+  | idents DOT TOK_IDENTIFIER
+  | DOT TOK_IDENTIFIER
+  | TOK_GLOBAL DOT TOK_IDENTIFIER
+  | idents DOT bad_identifier {::}
+  | idents DOT error {::}
+  ;
+
+inherit_specifier::= TOK_IDENTIFIER TOK_COLON_COLON
+  | TOK_GLOBAL TOK_COLON_COLON
+  | inherit_specifier TOK_IDENTIFIER TOK_COLON_COLON
+  | inherit_specifier bad_identifier TOK_COLON_COLON 
+  ;
+
+low_idents::= TOK_IDENTIFIER
+  | TOK_PREDEF TOK_COLON_COLON TOK_IDENTIFIER
+  | TOK_PREDEF TOK_COLON_COLON bad_identifier
+  | inherit_specifier TOK_IDENTIFIER
+  | inherit_specifier bad_identifier 
+  | inherit_specifier error 
+  | TOK_COLON_COLON TOK_IDENTIFIER
+  | TOK_COLON_COLON bad_identifier
+  ;
+
+comma_expr_or_zero::= /* empty */ 
+  | comma_expr
+  | TOK_LEX_EOF {: yyerror("Unexpected end of file."); :}
+  ;
+
+comma_expr_or_maxint::= /* empty */ 
+  | comma_expr
+  | TOK_LEX_EOF {: yyerror("Unexpected end of file.");  :}
+  ;
+
+gauge::= TOK_GAUGE catch_arg
+  ;
+
+typeof::= TOK_TYPEOF LPAREN expr0 RPAREN
+  | TOK_TYPEOF LPAREN error RPAREN {: yyerrok; :}
+  | TOK_TYPEOF LPAREN error RBRACE {: yyerror("Missing ')'."); :}
+  | TOK_TYPEOF LPAREN error TOK_LEX_EOF
+  {:
+    yyerror("Missing ')'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_TYPEOF LPAREN error SEMICOLON {:  yyerror("Missing ')'."); :}
+  ;
  
- modifiers            ::= modifiers_empty | modifiers_def ;
- modifiers_empty	::=  modifiers_part | ;
- modifiers_def		::= modifiers_part modifiers_opt;
- modifiers_opt 		::= modifiers_part | ;  
- modifiers_part		::= EXTERN | FINAL | INLINE | LOCAL | NOMASK | OPTIONAL | PRIVATE |
-                              PROTECTED | PUBLIC | STATIC | VARIANT  ;
-                               
- constant_identifier  ::=   constant_identifier_part constant_identifier_opt;
- constant_identifier_opt ::= constant_identifier_part_1 | ;
- constant_identifier_part ::= constant_identifier_part_1 | IDENTIFIER;
- constant_identifier_part_1 ::= DOT IDENTIFIER;
- 
- 
+catch_arg::= LPAREN comma_expr RPAREN  
+  | LPAREN error RPAREN 
+  | LPAREN error TOK_LEX_EOF
+  {:
+    yyerror("Missing ')'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | LPAREN error RBRACE {: yyerror("Missing ')'."); :}
+  | LPAREN error SEMICOLON {: yyerror("Missing ')'."); :}
+  | block
+  | error {: yyerror("Bad expression for catch."); :}
+  ; 
+
+catch::= TOK_CATCH
+     catch_arg
+     ;
+
+sscanf::= TOK_SSCANF LPAREN expr0 COMMA expr0 lvalue_list RPAREN
+  | TOK_SSCANF LPAREN expr0 COMMA expr0 error RPAREN
+  | TOK_SSCANF LPAREN expr0 COMMA expr0 error TOK_LEX_EOF
+  {:
+    yyerror("Missing ')'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_SSCANF LPAREN expr0 COMMA expr0 error RBRACE
+  {:
+    yyerror("Missing ')'.");
+  :}
+  | TOK_SSCANF LPAREN expr0 COMMA expr0 error SEMICOLON
+  {:
+    yyerror("Missing ')'.");
+  :}
+  | TOK_SSCANF LPAREN expr0 error RPAREN
+  | TOK_SSCANF LPAREN expr0 error TOK_LEX_EOF
+  {:
+    yyerror("Missing ')'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_SSCANF LPAREN expr0 error RBRACE
+  {:
+    yyerror("Missing ')'.");
+  :}
+  | TOK_SSCANF LPAREN expr0 error SEMICOLON
+  {:
+    yyerror("Missing ')'.");
+  :}
+  | TOK_SSCANF LPAREN error RPAREN 
+  | TOK_SSCANF LPAREN error TOK_LEX_EOF
+  {:
+    yyerror("Missing ')'.");
+    yyerror("Unexpected end of file.");
+  :}
+  | TOK_SSCANF LPAREN error RBRACE {:  yyerror("Missing ')'."); :}
+  | TOK_SSCANF LPAREN error SEMICOLON {:  yyerror("Missing ')'."); :}
+  ;
+
+lvalue::= expr4
+  | open_bracket_with_line_info low_lvalue_list RBRACK
+  | type6 TOK_IDENTIFIER
+  | bad_expr_ident
+  ;
+low_lvalue_list::= lvalue lvalue_list 
+  ;
+
+lvalue_list::= /* empty */ 
+  | COMMA lvalue lvalue_list 
+  ;
+
+string::= TOK_STRING 
+  | string TOK_STRING
+
+  ;
+
+/*
+ * Some error-handling
+ */
+
+
+bad_identifier::= bad_expr_ident
+  | TOK_ARRAY_ID
+  {: yyerror("array is a reserved word."); :}
+  | TOK_CLASS
+  {: yyerror("class is a reserved word."); :}
+  | TOK_ENUM
+  {: yyerror("enum is a reserved word."); :}
+  | TOK_FLOAT_ID
+  {: yyerror("float is a reserved word.");:}
+  | TOK_FUNCTION_ID
+  {: yyerror("function is a reserved word.");:}
+  | TOK_INT_ID
+  {: yyerror("int is a reserved word."); :}
+  | TOK_MAPPING_ID
+  {: yyerror("mapping is a reserved word."); :}
+  | TOK_MIXED_ID
+  {: yyerror("mixed is a reserved word."); :}
+  | TOK_MULTISET_ID
+  {: yyerror("multiset is a reserved word."); :}
+  | TOK_OBJECT_ID
+  {: yyerror("object is a reserved word."); :}
+  | TOK_PROGRAM_ID
+  {: yyerror("program is a reserved word."); :}
+  | TOK_STRING_ID
+  {: yyerror("string is a reserved word."); :}
+  | TOK_TYPEDEF
+  {: yyerror("typedef is a reserved word."); :}
+  | TOK_VOID_ID
+  {: yyerror("void is a reserved word."); :}
+  ;
+
+bad_expr_ident::=
+    TOK_INLINE
+  {: yyerror("inline is a reserved word."); :}
+  | TOK_LOCAL_ID
+  {: yyerror("local is a reserved word."); :}
+  | TOK_NO_MASK
+  {: yyerror("nomask is a reserved word."); :}
+  | TOK_PREDEF
+  {: yyerror("predef is a reserved word."); :}
+  | TOK_PRIVATE
+  {: yyerror("private is a reserved word."); :}
+  | TOK_PROTECTED
+  {: yyerror("protected is a reserved word."); :}
+  | TOK_PUBLIC
+  {: yyerror("public is a reserved word."); :}
+  | TOK_OPTIONAL
+  {: yyerror("optional is a reserved word."); :}
+  | TOK_VARIANT
+  {: yyerror("variant is a reserved word."); :}
+  | TOK_STATIC
+  {: yyerror("static is a reserved word."); :}
+  | TOK_EXTERN
+  {: yyerror("extern is a reserved word."); :}
+  | TOK_FINAL_ID
+  {: yyerror("final is a reserved word.");:}
+  | TOK_DO
+  {: yyerror("do is a reserved word."); :}
+  | TOK_ELSE
+  {: yyerror("else without if."); :}
+  | TOK_RETURN
+  {: yyerror("return is a reserved word."); :}
+  | TOK_IMPORT
+  {: yyerror("import is a reserved word."); :}
+  | TOK_INHERIT
+  {: yyerror("inherit is a reserved word."); :}
+  | TOK_CATCH
+  {: yyerror("catch is a reserved word."); :}
+  | TOK_GAUGE
+  {: yyerror("gauge is a reserved word."); :}
+  | TOK_LAMBDA
+  {: yyerror("lambda is a reserved word."); :}
+  | TOK_SSCANF
+  {: yyerror("sscanf is a reserved word."); :}
+  | TOK_SWITCH
+  {: yyerror("switch is a reserved word."); :}
+  | TOK_TYPEOF
+  {: yyerror("typeof is a reserved word."); :}
+  | TOK_BREAK
+  {: yyerror("break is a reserved word."); :}
+  | TOK_CASE
+  {: yyerror("case is a reserved word."); :}
+  | TOK_CONTINUE
+  {: yyerror("continue is a reserved word."); :}
+  | TOK_DEFAULT
+  {: yyerror("default is a reserved word."); :}
+  | TOK_FOR
+  {: yyerror("for is a reserved word."); :}
+  | TOK_FOREACH
+  {: yyerror("foreach is a reserved word."); :}
+  | TOK_IF
+  {: yyerror("if is a reserved word."); :}
+  ;
+

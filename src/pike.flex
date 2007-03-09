@@ -126,55 +126,48 @@ SingleCharacter = [^\r\n\'\\]
 <YYINITIAL> {
 
   /* keywords */
-  "array"                        { return symbol(ARRAY); }
-  "break"                        { return symbol(BREAK); }
-  "case"                         { return symbol(CASE); }
-  "catch"                        { return symbol(CATCH); }
-  "class"                        { return symbol(CLASS); }
-  "constant"                     { return symbol(CONSTANT); }
-  "continue"                     { return symbol(CONTINUE); }
-  "do"                           { return symbol(DO); }
-  "else"                         { return symbol(ELSE); }
-  "final"                        { return symbol(FINAL); }
-  "float"                        { return symbol(FLOAT); }
-  "for"                          { return symbol(FOR); }
-  "function"                     { return symbol(FUNCTION); }
-  "default"                      { return symbol(DEFAULT); }
-  "foreach"                      { return symbol(FOREACH); }
-  "import"                       { return symbol(IMPORT); }
-  "inherit"                      { return symbol(INHERIT); }
-  "int"                          { return symbol(INT); }
-  "goto"                         { return symbol(GOTO); }
-  "if"                           { return symbol(IF); }
-  "mapping"                      { return symbol(MAPPING); }
-  "mixed"                        { return symbol(MIXED); }
-  "multiset"                     { return symbol(MULTISET); }
-  "object"                       { return symbol(OBJECT); }
-  "optional"                     { return symbol(OPTIONAL); }
-  "public"                       { return symbol(PUBLIC); }
-  "switch"                       { return symbol(SWITCH); }
-  "string"                       { return symbol(STRING); }
-  "private"                      { return symbol(PRIVATE); }
-  "protected"                    { return symbol(PROTECTED); }
-  "return"                       { return symbol(RETURN); }
-  "void"                         { return symbol(VOID); }
-  "static"                       { return symbol(STATIC); }
-  "while"                        { return symbol(WHILE); }
-  "this"                         { return symbol(THIS); }
-  "throw"                        { return symbol(THROW); }
-  "variant"                        { return symbol(VARIANT); }
-  "nomask"                        { return symbol(NOMASK); }  
-  "lambda"                        { return symbol(LAMBDA); }  
-  "gauge"                        { return symbol(GAUGE); }  
-  "sscanf"                        { return symbol(SSCANF); }    
-  /* boolean literals */
-/*  "true"                         { return symbol(BOOLEAN_LITERAL, new Boolean(true)); }
-  "false"                        { return symbol(BOOLEAN_LITERAL, new Boolean(false)); }
-  */
-  /* null literal */
-/*  "null"                         { return symbol(NULL_LITERAL); }
-  */
-  
+  "array"                        { return symbol(TOK_ARRAY_ID); }
+  "break"                        { return symbol(TOK_BREAK); }
+  "case"                         { return symbol(TOK_CASE); }
+  "catch"                        { return symbol(TOK_CATCH); }
+  "class"                        { return symbol(TOK_CLASS); }
+  "constant"                     { return symbol(TOK_CONSTANT); }
+  "continue"                     { return symbol(TOK_CONTINUE); }
+  "do"                           { return symbol(TOK_DO); }
+  "else"                         { return symbol(TOK_ELSE); }
+  "final"                        { return symbol(TOK_FINAL); }
+  "float"                        { return symbol(TOK_FLOAT); }
+  "for"                          { return symbol(TOK_FOR); }
+  "function"                     { return symbol(TOK_FUNCTION); }
+  "default"                      { return symbol(TOK_DEFAULT); }
+  "foreach"                      { return symbol(TOK_FOREACH); }
+  "import"                       { return symbol(TOK_IMPORT); }
+  "inherit"                      { return symbol(TOK_INHERIT); }
+  "int"                          { return symbol(TOK_INT); }
+  "goto"                         { return symbol(TOK_GOTO); }
+  "if"                           { return symbol(TOK_IF); }
+  "mapping"                      { return symbol(TOK_MAPPING_ID); }
+  "mixed"                        { return symbol(TOK_MIXED_ID); }
+  "multiset"                     { return symbol(TOK_MULTISET_ID); }
+  "object"                       { return symbol(TOK_OBJECT); }
+  "optional"                     { return symbol(TOK_OPTIONAL); }
+  "public"                       { return symbol(TOK_PUBLIC); }
+  "switch"                       { return symbol(TOK_SWITCH); }
+  "string"                       { return symbol(TOK_STRING_ID); }
+  "private"                      { return symbol(TOK_PRIVATE); }
+  "protected"                    { return symbol(TOK_PROTECTED); }
+  "return"                       { return symbol(TOK_RETURN); }
+  "void"                         { return symbol(TOK_VOID); }
+  "static"                       { return symbol(TOK_STATIC); }
+  "while"                        { return symbol(TOK_WHILE); }
+  "this"                         { return symbol(TOK_THIS); }
+  "throw"                        { return symbol(TOK_THROW); }
+  "variant"                        { return symbol(TOK_VARIANT); }
+  "nomask"                        { return symbol(TOK_NOMASK); }  
+  "lambda"                        { return symbol(TOK_LAMBDA); }  
+  "gauge"                        { return symbol(TOK_GAUGE); }  
+  "sscanf"                        { return symbol(TOK_SSCANF); }    
+
   /* separators */
   "("                            { return symbol(LPAREN); }
   ")"                            { return symbol(RPAREN); }
@@ -194,46 +187,38 @@ SingleCharacter = [^\r\n\'\\]
   "~"                            { return symbol(COMP); }
   "?"                            { return symbol(QUESTION); }
   ":"                            { return symbol(COLON); }
-  "=="                           { return symbol(EQEQ); }
-  "::"                           { return symbol(COLONCOLON); }
-  "<="                           { return symbol(LTEQ); }
-  ".."                           { return symbol(DOTDOT); }
-  "..."                          { return symbol(DOTDOTDOT); }
-  ">="                           { return symbol(GTEQ); }
-  "->"                           { return symbol(INDIRECT); }
-  "!="                           { return symbol(NOTEQ); }
-  "&&"                           { return symbol(ANDAND); }
-  "||"                           { return symbol(OROR); }
-  "++"                           { return symbol(PLUSPLUS); }
-  "--"                           { return symbol(MINUSMINUS); }
+  "=="                           { return symbol(TOK_EQ); }
+  "::"                           { return symbol(TOK_COLON_COLON); }
+  "<="                           { return symbol(TOK_LE); }
+  ".."                           { return symbol(TOK_DOT_DOT); }
+  "..."                          { return symbol(TOK_DOT_DOT_DOT); }
+  ">="                           { return symbol(TOK_GE); }
+  "->"                           { return symbol(TOK_ARROW); }
+  "!="                           { return symbol(TOK_NE); }
+  "&&"                           { return symbol(TOK_LAND); }
+  "||"                           { return symbol(TOK_LOR); }
+  "++"                           { return symbol(TOK_INC); }
+  "--"                           { return symbol(TOK_DEC); }
   "+"                            { return symbol(PLUS); }
   "-"                            { return symbol(MINUS); }
   "*"                            { return symbol(MULT); }
   "/"                            { return symbol(DIV); }
-  "/"                            { return symbol(DIV); }
   "@"                            { return symbol(AT); }
   "|"                            { return symbol(OR); }
   "^"                            { return symbol(XOR); }
-  "({"                           { return symbol(LPLC); }
-  "})"                           { return symbol(RCRP); }
-  "(["                           { return symbol(LPLB); }
-  "])"                           { return symbol(RBRP); }
-  "(<"                           { return symbol(RPLT); }
-  ">)"                           { return symbol(GTLP); }
   "%"                            { return symbol(MOD); }
-  "<<"                           { return symbol(LSHIFT); }
-  ">>"                           { return symbol(RSHIFT); }
-  ">>>"                          { return symbol(URSHIFT); }
-  "+="                           { return symbol(PLUSEQ); }
-  "-="                           { return symbol(MINUSEQ); }
-  "*="                           { return symbol(MULTEQ); }
-  "/="                           { return symbol(DIVEQ); }
-  "&="                           { return symbol(ANDEQ); }
-  "|="                           { return symbol(OREQ); }
-  "^="                           { return symbol(XOREQ); }
-  "%="                           { return symbol(MODEQ); }
-  "<<="                          { return symbol(LSHIFTEQ); }
-  ">>="                          { return symbol(RSHIFTEQ); }
+  "<<"                           { return symbol(TOK_LSH); }
+  ">>"                           { return symbol(TOK_RSH); }
+  "+="                           { return symbol(TOK_ADD_EQ); }
+  "-="                           { return symbol(TOK_SUB_EQ); }
+  "*="                           { return symbol(TOK_MULT_EQ); }
+  "/="                           { return symbol(TOK_DIV_EQ); }
+  "&="                           { return symbol(TOK_AND_EQ); }
+  "|="                           { return symbol(TOK_OR_EQ); }
+  "^="                           { return symbol(TOK_XOR_EQ); }
+  "%="                           { return symbol(TOK_MOD_EQ); }
+  "<<="                          { return symbol(TOK_LSH_EQ); }
+  ">>="                          { return symbol(TOK_RSH_EQ); }
   
   
   /* string literal */

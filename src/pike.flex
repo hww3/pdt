@@ -35,7 +35,7 @@ import java_cup.runtime.*;
 %%
 
 %class Scanner
-%implements JFlex.sym
+%extends sym
 
 %unicode
 %pack
@@ -135,10 +135,10 @@ SingleCharacter = [^\r\n\'\\]
   "continue"                     { return symbol(TOK_CONTINUE); }
   "do"                           { return symbol(TOK_DO); }
   "else"                         { return symbol(TOK_ELSE); }
-  "final"                        { return symbol(TOK_FINAL); }
+  "final"                        { return symbol(TOK_FINAL_ID); }
   "float"                        { return symbol(TOK_FLOAT); }
   "for"                          { return symbol(TOK_FOR); }
-  "function"                     { return symbol(TOK_FUNCTION); }
+  "function"                     { return symbol(TOK_FUNCTION_ID); }
   "default"                      { return symbol(TOK_DEFAULT); }
   "foreach"                      { return symbol(TOK_FOREACH); }
   "import"                       { return symbol(TOK_IMPORT); }
@@ -149,7 +149,7 @@ SingleCharacter = [^\r\n\'\\]
   "mapping"                      { return symbol(TOK_MAPPING_ID); }
   "mixed"                        { return symbol(TOK_MIXED_ID); }
   "multiset"                     { return symbol(TOK_MULTISET_ID); }
-  "object"                       { return symbol(TOK_OBJECT); }
+  "object"                       { return symbol(TOK_OBJECT_ID); }
   "optional"                     { return symbol(TOK_OPTIONAL); }
   "public"                       { return symbol(TOK_PUBLIC); }
   "switch"                       { return symbol(TOK_SWITCH); }
@@ -157,7 +157,7 @@ SingleCharacter = [^\r\n\'\\]
   "private"                      { return symbol(TOK_PRIVATE); }
   "protected"                    { return symbol(TOK_PROTECTED); }
   "return"                       { return symbol(TOK_RETURN); }
-  "void"                         { return symbol(TOK_VOID); }
+  "void"                         { return symbol(TOK_VOID_ID); }
   "static"                       { return symbol(TOK_STATIC); }
   "while"                        { return symbol(TOK_WHILE); }
   "this"                         { return symbol(TOK_THIS); }
@@ -183,7 +183,7 @@ SingleCharacter = [^\r\n\'\\]
   "="                            { return symbol(EQ); }
   ">"                            { return symbol(GT); }
   "<"                            { return symbol(LT); }
-  "!"                            { return symbol(NOT); }
+  "!"                            { return symbol(TOK_NOT); }
   "~"                            { return symbol(COMP); }
   "?"                            { return symbol(QUESTION); }
   ":"                            { return symbol(COLON); }

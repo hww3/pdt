@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.4 2007-03-09 05:53:48 hww3 Exp $
+|| $Id: pike.cup,v 1.5 2007-03-14 05:36:45 hww3 Exp $
 */
 
 import java_cup.runtime.*;
@@ -42,7 +42,8 @@ terminal TOK_NUMBER ;
 
 terminal TOK_INC TOK_DEC ;
 terminal TOK_RETURN ;
-
+terminal TOK_THROW;
+terminal TOK_GOTO;
 terminal TOK_EQ ;
 terminal TOK_GE ;
 terminal TOK_LE ;
@@ -68,6 +69,7 @@ terminal TOK_ADD_EQ ;
 terminal TOK_AND_EQ ; 
 terminal TOK_ARRAY_ID ;
 terminal TOK_BREAK ;
+terminal TOK_THIS;
 terminal TOK_CASE ;
 terminal TOK_CLASS ;
 terminal TOK_COLON_COLON ;

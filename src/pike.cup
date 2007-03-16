@@ -2,12 +2,18 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.5 2007-03-14 05:36:45 hww3 Exp $
+|| $Id: pike.cup,v 1.6 2007-03-16 03:01:43 hww3 Exp $
 */
 
 import java_cup.runtime.*;
 
 parser code  {: 
+
+  public void yyerror(String message)
+  { 
+    report_error(message, null);
+  }
+  
   public void report_error(String message, Object info) {
     StringBuffer m = new StringBuffer("Error ");
 
@@ -42,8 +48,8 @@ terminal TOK_NUMBER ;
 
 terminal TOK_INC TOK_DEC ;
 terminal TOK_RETURN ;
-terminal TOK_THROW;
-terminal TOK_GOTO;
+//terminal TOK_THROW;
+//terminal TOK_GOTO;
 terminal TOK_EQ ;
 terminal TOK_GE ;
 terminal TOK_LE ;
@@ -69,7 +75,7 @@ terminal TOK_ADD_EQ ;
 terminal TOK_AND_EQ ; 
 terminal TOK_ARRAY_ID ;
 terminal TOK_BREAK ;
-terminal TOK_THIS;
+//terminal TOK_THIS;
 terminal TOK_CASE ;
 terminal TOK_CLASS ;
 terminal TOK_COLON_COLON ;
@@ -355,7 +361,7 @@ _import::= TOK_IMPORT idents SEMICOLON
   | TOK_IMPORT string SEMICOLON
   | TOK_IMPORT error SEMICOLON
   | TOK_IMPORT error TOK_LEX_EOF
-  | TOK_IMPORT error RBRACE {: yyerror("Missing SEMICOLON."); :}
+  | TOK_IMPORT error RBRACE {: parser.yyerror("Missing SEMICOLON."); :}
   ;
 
 constant_name::= TOK_IDENTIFIER EQ safe_expr0
@@ -370,12 +376,12 @@ constant_list::= constant_name
 constant::= modifiers TOK_CONSTANT constant_list SEMICOLON
   | modifiers TOK_CONSTANT error SEMICOLON
   | modifiers TOK_CONSTANT error TOK_LEX_EOF
-  | modifiers TOK_CONSTANT error RBRACE {: yyerror("Missing SEMICOLON."); :}
+  | modifiers TOK_CONSTANT error RBRACE {: parser.yyerror("Missing SEMICOLON."); :}
   ;
 
 block_or_semi::= block
   | SEMICOLON
-  | TOK_LEX_EOF {:  yyerror("Expected SEMICOLON."); :}
+  | TOK_LEX_EOF {:  parser.yyerror("Expected SEMICOLON."); :}
   | error
   ;
 
@@ -393,14 +399,14 @@ close_paren_or_missing::= RPAREN
 close_brace_or_missing::= RBRACE
   | /* empty */
   {:
-    yyerror("Missing RBRACE.");
+    parser.yyerror("Missing RBRACE.");
   :}
   ;
 
 close_brace_or_eof::= RBRACE
   | TOK_LEX_EOF
   {:
-    yyerror("Missing RBRACE.");
+    parser.yyerror("Missing RBRACE.");
   :}
   ;
 
@@ -410,7 +416,7 @@ open_bracket_with_line_info::= LBRACK
 close_bracket_or_missing::= RBRACK
   | /* empty */
   {:
-    yyerror("Missing RBRACK.");
+    parser.yyerror("Missing RBRACK.");
   :}
   ;
 
@@ -424,22 +430,22 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame
     error
   | modifiers type_or_error optional_stars bad_identifier
     LPAREN arguments RPAREN block_or_semi
-  | modifiers type_or_error name_list SEMICOLON {:}
-  | inheritance {:}
-  | _import {:}
-  | constant {:}
-  | class {: }
-  | enum {: }
-  | typedef {:}
+  | modifiers type_or_error name_list SEMICOLON {: :}
+  | inheritance {: :}
+  | _import {: :}
+  | constant {: :}
+  | class {: :}
+  | enum {: :}
+  | typedef {: :}
   | error TOK_LEX_EOF
   {:
-    yyerror("Missing SEMICOLON.");
-    yyerror("Unexpected end of file");
+    parser.yyerror("Missing SEMICOLON.");
+    parser.yyerror("Unexpected end of file");
   :}
   | error SEMICOLON
   | error RBRACE
   {:
-    yyerror("Missing SEMICOLON.");
+    parser.yyerror("Missing SEMICOLON.");
   :}
   | modifiers
    LBRACE 
@@ -450,7 +456,7 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame
 optional_dot_dot_dot::= TOK_DOT_DOT_DOT
   | TOK_DOT_DOT
   {:
-    yyerror("Range indicator ('..') where elipsis ('...') expected.");
+    parser.yyerror("Range indicator ('..') where elipsis ('...') expected.");
   :}
   | /* empty */
   ;
@@ -474,7 +480,7 @@ arguments2::= new_arg_name
   | arguments2 COMMA new_arg_name 
   | arguments2 COLON new_arg_name
   {:
-    yyerror("Unexpected ':' in argument list.");
+    parser.yyerror("Unexpected ':' in argument list.");
   :}
   ;
 
@@ -634,7 +640,7 @@ number_or_minint::= /* Empty */
 expected_dot_dot::= TOK_DOT_DOT
   | TOK_DOT_DOT_DOT
   {:
-    yyerror("Elipsis ('...') where range indicator ('..') expected.");
+    parser.yyerror("Elipsis ('...') where range indicator ('..') expected.");
   :}
   ;
 
@@ -686,7 +692,7 @@ new_name::= optional_stars TOK_IDENTIFIER
   | optional_stars TOK_IDENTIFIER EQ error
   | optional_stars TOK_IDENTIFIER EQ TOK_LEX_EOF
   {:
-    yyerror("Unexpected end of file in variable definition.");
+    parser.yyerror("Unexpected end of file in variable definition.");
   :}
   | optional_stars bad_identifier EQ expr0
   ;
@@ -699,7 +705,7 @@ new_local_name::= optional_stars TOK_IDENTIFIER
   | optional_stars TOK_IDENTIFIER EQ error
   | optional_stars TOK_IDENTIFIER EQ TOK_LEX_EOF
   {:
-    yyerror("Unexpected end of file in local variable definition.");
+    parser.yyerror("Unexpected end of file in local variable definition.");
   :}
   ;
 
@@ -720,14 +726,14 @@ block::= LBRACE
 end_block::= RBRACE
   | TOK_LEX_EOF
   {:
-    yyerror("Missing '}'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing '}'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   ;
 
 failsafe_block::= block
               | error 
-              | TOK_LEX_EOF {: yyerror("Unexpected end of file."); :}
+              | TOK_LEX_EOF {: parser.yyerror("Unexpected end of file."); :}
               ;
 
 
@@ -753,10 +759,10 @@ local_constant::= TOK_CONSTANT local_constant_list SEMICOLON
   | TOK_CONSTANT error SEMICOLON
   | TOK_CONSTANT error TOK_LEX_EOF
   {:
-    yyerror("Missing SEMICOLON.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing SEMICOLON.");
+    parser.yyerror("Unexpected end of file.");
   :}
-  | TOK_CONSTANT error RBRACE {: yyerror("Missing ';'."); :}
+  | TOK_CONSTANT error RBRACE {: parser.yyerror("Missing ';'."); :}
   ;
 
 
@@ -778,12 +784,12 @@ normal_label_statement::= statement_with_semicolon
   | error SEMICOLON
   | error TOK_LEX_EOF
   {:
-    yyerror("Missing ';'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ';'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   | error RBRACE
   {:
-    yyerror("Missing ';'.");
+    parser.yyerror("Missing ';'.");
   :}
   | SEMICOLON
   ;
@@ -811,7 +817,7 @@ break::= TOK_BREAK optional_label  ;
 default::= TOK_DEFAULT COLON 
   | TOK_DEFAULT
   {:
-    yyerror("Expected ':' after default.");
+    parser.yyerror("Expected ':' after default.");
   :}
   ;
 
@@ -844,7 +850,7 @@ create_arguments2::= create_arg
   | create_arguments2 COMMA create_arg 
   | create_arguments2 COLON create_arg
   {:
-    yyerror("Unexpected ':' in create argument list.");
+    parser.yyerror("Unexpected ':' in create argument list.");
   :}
   ;
 
@@ -863,7 +869,7 @@ failsafe_program::= LBRACE program end_block
                 | error 
                 | TOK_LEX_EOF
                 {:
-		  yyerror("End of file where program definition expected.");
+		  parser.yyerror("End of file where program definition expected.");
 		:}
                 ;
 
@@ -901,11 +907,11 @@ cond::= TOK_IF
   ;
 
 end_cond::= RPAREN
-  | RBRACE {: yyerror("Missing RPAREN."); :}
+  | RBRACE {: parser.yyerror("Missing RPAREN."); :}
   | TOK_LEX_EOF
   {:
-    yyerror("Missing RPAREN.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing RPAREN.");
+    parser.yyerror("Unexpected end of file.");
   :}
   ;
 
@@ -918,7 +924,7 @@ safe_lvalue::= lvalue
   ;
 
 safe_expr0::= expr0
-  | TOK_LEX_EOF {: yyerror("Unexpected end of file.");  :}
+  | TOK_LEX_EOF {: parser.yyerror("Unexpected end of file.");  :}
   | error 
   ;
 
@@ -940,21 +946,21 @@ do::= TOK_DO line_number_info statement
   TOK_WHILE LPAREN safe_comma_expr end_cond expected_semicolon
   | TOK_DO line_number_info statement TOK_WHILE TOK_LEX_EOF
   {:
-    yyerror("Missing LPAREN in do-while loop.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing LPAREN in do-while loop.");
+    parser.yyerror("Unexpected end of file.");
   :}
   | TOK_DO line_number_info statement TOK_LEX_EOF
   {:
-    yyerror("Missing 'while' in do-while loop.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing 'while' in do-while loop.");
+    parser.yyerror("Unexpected end of file.");
   :}
   ;
 
 expected_semicolon::= SEMICOLON
   | TOK_LEX_EOF
   {:
-    yyerror("Missing ';'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ';'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   ;
 
@@ -987,16 +993,16 @@ case::= TOK_CASE safe_comma_expr expected_colon
 expected_colon::= COLON
   | SEMICOLON
   {:
-    yyerror("Missing ':'.");
+    parser.yyerror("Missing ':'.");
   :}
   | RBRACE
   {:
-    yyerror("Missing ':'.");
+    parser.yyerror("Missing ':'.");
   :}
   | TOK_LEX_EOF
   {:
-    yyerror("Missing ':'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ':'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   ;
 
@@ -1180,16 +1186,16 @@ expr4::= string
   | expr4 open_paren_with_line_info error RPAREN
   | expr4 open_paren_with_line_info error TOK_LEX_EOF
   {:
-    yyerror("Missing ')'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ')'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   | expr4 open_paren_with_line_info error SEMICOLON
   {:
-    yyerror("Missing ')'.");
+    parser.yyerror("Missing ')'.");
   :}
   | expr4 open_paren_with_line_info error RBRACE
   {:
-    yyerror("Missing ')'.");
+    parser.yyerror("Missing ')'.");
   :}
   | expr4 open_bracket_with_line_info MULT RBRACK
   | expr4 open_bracket_with_line_info expr0 RBRACK
@@ -1198,15 +1204,15 @@ expr4::= string
   | expr4 open_bracket_with_line_info error RBRACK
   | expr4 open_bracket_with_line_info error TOK_LEX_EOF
   {:
-    yyerror("Missing ']'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ']'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   | expr4 open_bracket_with_line_info error SEMICOLON
-    {: yyerror("Missing ']'."); :}
+    {: parser.yyerror("Missing ']'."); :}
   | expr4 open_bracket_with_line_info error RBRACE
-    {: yyerror("Missing ']'."); :}
+    {: parser.yyerror("Missing ']'."); :}
   | expr4 open_bracket_with_line_info error RPAREN
-    {: yyerror("Missing ']'."); :}
+    {: parser.yyerror("Missing ']'."); :}
   | open_paren_with_line_info comma_expr2 RPAREN
   | open_paren_with_line_info LBRACE expr_list close_brace_or_missing RPAREN
   | open_paren_with_line_info
@@ -1215,27 +1221,27 @@ expr4::= string
   | TOK_MULTISET_START line_number_info expr_list TOK_MULTISET_END
   | TOK_MULTISET_START line_number_info expr_list RPAREN
     {:
-      yyerror("Missing '>'.");
+      parser.yyerror("Missing '>'.");
     :}
   | open_paren_with_line_info error RPAREN
   | open_paren_with_line_info error TOK_LEX_EOF
   {:
-    yyerror("Missing RPAREN.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing RPAREN.");
+    parser.yyerror("Unexpected end of file.");
   :}
-  | open_paren_with_line_info error SEMICOLON {: yyerror("Missing RPAREN."); :}
-  | open_paren_with_line_info error RBRACE {: yyerror("Missing RPAREN."); :}
+  | open_paren_with_line_info error SEMICOLON {: parser.yyerror("Missing RPAREN."); :}
+  | open_paren_with_line_info error RBRACE {: parser.yyerror("Missing RPAREN."); :}
   | TOK_MULTISET_START line_number_info error TOK_MULTISET_END 
   | TOK_MULTISET_START line_number_info error RPAREN {:
-    yyerror("Missing '>'.");
+    parser.yyerror("Missing '>'.");
   :}
   | TOK_MULTISET_START line_number_info error TOK_LEX_EOF
   {:
-    yyerror("Missing '>)'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing '>)'.");
+    parser.yyerror("Unexpected end of file.");
   :}
-  | TOK_MULTISET_START line_number_info error SEMICOLON {: yyerror("Missing '>)'."); :}
-  | TOK_MULTISET_START line_number_info error RBRACE {: yyerror("Missing '>)'."); :}
+  | TOK_MULTISET_START line_number_info error SEMICOLON {: parser.yyerror("Missing '>)'."); :}
+  | TOK_MULTISET_START line_number_info error RBRACE {: parser.yyerror("Missing '>)'."); :}
   | expr4 TOK_ARROW line_number_info magic_identifier
   | expr4 TOK_ARROW line_number_info error 
   ;
@@ -1271,39 +1277,39 @@ low_idents::= TOK_IDENTIFIER
 
 comma_expr_or_zero::= /* empty */ 
   | comma_expr
-  | TOK_LEX_EOF {: yyerror("Unexpected end of file."); :}
+  | TOK_LEX_EOF {: parser.yyerror("Unexpected end of file."); :}
   ;
 
 comma_expr_or_maxint::= /* empty */ 
   | comma_expr
-  | TOK_LEX_EOF {: yyerror("Unexpected end of file.");  :}
+  | TOK_LEX_EOF {: parser.yyerror("Unexpected end of file.");  :}
   ;
 
 gauge::= TOK_GAUGE catch_arg
   ;
 
 typeof::= TOK_TYPEOF LPAREN expr0 RPAREN
-  | TOK_TYPEOF LPAREN error RPAREN {: yyerrok; :}
-  | TOK_TYPEOF LPAREN error RBRACE {: yyerror("Missing ')'."); :}
+  | TOK_TYPEOF LPAREN error RPAREN {:  :}
+  | TOK_TYPEOF LPAREN error RBRACE {: parser.yyerror("Missing ')'."); :}
   | TOK_TYPEOF LPAREN error TOK_LEX_EOF
   {:
-    yyerror("Missing ')'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ')'.");
+    parser.yyerror("Unexpected end of file.");
   :}
-  | TOK_TYPEOF LPAREN error SEMICOLON {:  yyerror("Missing ')'."); :}
+  | TOK_TYPEOF LPAREN error SEMICOLON {:  parser.yyerror("Missing ')'."); :}
   ;
  
 catch_arg::= LPAREN comma_expr RPAREN  
   | LPAREN error RPAREN 
   | LPAREN error TOK_LEX_EOF
   {:
-    yyerror("Missing ')'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ')'.");
+    parser.yyerror("Unexpected end of file.");
   :}
-  | LPAREN error RBRACE {: yyerror("Missing ')'."); :}
-  | LPAREN error SEMICOLON {: yyerror("Missing ')'."); :}
+  | LPAREN error RBRACE {: parser.yyerror("Missing ')'."); :}
+  | LPAREN error SEMICOLON {: parser.yyerror("Missing ')'."); :}
   | block
-  | error {: yyerror("Bad expression for catch."); :}
+  | error {: parser.yyerror("Bad expression for catch."); :}
   ; 
 
 catch::= TOK_CATCH
@@ -1314,39 +1320,39 @@ sscanf::= TOK_SSCANF LPAREN expr0 COMMA expr0 lvalue_list RPAREN
   | TOK_SSCANF LPAREN expr0 COMMA expr0 error RPAREN
   | TOK_SSCANF LPAREN expr0 COMMA expr0 error TOK_LEX_EOF
   {:
-    yyerror("Missing ')'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ')'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   | TOK_SSCANF LPAREN expr0 COMMA expr0 error RBRACE
   {:
-    yyerror("Missing ')'.");
+    parser.yyerror("Missing ')'.");
   :}
   | TOK_SSCANF LPAREN expr0 COMMA expr0 error SEMICOLON
   {:
-    yyerror("Missing ')'.");
+    parser.yyerror("Missing ')'.");
   :}
   | TOK_SSCANF LPAREN expr0 error RPAREN
   | TOK_SSCANF LPAREN expr0 error TOK_LEX_EOF
   {:
-    yyerror("Missing ')'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ')'.");
+    parser.yyerror("Unexpected end of file.");
   :}
   | TOK_SSCANF LPAREN expr0 error RBRACE
   {:
-    yyerror("Missing ')'.");
+    parser.yyerror("Missing ')'.");
   :}
   | TOK_SSCANF LPAREN expr0 error SEMICOLON
   {:
-    yyerror("Missing ')'.");
+    parser.yyerror("Missing ')'.");
   :}
   | TOK_SSCANF LPAREN error RPAREN 
   | TOK_SSCANF LPAREN error TOK_LEX_EOF
   {:
-    yyerror("Missing ')'.");
-    yyerror("Unexpected end of file.");
+    parser.yyerror("Missing ')'.");
+    parser.yyerror("Unexpected end of file.");
   :}
-  | TOK_SSCANF LPAREN error RBRACE {:  yyerror("Missing ')'."); :}
-  | TOK_SSCANF LPAREN error SEMICOLON {:  yyerror("Missing ')'."); :}
+  | TOK_SSCANF LPAREN error RBRACE {:  parser.yyerror("Missing ')'."); :}
+  | TOK_SSCANF LPAREN error SEMICOLON {:  parser.yyerror("Missing ')'."); :}
   ;
 
 lvalue::= expr4
@@ -1373,95 +1379,95 @@ string::= TOK_STRING
 
 bad_identifier::= bad_expr_ident
   | TOK_ARRAY_ID
-  {: yyerror("array is a reserved word."); :}
+  {: parser.yyerror("array is a reserved word."); :}
   | TOK_CLASS
-  {: yyerror("class is a reserved word."); :}
+  {: parser.yyerror("class is a reserved word."); :}
   | TOK_ENUM
-  {: yyerror("enum is a reserved word."); :}
+  {: parser.yyerror("enum is a reserved word."); :}
   | TOK_FLOAT_ID
-  {: yyerror("float is a reserved word.");:}
+  {: parser.yyerror("float is a reserved word.");:}
   | TOK_FUNCTION_ID
-  {: yyerror("function is a reserved word.");:}
+  {: parser.yyerror("function is a reserved word.");:}
   | TOK_INT_ID
-  {: yyerror("int is a reserved word."); :}
+  {: parser.yyerror("int is a reserved word."); :}
   | TOK_MAPPING_ID
-  {: yyerror("mapping is a reserved word."); :}
+  {: parser.yyerror("mapping is a reserved word."); :}
   | TOK_MIXED_ID
-  {: yyerror("mixed is a reserved word."); :}
+  {: parser.yyerror("mixed is a reserved word."); :}
   | TOK_MULTISET_ID
-  {: yyerror("multiset is a reserved word."); :}
+  {: parser.yyerror("multiset is a reserved word."); :}
   | TOK_OBJECT_ID
-  {: yyerror("object is a reserved word."); :}
+  {: parser.yyerror("object is a reserved word."); :}
   | TOK_PROGRAM_ID
-  {: yyerror("program is a reserved word."); :}
+  {: parser.yyerror("program is a reserved word."); :}
   | TOK_STRING_ID
-  {: yyerror("string is a reserved word."); :}
+  {: parser.yyerror("string is a reserved word."); :}
   | TOK_TYPEDEF
-  {: yyerror("typedef is a reserved word."); :}
+  {: parser.yyerror("typedef is a reserved word."); :}
   | TOK_VOID_ID
-  {: yyerror("void is a reserved word."); :}
+  {: parser.yyerror("void is a reserved word."); :}
   ;
 
 bad_expr_ident::=
     TOK_INLINE
-  {: yyerror("inline is a reserved word."); :}
+  {: parser.yyerror("inline is a reserved word."); :}
   | TOK_LOCAL_ID
-  {: yyerror("local is a reserved word."); :}
+  {: parser.yyerror("local is a reserved word."); :}
   | TOK_NO_MASK
-  {: yyerror("nomask is a reserved word."); :}
+  {: parser.yyerror("nomask is a reserved word."); :}
   | TOK_PREDEF
-  {: yyerror("predef is a reserved word."); :}
+  {: parser.yyerror("predef is a reserved word."); :}
   | TOK_PRIVATE
-  {: yyerror("private is a reserved word."); :}
+  {: parser.yyerror("private is a reserved word."); :}
   | TOK_PROTECTED
-  {: yyerror("protected is a reserved word."); :}
+  {: parser.yyerror("protected is a reserved word."); :}
   | TOK_PUBLIC
-  {: yyerror("public is a reserved word."); :}
+  {: parser.yyerror("public is a reserved word."); :}
   | TOK_OPTIONAL
-  {: yyerror("optional is a reserved word."); :}
+  {: parser.yyerror("optional is a reserved word."); :}
   | TOK_VARIANT
-  {: yyerror("variant is a reserved word."); :}
+  {: parser.yyerror("variant is a reserved word."); :}
   | TOK_STATIC
-  {: yyerror("static is a reserved word."); :}
+  {: parser.yyerror("static is a reserved word."); :}
   | TOK_EXTERN
-  {: yyerror("extern is a reserved word."); :}
+  {: parser.yyerror("extern is a reserved word."); :}
   | TOK_FINAL_ID
-  {: yyerror("final is a reserved word.");:}
+  {: parser.yyerror("final is a reserved word.");:}
   | TOK_DO
-  {: yyerror("do is a reserved word."); :}
+  {: parser.yyerror("do is a reserved word."); :}
   | TOK_ELSE
-  {: yyerror("else without if."); :}
+  {: parser.yyerror("else without if."); :}
   | TOK_RETURN
-  {: yyerror("return is a reserved word."); :}
+  {: parser.yyerror("return is a reserved word."); :}
   | TOK_IMPORT
-  {: yyerror("import is a reserved word."); :}
+  {: parser.yyerror("import is a reserved word."); :}
   | TOK_INHERIT
-  {: yyerror("inherit is a reserved word."); :}
+  {: parser.yyerror("inherit is a reserved word."); :}
   | TOK_CATCH
-  {: yyerror("catch is a reserved word."); :}
+  {: parser.yyerror("catch is a reserved word."); :}
   | TOK_GAUGE
-  {: yyerror("gauge is a reserved word."); :}
+  {: parser.yyerror("gauge is a reserved word."); :}
   | TOK_LAMBDA
-  {: yyerror("lambda is a reserved word."); :}
+  {: parser.yyerror("lambda is a reserved word."); :}
   | TOK_SSCANF
-  {: yyerror("sscanf is a reserved word."); :}
+  {: parser.yyerror("sscanf is a reserved word."); :}
   | TOK_SWITCH
-  {: yyerror("switch is a reserved word."); :}
+  {: parser.yyerror("switch is a reserved word."); :}
   | TOK_TYPEOF
-  {: yyerror("typeof is a reserved word."); :}
+  {: parser.yyerror("typeof is a reserved word."); :}
   | TOK_BREAK
-  {: yyerror("break is a reserved word."); :}
+  {: parser.yyerror("break is a reserved word."); :}
   | TOK_CASE
-  {: yyerror("case is a reserved word."); :}
+  {: parser.yyerror("case is a reserved word."); :}
   | TOK_CONTINUE
-  {: yyerror("continue is a reserved word."); :}
+  {: parser.yyerror("continue is a reserved word."); :}
   | TOK_DEFAULT
-  {: yyerror("default is a reserved word."); :}
+  {: parser.yyerror("default is a reserved word."); :}
   | TOK_FOR
-  {: yyerror("for is a reserved word."); :}
+  {: parser.yyerror("for is a reserved word."); :}
   | TOK_FOREACH
-  {: yyerror("foreach is a reserved word."); :}
+  {: parser.yyerror("foreach is a reserved word."); :}
   | TOK_IF
-  {: yyerror("if is a reserved word."); :}
+  {: parser.yyerror("if is a reserved word."); :}
   ;
 

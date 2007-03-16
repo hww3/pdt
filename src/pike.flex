@@ -46,6 +46,24 @@ import java_cup.runtime.*;
 %cup
 
 %{
+
+  public void yyerror(String message)
+  { 
+    report_error(message, null);
+  }
+  
+  public void report_error(String message, Object info) {
+    StringBuffer m = new StringBuffer("Error ");
+
+    if (info instanceof java_cup.runtime.Symbol) 
+      m.append( "(" +info.toString()+")" );
+     
+    m.append(" : "+message);
+   
+    System.out.println(m);
+  }
+   
+
   StringBuffer string = new StringBuffer();
   
   private Symbol symbol(int type) {
@@ -143,9 +161,8 @@ SingleCharacter = [^\r\n\'\\]
   "foreach"                      { return symbol(TOK_FOREACH); }
   "import"                       { return symbol(TOK_IMPORT); }
   "inherit"                      { return symbol(TOK_INHERIT); }
-  "int"                          { return symbol(TOK_INT); }
-  "goto"                         { return symbol(TOK_GOTO); }
-  "if"                           { return symbol(TOK_IF); }
+  "int"                          { return symbol(TOK_INT_ID); }
+ "if"                           { return symbol(TOK_IF); }
   "mapping"                      { return symbol(TOK_MAPPING_ID); }
   "mixed"                        { return symbol(TOK_MIXED_ID); }
   "multiset"                     { return symbol(TOK_MULTISET_ID); }
@@ -160,14 +177,16 @@ SingleCharacter = [^\r\n\'\\]
   "void"                         { return symbol(TOK_VOID_ID); }
   "static"                       { return symbol(TOK_STATIC); }
   "while"                        { return symbol(TOK_WHILE); }
-  "this"                         { return symbol(TOK_THIS); }
-  "throw"                        { return symbol(TOK_THROW); }
-  "variant"                        { return symbol(TOK_VARIANT); }
-  "nomask"                        { return symbol(TOK_NOMASK); }  
+   "variant"                        { return symbol(TOK_VARIANT); }
+  "nomask"                        { return symbol(TOK_NO_MASK); }  
   "lambda"                        { return symbol(TOK_LAMBDA); }  
   "gauge"                        { return symbol(TOK_GAUGE); }  
   "sscanf"                        { return symbol(TOK_SSCANF); }    
-
+/*
+  "goto"                         { return symbol(TOK_GOTO); }
+  "this"                         { return symbol(TOK_THIS); }
+  "throw"                        { return symbol(TOK_THROW); }
+*/
   /* separators */
   "("                            { return symbol(LPAREN); }
   ")"                            { return symbol(RPAREN); }
@@ -229,18 +248,18 @@ SingleCharacter = [^\r\n\'\\]
 
   /* numeric literals */
 
-  {DecIntegerLiteral}            { return symbol(INTEGER_LITERAL, new Integer(yytext())); }
-  {DecLongLiteral}               { return symbol(INTEGER_LITERAL, new Long(yytext().substring(0,yylength()-1))); }
+  {DecIntegerLiteral}            { return symbol(TOK_NUMBER, new Integer(yytext())); }
+  {DecLongLiteral}               { return symbol(TOK_NUMBER, new Long(yytext().substring(0,yylength()-1))); }
   
-  {HexIntegerLiteral}            { return symbol(INTEGER_LITERAL, new Integer((int) parseLong(yytext().substring(2),16))); }
-  {HexLongLiteral}               { return symbol(INTEGER_LITERAL, new Long(parseLong(yytext().substring(2,yylength()-1),16))); }
+  {HexIntegerLiteral}            { return symbol(TOK_NUMBER, new Integer((int) parseLong(yytext().substring(2),16))); }
+  {HexLongLiteral}               { return symbol(TOK_NUMBER, new Long(parseLong(yytext().substring(2,yylength()-1),16))); }
  
-  {OctIntegerLiteral}            { return symbol(INTEGER_LITERAL, new Integer((int) parseLong(yytext(),8))); }  
-  {OctLongLiteral}               { return symbol(INTEGER_LITERAL, new Long(parseLong(yytext().substring(0,yylength()-1),8))); }
+  {OctIntegerLiteral}            { return symbol(TOK_NUMBER, new Integer((int) parseLong(yytext(),8))); }  
+  {OctLongLiteral}               { return symbol(TOK_NUMBER, new Long(parseLong(yytext().substring(0,yylength()-1),8))); }
   
-  {FloatLiteral}                 { return symbol(FLOATING_POINT_LITERAL, new Float(yytext().substring(0,yylength()-1))); }
-  {DoubleLiteral}                { return symbol(FLOATING_POINT_LITERAL, new Double(yytext())); }
-  {DoubleLiteral}[dD]            { return symbol(FLOATING_POINT_LITERAL, new Double(yytext().substring(0,yylength()-1))); }
+  {FloatLiteral}                 { return symbol(TOK_FLOAT, new Float(yytext().substring(0,yylength()-1))); }
+  {DoubleLiteral}                { return symbol(TOK_FLOAT, new Double(yytext())); }
+  {DoubleLiteral}[dD]            { return symbol(TOK_FLOAT, new Double(yytext().substring(0,yylength()-1))); }
   
   /* comments */
   {Comment}                      { /* ignore */ }
@@ -249,11 +268,11 @@ SingleCharacter = [^\r\n\'\\]
   {WhiteSpace}                   { /* ignore */ }
 
   /* identifiers */ 
-  {Identifier}                   { return symbol(IDENTIFIER, yytext()); }  
+  {Identifier}                   { return symbol(TOK_IDENTIFIER, yytext()); }  
 }
 
 <STRING> {
-  \"                             { yybegin(YYINITIAL); return symbol(STRING_LITERAL, string.toString()); }
+  \"                             { yybegin(YYINITIAL); return symbol(TOK_STRING, string.toString()); }
   
   {StringCharacter}+             { string.append( yytext() ); }
   
@@ -275,20 +294,20 @@ SingleCharacter = [^\r\n\'\\]
 }
 
 <CHARLITERAL> {
-  {SingleCharacter}\'            { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character(yytext().charAt(0))); }
+  {SingleCharacter}\'            { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character(yytext().charAt(0))); }
   
   /* escape sequences */
-  "\\b"\'                        { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\b'));}
-  "\\t"\'                        { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\t'));}
-  "\\n"\'                        { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\t'));}
-  "\\f"\'                        { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\f'));}
-  "\\r"\'                        { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\r'));}
-  "\\\""\'                       { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\"'));}
-  "\\'"\'                        { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\''));}
-  "\\\\"\'                       { yybegin(YYINITIAL); return symbol(CHARACTER_LITERAL, new Character('\\')); }
+  "\\b"\'                        { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\b'));}
+  "\\t"\'                        { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\t'));}
+  "\\n"\'                        { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\t'));}
+  "\\f"\'                        { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\f'));}
+  "\\r"\'                        { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\r'));}
+  "\\\""\'                       { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\"'));}
+  "\\'"\'                        { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\''));}
+  "\\\\"\'                       { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\\')); }
   \\[0-3]?{OctDigit}?{OctDigit}\' { yybegin(YYINITIAL); 
 			                              int val = Integer.parseInt(yytext().substring(1,yylength()-1),8);
-			                            return symbol(CHARACTER_LITERAL, new Character((char)val)); }
+			                            return symbol(TOK_NUMBER, new Character((char)val)); }
   
   /* error cases */
   \\.                            { throw new RuntimeException("Illegal escape sequence \""+yytext()+"\""); }

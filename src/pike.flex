@@ -143,6 +143,11 @@ SingleCharacter = [^\r\n\'\\]
 
 <YYINITIAL> {
 
+  /* misc */
+  "(<"							{ return symbol(TOK_MULTISET_START); }
+  ">)"							{ return symbol(TOK_MULTISET_END); }
+
+
   /* keywords */
   "array"                        { return symbol(TOK_ARRAY_ID); }
   "break"                        { return symbol(TOK_BREAK); }

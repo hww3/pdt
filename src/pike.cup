@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.6 2007-03-16 03:01:43 hww3 Exp $
+|| $Id: pike.cup,v 1.7 2007-03-16 03:39:26 hww3 Exp $
 */
 
 import java_cup.runtime.*;
@@ -376,12 +376,12 @@ constant_list::= constant_name
 constant::= modifiers TOK_CONSTANT constant_list SEMICOLON
   | modifiers TOK_CONSTANT error SEMICOLON
   | modifiers TOK_CONSTANT error TOK_LEX_EOF
-  | modifiers TOK_CONSTANT error RBRACE {: parser.yyerror("Missing SEMICOLON."); :}
+  | modifiers TOK_CONSTANT error RBRACE {: parser.yyerror("Missing ';'."); :}
   ;
 
 block_or_semi::= block
   | SEMICOLON
-  | TOK_LEX_EOF {:  parser.yyerror("Expected SEMICOLON."); :}
+  | TOK_LEX_EOF {:  parser.yyerror("Expected ';'."); :}
   | error
   ;
 
@@ -399,14 +399,14 @@ close_paren_or_missing::= RPAREN
 close_brace_or_missing::= RBRACE
   | /* empty */
   {:
-    parser.yyerror("Missing RBRACE.");
+    parser.yyerror("Missing ']'.");
   :}
   ;
 
 close_brace_or_eof::= RBRACE
   | TOK_LEX_EOF
   {:
-    parser.yyerror("Missing RBRACE.");
+    parser.yyerror("Missing '['.");
   :}
   ;
 
@@ -416,20 +416,23 @@ open_bracket_with_line_info::= LBRACK
 close_bracket_or_missing::= RBRACK
   | /* empty */
   {:
-    parser.yyerror("Missing RBRACK.");
+    parser.yyerror("Missing ']'.");
   :}
   ;
 
 push_compiler_frame0::= /* empty */
+  {:
+      System.out.println("have a method!\n");
+   :}
   ;
 
-def::= modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame0
+def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
   LPAREN arguments close_paren_or_missing
-  block_or_semi
-  | modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame0
-    error
-  | modifiers type_or_error optional_stars bad_identifier
-    LPAREN arguments RPAREN block_or_semi
+  block_or_semi {: System.out.println("have function: " + ident.toString()); :}
+  | modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
+    error {: System.out.println("have function: " + ident.toString()); :}
+  | modifiers type_or_error optional_stars bad_identifier:ident
+    LPAREN arguments RPAREN block_or_semi {: System.out.println("have function: " + ident.toString()); :}
   | modifiers type_or_error name_list SEMICOLON {: :}
   | inheritance {: :}
   | _import {: :}
@@ -439,13 +442,13 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER push_compiler_frame
   | typedef {: :}
   | error TOK_LEX_EOF
   {:
-    parser.yyerror("Missing SEMICOLON.");
+    parser.yyerror("Missing ';'.");
     parser.yyerror("Unexpected end of file");
   :}
   | error SEMICOLON
   | error RBRACE
   {:
-    parser.yyerror("Missing SEMICOLON.");
+    parser.yyerror("Missing ';'.");
   :}
   | modifiers
    LBRACE 
@@ -907,10 +910,10 @@ cond::= TOK_IF
   ;
 
 end_cond::= RPAREN
-  | RBRACE {: parser.yyerror("Missing RPAREN."); :}
+  | RBRACE {: parser.yyerror("Missing ')'."); :}
   | TOK_LEX_EOF
   {:
-    parser.yyerror("Missing RPAREN.");
+    parser.yyerror("Missing ')'.");
     parser.yyerror("Unexpected end of file.");
   :}
   ;
@@ -946,7 +949,7 @@ do::= TOK_DO line_number_info statement
   TOK_WHILE LPAREN safe_comma_expr end_cond expected_semicolon
   | TOK_DO line_number_info statement TOK_WHILE TOK_LEX_EOF
   {:
-    parser.yyerror("Missing LPAREN in do-while loop.");
+    parser.yyerror("Missing '(' in do-while loop.");
     parser.yyerror("Unexpected end of file.");
   :}
   | TOK_DO line_number_info statement TOK_LEX_EOF
@@ -1226,11 +1229,11 @@ expr4::= string
   | open_paren_with_line_info error RPAREN
   | open_paren_with_line_info error TOK_LEX_EOF
   {:
-    parser.yyerror("Missing RPAREN.");
+    parser.yyerror("Missing ')'.");
     parser.yyerror("Unexpected end of file.");
   :}
-  | open_paren_with_line_info error SEMICOLON {: parser.yyerror("Missing RPAREN."); :}
-  | open_paren_with_line_info error RBRACE {: parser.yyerror("Missing RPAREN."); :}
+  | open_paren_with_line_info error SEMICOLON {: parser.yyerror("Missing ')'."); :}
+  | open_paren_with_line_info error RBRACE {: parser.yyerror("Missing ')'."); :}
   | TOK_MULTISET_START line_number_info error TOK_MULTISET_END 
   | TOK_MULTISET_START line_number_info error RPAREN {:
     parser.yyerror("Missing '>'.");

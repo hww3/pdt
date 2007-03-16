@@ -30,7 +30,9 @@
    For a real world application (e.g. a Java compiler) this can 
    and should be optimized */
 
+package org.gotpike.pdt.parser;
 import java_cup.runtime.*;
+
 
 %%
 
@@ -63,6 +65,15 @@ import java_cup.runtime.*;
     System.out.println(m);
   }
    
+  public int getYycolumn()
+  {
+    return yycolumn;
+  }
+
+  public int getYyline()
+  {
+    return yyline;
+  }
 
   StringBuffer string = new StringBuffer();
   

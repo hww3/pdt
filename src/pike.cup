@@ -2,8 +2,9 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.7 2007-03-16 03:39:26 hww3 Exp $
+|| $Id: pike.cup,v 1.8 2007-03-16 22:28:59 hww3 Exp $
 */
+package org.gotpike.pdt.parser;
 
 import java_cup.runtime.*;
 
@@ -1222,8 +1223,9 @@ expr4::= string
     open_bracket_with_line_info	/* Only to avoid shift/reduce conflicts. */
     m_expr_list close_bracket_or_missing RPAREN
   | TOK_MULTISET_START line_number_info expr_list TOK_MULTISET_END
-  | TOK_MULTISET_START line_number_info expr_list RPAREN
+  | TOK_MULTISET_START line_number_info expr_list RPAREN:e
     {:
+      parser.yyerror("Line: " + ((org.gotpike.pdt.parser.Scanner) CUP$parser$parser.getScanner()).getYyline() + " " + ((org.gotpike.pdt.parser.Scanner)CUP$parser$parser.getScanner()).getYycolumn());
       parser.yyerror("Missing '>'.");
     :}
   | open_paren_with_line_info error RPAREN

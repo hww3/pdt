@@ -1,22 +1,32 @@
 package org.gotpike.pdt;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.team.core.IFileTypeInfo;
 import org.eclipse.team.core.Team;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.plugin.*;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.gotpike.pdt.PDTPlugin;
+import org.gotpike.pdt.editors.PikeDocumentProvider;
 import org.gotpike.pdt.preferences.CodeAssistPreferences;
 import org.gotpike.pdt.preferences.MarkOccurrencesPreferences;
 import org.gotpike.pdt.preferences.PreferenceConstants;
 import org.gotpike.pdt.preferences.SourceFormatterPreferences;
 import org.gotpike.pdt.preferences.TaskTagPreferences;
+import org.gotpike.pdt.util.PikeColorProvider;
 import org.gotpike.pdt.util.PikeExecutor;
 import org.osgi.framework.BundleContext;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.RGB;
+
 
 import java.io.File;
 import java.util.*;
@@ -29,6 +39,7 @@ public class PDTPlugin extends AbstractUIPlugin {
 	private static PDTPlugin plugin;
 	//Resource bundle.
 	private ResourceBundle resourceBundle;
+	private IDocumentProvider fDocumentProvider;
 	
 	public static final String PIKE_EXECUTABLE_PREFERENCE = "PIKE_EXECUTABLE";
 
@@ -53,6 +64,7 @@ public class PDTPlugin extends AbstractUIPlugin {
 
 	public static final int SYNTAX_VALIDATION_INTERVAL_DEFAULT = 400;
 	
+	private PikeColorProvider colorProvider = new PikeColorProvider();
 	private boolean requirePikeCheckPassed;
 	private boolean requirePikeErrorDisplayed;
 
@@ -111,6 +123,23 @@ public class PDTPlugin extends AbstractUIPlugin {
 	public static PDTPlugin getDefault() {
 		return plugin;
 	}
+	
+	/**
+	 * Returns the workspace instance.
+	 */
+	public static IWorkspace getWorkspace() {
+		return ResourcesPlugin.getWorkspace();
+	}
+
+
+	public static IWorkbenchWindow getWorkbenchWindow() {
+		IWorkbenchWindow window = getDefault().getWorkbench()
+				.getActiveWorkbenchWindow();
+		if (window == null)
+			window = getDefault().getWorkbench().getWorkbenchWindows()[0];
+		return window;
+	}
+
 
 	/**
 	 * Returns the string from the plugin's resource bundle,
@@ -145,6 +174,31 @@ public class PDTPlugin extends AbstractUIPlugin {
             : "org.gotpike.pdt";
 	}
 
+	public synchronized IDocumentProvider getDocumentProvider() {
+
+		if (fDocumentProvider == null)
+			fDocumentProvider = new PikeDocumentProvider();
+		return fDocumentProvider;
+	}
+
+    /**
+     * Returns a color with the requested RGB value.
+     */
+    public Color getColor(RGB rgb)
+    {
+        return colorProvider.getColor(rgb);
+    }
+
+    /**
+     * Returns a color represented by the given preference setting.
+     */
+    public Color getColor(String preferenceKey)
+    {
+        return getColor(
+            PreferenceConverter.getColor(getPreferenceStore(), preferenceKey)
+            );
+    }
+    
 	/**
 	 * Initializes a preference store with default preference values for this
 	 * plug-in.

@@ -5,7 +5,8 @@ import java.util.*;
 import org.eclipse.jface.viewers.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
-import org.epic.core.model.*;
+import org.gotpike.pdt.model.Method;
+import org.gotpike.pdt.model.SourceFile;
 
 public class PikeOutlinePage extends ContentOutlinePage
 {
@@ -16,7 +17,7 @@ public class PikeOutlinePage extends ContentOutlinePage
      * We keep track of it to speed up outline synchronisations in the common
      * case (caret movements within a sub).
      */
-    private Subroutine lastCaretSub;
+    private Method lastCaretSub;
     
     public PikeOutlinePage(SourceFile source)
     {
@@ -53,9 +54,9 @@ public class PikeOutlinePage extends ContentOutlinePage
             caretLine > lastCaretSub.getEndLine())
         {
             lastCaretSub = null;
-            for (Iterator i = source.getSubs(); i.hasNext();)
+            for (Iterator i = source.getMethods(); i.hasNext();)
             {
-                Subroutine sub = (Subroutine) i.next();
+                Method sub = (Method) i.next();
                 if (caretLine >= sub.getStartLine() &&
                     caretLine <= sub.getEndLine())
                 {

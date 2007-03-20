@@ -1,17 +1,20 @@
 package org.gotpike.pdt.views;
 
 import java.util.*;
-import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.jface.viewers.*;
-import org.epic.core.model.*;
-import org.epic.core.model.Package;
+
+import org.gotpike.pdt.model.Class;
+import org.gotpike.pdt.model.IClassElement;
+import org.gotpike.pdt.model.ISourceFileListener;
+import org.gotpike.pdt.model.Inherit;
+import org.gotpike.pdt.model.Method;
+import org.gotpike.pdt.model.SourceFile;
 
 public class PikeOutlineContentProvider implements ITreeContentProvider
 {
-    static final String MODULES = " Modules";
-    static final String SUBROUTINES = " Subroutines";
+    static final String INHERITS = " Inherits";
+    static final String METHODS = " Methods";
     
     private static final Object[] EMPTY_ARRAY = new Object[0];
 
@@ -20,7 +23,7 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
     private final ISourceFileListener listener = new ISourceFileListener() {
         public void sourceFileChanged(SourceFile source)
         {
-            PerlOutlineContentProvider.this.modelChanged();
+            PikeOutlineContentProvider.this.modelChanged();
         } };
 
     private SourceFile model;
@@ -54,27 +57,27 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
     {
         if (parentElement instanceof SourceFile)
         {
-            return model.getPackages().toArray();
+            return model.getClasses().toArray();
         }
-        else if (parentElement instanceof Package)
+        else if (parentElement instanceof Class)
         {
-            Package pkg = (Package) parentElement;
-            PackageElem[] ret = new PackageElem[2];
-            ret[0] = new PackageElem(pkg, MODULES);
-            ret[1] = new PackageElem(pkg, SUBROUTINES);
+            Class pkg = (Class) parentElement;
+            ClassElem[] ret = new ClassElem[2];
+            ret[0] = new ClassElem(pkg, INHERITS);
+            ret[1] = new ClassElem(pkg, METHODS);
             return ret;
         }
-        else if (parentElement instanceof PackageElem)
+        else if (parentElement instanceof ClassElem)
         {
-            PackageElem elem = (PackageElem) parentElement;
+            ClassElem elem = (ClassElem) parentElement;
             
-            if (elem.name.equals(MODULES))
+            if (elem.name.equals(INHERITS))
             {
-                return elem.pkg.getUses().toArray();
+                return elem.pkg.getInherits().toArray();
             }
-            else if (elem.name.equals(SUBROUTINES))
+            else if (elem.name.equals(METHODS))
             {
-                return elem.pkg.getSubs().toArray();
+                return elem.pkg.getMethods().toArray();
             }
             else assert false;
         }
@@ -83,12 +86,12 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
 
     public Object getParent(Object element)
     {
-        if (element instanceof Subroutine)
-            return ((Subroutine) element).getParent();
-        else if (element instanceof ModuleUse)
-            return ((ModuleUse) element).getParent();
-        else if (element instanceof PackageElem)
-            return ((PackageElem) element).pkg;
+        if (element instanceof Method)
+            return ((Method) element).getParent();
+        else if (element instanceof Inherit)
+            return ((Inherit) element).getParent();
+        else if (element instanceof ClassElem)
+            return ((ClassElem) element).pkg;
         else if (element instanceof Package)
             return model;
 
@@ -112,16 +115,16 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
     private boolean contentChanged()
     {
         return
-            packageContentChanged(model.getSubs(), prevSubsContent.iterator()) ||
-            packageContentChanged(model.getUses(), prevUsesContent.iterator());
+            packageContentChanged(model.getMethods(), prevSubsContent.iterator()) ||
+            packageContentChanged(model.getInherits(), prevUsesContent.iterator());
     }
     
     private boolean packageContentChanged(Iterator curContent, Iterator prevContent)
     {
         while(curContent.hasNext() && prevContent.hasNext())
         {
-            IPackageElement curElem = (IPackageElement) curContent.next();
-            IPackageElement prevElem = (IPackageElement) prevContent.next();
+            IClassElement curElem = (IClassElement) curContent.next();
+            IClassElement prevElem = (IClassElement) prevContent.next();
             
             if (packageElementsDiffer(curElem, prevElem))                
             {
@@ -131,7 +134,7 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         return curContent.hasNext() != prevContent.hasNext();
     }
     
-    private boolean packageElementsDiffer(IPackageElement curElem, IPackageElement prevElem)
+    private boolean packageElementsDiffer(IClassElement curElem, IClassElement prevElem)
     {
         return
             !curElem.getName().equals(prevElem.getName()) ||
@@ -160,10 +163,10 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         
         if (model != null)
         {
-            for (Iterator i = model.getSubs(); i.hasNext();)
+            for (Iterator i = model.getMethods(); i.hasNext();)
                 prevSubsContent.add(i.next());        
             
-            for (Iterator i = model.getUses(); i.hasNext();)
+            for (Iterator i = model.getInherits(); i.hasNext();)
                 prevUsesContent.add(i.next());
         }
     }
@@ -179,12 +182,12 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         viewer.expandToLevel(3);
     }
     
-    public static class PackageElem
+    public static class ClassElem
     {
-        public final Package pkg;
+        public final Class pkg;
         public final String name;
         
-        public PackageElem(Package pkg, String name)
+        public ClassElem(Class pkg, String name)
         {
             this.pkg = pkg;
             this.name = name;
@@ -192,9 +195,9 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         
         public boolean equals(Object obj)
         {
-            if (!(obj instanceof Package)) return false;
+            if (!(obj instanceof Class)) return false;
             
-            Package pkg = (Package) obj;
+            Class pkg = (Class) obj;
             return pkg.equals(this.pkg) && name.equals(this.name);
         }
         

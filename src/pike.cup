@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.8 2007-03-16 22:28:59 hww3 Exp $
+|| $Id: pike.cup,v 1.9 2007-03-20 02:00:11 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -12,16 +12,20 @@ parser code  {:
 
   public void yyerror(String message)
   { 
+    PikeScanner scanner = (PikeScanner)getScanner();
+    message = ((scanner.filename!=null)?scanner.filename:"-") + ":" + (scanner.getYyline()+1) + /*" " +scanner.getYycolumn() + */": " + message;
+   
+  
     report_error(message, null);
   }
   
   public void report_error(String message, Object info) {
-    StringBuffer m = new StringBuffer("Error ");
+    StringBuffer m = new StringBuffer("Error");
 
     if (info instanceof java_cup.runtime.Symbol) 
       m.append( "(" +info.toString()+")" );
      
-    m.append(" : "+message);
+    m.append(": "+message);
    
     System.out.println(m);
   }
@@ -41,7 +45,7 @@ terminal TOK_CONSTANT ;
 terminal TOK_FLOAT ;
 terminal TOK_STRING ;
 terminal TOK_NUMBER ;
-
+terminal TOK_COMMENT ;
 /*
  * These are the predefined functions that can be accessed from Pike.
  */
@@ -1218,14 +1222,13 @@ expr4::= string
   | expr4 open_bracket_with_line_info error RPAREN
     {: parser.yyerror("Missing ']'."); :}
   | open_paren_with_line_info comma_expr2 RPAREN
-  | open_paren_with_line_info LBRACE expr_list close_brace_or_missing RPAREN
+  | open_paren_with_line_info LBRACE:lcurly expr_list close_brace_or_missing RPAREN:rcurly {: System.out.println("array! "+ lcurly + "\n"); :}
   | open_paren_with_line_info
     open_bracket_with_line_info	/* Only to avoid shift/reduce conflicts. */
     m_expr_list close_bracket_or_missing RPAREN
   | TOK_MULTISET_START line_number_info expr_list TOK_MULTISET_END
   | TOK_MULTISET_START line_number_info expr_list RPAREN:e
     {:
-      parser.yyerror("Line: " + ((org.gotpike.pdt.parser.Scanner) CUP$parser$parser.getScanner()).getYyline() + " " + ((org.gotpike.pdt.parser.Scanner)CUP$parser$parser.getScanner()).getYycolumn());
       parser.yyerror("Missing '>'.");
     :}
   | open_paren_with_line_info error RPAREN

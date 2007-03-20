@@ -32,11 +32,12 @@
 
 package org.gotpike.pdt.parser;
 import java_cup.runtime.*;
-
+import java.io.Reader;
+import org.eclipse.jface.text.IDocument;
 
 %%
 
-%class Scanner
+%class PikeScanner
 %extends sym
 
 %unicode
@@ -44,11 +45,19 @@ import java_cup.runtime.*;
 
 %line
 %column
+%char
 
 %cup
 
 %{
-
+  public String filename = null;
+  
+  PikeScanner(java.io.Reader in, String filename)
+  {
+    this.filename = filename;
+    this.zzReader = in;
+  }
+  
   public void yyerror(String message)
   { 
     report_error(message, null);
@@ -74,15 +83,42 @@ import java_cup.runtime.*;
   {
     return yyline;
   }
+  
+  private int getStartOffset(CurlySymbol parseStartCurly)
+  {
+      return parseStartCurly != null ? parseStartCurly.getOffset() : 0;
+  }
+  
 
+ public void reset(
+        Reader reader,
+        IDocument doc,
+        CurlySymbol parseStartCurly)
+    {
+        this.doc = doc;
+		this.zzReader = reader;        
+        if (parseStartCurly != null) level = parseStartCurly.getLevel();
+    }
+
+
+  int level = 0;
+  IDocument doc;
+  
   StringBuffer string = new StringBuffer();
   
-  private Symbol symbol(int type) {
-    return new PikeSymbol(type, yyline+1, yycolumn+1);
+  private PikeSymbol symbol(int type) {
+    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar);
   }
 
-  private Symbol symbol(int type, Object value) {
-    return new PikeSymbol(type, yyline+1, yycolumn+1, value);
+  private PikeSymbol symbol(int type, Object value) {
+    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, value);
+  }
+
+  private CurlySymbol curlysymbol(int type) {
+    int _level = level; 
+    if(type == LBRACE) level++;
+    else level--; 
+    return new CurlySymbol(type, yyline+1, yycolumn+1, yychar, _level);
   }
 
   /* assumes correct representation of a long value for 
@@ -206,8 +242,8 @@ SingleCharacter = [^\r\n\'\\]
   /* separators */
   "("                            { return symbol(LPAREN); }
   ")"                            { return symbol(RPAREN); }
-  "{"                            { return symbol(LBRACE); }
-  "}"                            { return symbol(RBRACE); }
+  "{"                            { return curlysymbol(LBRACE); }
+  "}"                            { return curlysymbol(RBRACE); }
   "["                            { return symbol(LBRACK); }
   "]"                            { return symbol(RBRACK); }
   ";"                            { return symbol(SEMICOLON); }
@@ -278,7 +314,7 @@ SingleCharacter = [^\r\n\'\\]
   {DoubleLiteral}[dD]            { return symbol(TOK_FLOAT, new Double(yytext().substring(0,yylength()-1))); }
   
   /* comments */
-  {Comment}                      { /* ignore */ }
+  {Comment}                      { return symbol(TOK_COMMENT, yytext()); }
 
   /* whitespace */
   {WhiteSpace}                   { /* ignore */ }

@@ -6,6 +6,7 @@ import org.eclipse.swt.graphics.Image;
 import org.gotpike.pdt.model.ISourceElement;
 import org.gotpike.pdt.model.Inherit;
 import org.gotpike.pdt.model.Method;
+import org.gotpike.pdt.model.Class;
 import org.gotpike.pdt.util.PikePluginImages;
 
 public class PikeOutlineLabelProvider extends LabelProvider
@@ -22,17 +23,7 @@ public class PikeOutlineLabelProvider extends LabelProvider
         {
             return PikePluginImages.get(PikePluginImages.IMG_ICON_USE);
         }
-        else if (element instanceof PikeOutlineContentProvider.ClassElem)
-        {
-            PikeOutlineContentProvider.ClassElem elem =
-                (PikeOutlineContentProvider.ClassElem) element;
-            
-            if (elem.name.equals(PikeOutlineContentProvider.METHODS))
-                return PikePluginImages.get(PikePluginImages.IMG_ICON_SUBROUTINE_NODE);
-            else if (elem.name.equals(PikeOutlineContentProvider.INHERITS))
-                return PikePluginImages.get(PikePluginImages.IMG_ICON_USE_NODE);
-        }
-        else if (element instanceof Package)
+        else if (element instanceof Class)
         {
             return PikePluginImages.get(PikePluginImages.IMG_ICON_PACKAGE_NODE);
         }

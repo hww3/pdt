@@ -34,7 +34,7 @@ public class Class implements IMultilineElement
 {
     private final int index;
     private final int blockLevel;
-    private final PikeSymbol name;
+    private final String name;
     private final List methods;
     private final List inherits;
     private PikeSymbol lastToken;
@@ -42,11 +42,11 @@ public class Class implements IMultilineElement
     /**
      * Creates the default ("main") package.
      */
-    public Class()
+    public Class(String name)
     {
         this.index = 0;
         this.blockLevel = 0;
-        this.name = null;
+        this.name = name;
         this.methods = new ArrayList();
         this.inherits = new ArrayList();
     }
@@ -57,7 +57,7 @@ public class Class implements IMultilineElement
     public Class(
         int index,
         int blockLevel,
-        PikeSymbol name)
+        String name)
     {
         this.index = index;
         this.blockLevel = blockLevel;
@@ -103,7 +103,7 @@ public class Class implements IMultilineElement
 
     public int getStartLine()
     {
-        return name != null ? name.getLine()-1 : 0;
+        return 0;
     }
     
     public int getIndex()
@@ -113,22 +113,22 @@ public class Class implements IMultilineElement
 
     public int getLength()
     {
-        return name != null ? name.getLength() : "main".length();
+        return name.length();
     }
 
     public String getName()
     {
-        return name != null ? (String)name.value : "main";
+        return name;
     }
 
     public int getOffset()
     {
-        return name != null ? name.getOffset() : -1;
+        return  -1;
     }
     
     public List getMethods()
     {
-        return Collections.unmodifiableList(inherits);
+        return Collections.unmodifiableList(methods);
     }
     
     public List getInherits()

@@ -94,7 +94,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
         source = new SourceFile(
             PDTPlugin.getDefault().getLog(),
-            getViewer().getDocument());
+            getViewer().getDocument(), this);
 
         reconcile();
     }
@@ -199,7 +199,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
             source = new SourceFile(
                 PDTPlugin.getDefault().getLog(),
-                getViewer().getDocument());
+                getViewer().getDocument(), this);
 
             reconcile();
         }

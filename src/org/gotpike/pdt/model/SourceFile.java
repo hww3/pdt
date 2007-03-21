@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.gotpike.pdt.PDTPlugin;
+import org.gotpike.pdt.editors.PikeEditor;
 import org.gotpike.pdt.editors.PikePartitioner;
 import org.gotpike.pdt.parser.*;
 
@@ -34,13 +35,13 @@ public class SourceFile
     private final IDocument doc;
     private List docs;
     private List classes;
-    
+    private PikeEditor editor;
     /**
      * Creates a SourceFile which will be reflecting contents of the given
      * source document. As a second step of initialisation, {@link #parse}
      * has to be called.
      */
-    public SourceFile(ILog log, IDocument doc)
+    public SourceFile(ILog log, IDocument doc, PikeEditor editor)
     {
         assert log != null;
         assert doc != null;
@@ -48,6 +49,7 @@ public class SourceFile
         this.doc = doc;
         this.classes = new ArrayList();
         this.docs = new ArrayList();
+        this.editor = editor;
     }
     
     /**
@@ -92,19 +94,11 @@ public class SourceFile
      * @return an iterator over {@link Method} instances representing
      *         subroutines found in the source, in their original order  
      */
-    public Iterator getMethods()
-    {
-        return new MethodIterator();
-    }
     
     /**
      * @return an iterator over {@link Inherit} instances representing
      *         'use module' statements found in the source, in their original order  
      */
-    public Iterator getInherits()
-    {
-        return new InheritIterator();
-    }
     
     public synchronized void parse()
     {
@@ -136,24 +130,23 @@ public class SourceFile
             }
         }
         */
- /*   	 IWorkbench wb = PlatformUI.getWorkbench();
-    	 IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
-    	 IWorkbenchPage page = win.getActivePage();
-    	 IEditorPart editor = page.getActiveEditor();
-    	 IFile original = ((FileEditorInput)editor.getEditorInput()).getFile();
-         IDocument edoc = ((TextEditor)editor).getDocumentProvider().getDocument(null);
-    	 if(edoc == doc)
-    	 {
-    		 System.out.println(original.getName());
-    		 System.out.println("whee!");
-    	 }
-*/
-    	PikeScanner s = new PikeScanner(new StringReader(doc.get()) /*, original.getName()*/);
+        String fn = "unknown";
+    	   IFile original = ((FileEditorInput)editor.getEditorInput()).getFile();
+           fn = original.getFullPath().toOSString();
+    	 
+    	PikeScanner s = new PikeScanner(new StringReader(doc.get()), fn);
         parser p = new parser(s);
         p.source = this;
         
-        try {
-			this.addClass();
+    	if(fn != null)
+        	fn = original.getName();
+        	int i = fn.indexOf('.');
+        	if(i!= -1)
+        		fn = fn.substring(0, i);
+
+        	try {
+        	
+			this.addClass(fn);
 		} catch (BadLocationException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -189,16 +182,11 @@ public class SourceFile
         docs.add(new AutoDocComment(docStart, docEnd));
     }
     
-    private void addClass(PikeSymbol docStart, PikeSymbol docEnd)
-    throws BadLocationException
-{
-        classes.add(new Class());
-}
     
-    private void addClass()
+    private void addClass(String name)
     throws BadLocationException
 {
-    classes.add(new Class());
+    classes.add(new Class(name));
 }
     private void fireSourceFileChanged()
     {
@@ -394,75 +382,6 @@ public class SourceFile
         }
     }*/
     
-    private class MethodIterator implements Iterator
-    {
-        private Iterator pkgIterator;
-        private Iterator subIterator;
-        
-        public MethodIterator()
-        {
-            pkgIterator = classes.iterator();
-        }
-        
-        public void remove()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext()
-        {
-            while (subIterator == null || !subIterator.hasNext())
-            {
-                if (pkgIterator.hasNext())
-                {
-                    Class pkg = (Class) pkgIterator.next();
-                    subIterator = pkg.getMethods().iterator();
-                }
-                else return false;
-            }
-            return true;
-        }
-
-        public Object next()
-        {
-            return subIterator.next();
-        }
-    }
-
-    
-    private class InheritIterator implements Iterator
-    {
-        private Iterator pkgIterator;
-        private Iterator subIterator;
-        
-        public InheritIterator()
-        {
-            pkgIterator = classes.iterator();
-        }
-        
-        public void remove()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext()
-        {
-            while (subIterator == null || !subIterator.hasNext())
-            {
-                if (pkgIterator.hasNext())
-                {
-                    Class pkg = (Class) pkgIterator.next();
-                    subIterator = pkg.getInherits().iterator();
-                }
-                else return false;
-            }
-            return true;
-        }
-
-        public Object next()
-        {
-            return subIterator.next();
-        }
-    }
+ 
     
 }

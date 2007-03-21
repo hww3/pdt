@@ -50,7 +50,7 @@ public class PikeOutlinePage extends ContentOutlinePage
     public void updateSelection(int caretLine)
     {
         // check lastCaretSub first to speed up things in the most common case
-        if (lastCaretSub == null ||
+/*        if (lastCaretSub == null ||
             caretLine < lastCaretSub.getStartLine() ||
             caretLine > lastCaretSub.getEndLine())
         {
@@ -69,6 +69,6 @@ public class PikeOutlinePage extends ContentOutlinePage
         if (lastCaretSub != null)
             setSelection(new StructuredSelection(lastCaretSub));
         else
-            setSelection(StructuredSelection.EMPTY);
+            setSelection(StructuredSelection.EMPTY);*/
     }
 }

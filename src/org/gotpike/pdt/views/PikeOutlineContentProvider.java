@@ -12,10 +12,7 @@ import org.gotpike.pdt.model.Method;
 import org.gotpike.pdt.model.SourceFile;
 
 public class PikeOutlineContentProvider implements ITreeContentProvider
-{
-    static final String INHERITS = " Inherits";
-    static final String METHODS = " Methods";
-    
+{   
     private static final Object[] EMPTY_ARRAY = new Object[0];
 
     private final List prevSubsContent;
@@ -54,33 +51,24 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
     }
 
     public Object[] getChildren(Object parentElement)
-    {
+    {    	
         if (parentElement instanceof SourceFile)
         {
             return model.getClasses().toArray();
         }
         else if (parentElement instanceof Class)
         {
-            Class pkg = (Class) parentElement;
-            ClassElem[] ret = new ClassElem[2];
-            ret[0] = new ClassElem(pkg, INHERITS);
-            ret[1] = new ClassElem(pkg, METHODS);
-            return ret;
-        }
-        else if (parentElement instanceof ClassElem)
-        {
-            ClassElem elem = (ClassElem) parentElement;
+            List i = ((Class)parentElement).getInherits();
+            List m = ((Class)parentElement).getMethods();
+            ArrayList c = new ArrayList();
             
-            if (elem.name.equals(INHERITS))
-            {
-                return elem.pkg.getInherits().toArray();
-            }
-            else if (elem.name.equals(METHODS))
-            {
-                return elem.pkg.getMethods().toArray();
-            }
-            else assert false;
+            c.addAll((List)i);
+            c.addAll(m);
+            
+            Object[] x = c.toArray();
+            return x;
         }
+ 
         return EMPTY_ARRAY;
     }
 
@@ -114,9 +102,12 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
      */
     private boolean contentChanged()
     {
-        return
+    	return true;
+    	
+/*        return
             packageContentChanged(model.getMethods(), prevSubsContent.iterator()) ||
             packageContentChanged(model.getInherits(), prevUsesContent.iterator());
+            */
     }
     
     private boolean packageContentChanged(Iterator curContent, Iterator prevContent)
@@ -163,11 +154,13 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         
         if (model != null)
         {
+        	/*
             for (Iterator i = model.getMethods(); i.hasNext();)
                 prevSubsContent.add(i.next());        
             
             for (Iterator i = model.getInherits(); i.hasNext();)
                 prevUsesContent.add(i.next());
+*/
         }
     }
     

@@ -21,6 +21,7 @@ public class PikeOutlinePage extends ContentOutlinePage
     
     public PikeOutlinePage(SourceFile source)
     {
+    	
         this.source = source;
     }
 

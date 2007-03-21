@@ -45,10 +45,10 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
     private PikePairMatcher bracketMatcher;
     private PikeBracketInserter bracketInserter;
-    private FoldReconciler foldReconciler;
-    private TasksReconciler tasksReconciler;
+//    private FoldReconciler foldReconciler;
+//    private TasksReconciler tasksReconciler;
     private PikeOutlinePage outlinePage;
-    private PikeSyntaxValidationThread validationThread;
+//    private PikeSyntaxValidationThread validationThread;
     private ISourceViewer sourceViewer;
     private IdleTimer idleTimer;
     private ProjectionSupport projectionSupport;
@@ -109,15 +109,15 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
         uninstallAnnotationListener();
 
-        try
-        {
+  //      try
+  //      {
             if (sourceViewer instanceof ITextViewerExtension &&
                 bracketInserter != null)
             {
                 ((ITextViewerExtension) sourceViewer).removeVerifyKeyListener(
                     bracketInserter);
             }
-            if (validationThread != null) validationThread.dispose();
+/*            if (validationThread != null) validationThread.dispose();
             if (idleTimer != null) idleTimer.dispose();
 
             String[] actionIds = PikeEditorActionIds.getEditorActions();
@@ -126,14 +126,14 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
                 IAction action = getAction(actionIds[i]);
                 if (action instanceof PikeEditorAction)
                     ((PikeEditorAction) action).dispose();
-            }
+            }*/
 
-            super.dispose();
-        }
-        catch (InterruptedException e)
+           super.dispose();
+  //      }
+/*        catch (InterruptedException e)
         {
             e.printStackTrace(); // TODO log it
-        }
+        }*/
     }
 
     /**
@@ -342,7 +342,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         if (event.getProperty().equals(
             PDTPlugin.SYNTAX_VALIDATION_PREFERENCE))
         {
-            if (PDTPlugin.getDefault().getSyntaxValidationPreference())
+ /*           if (PDTPlugin.getDefault().getSyntaxValidationPreference())
             {
                 if (!idleTimer.isRegistered(validationThread))
                 {
@@ -355,13 +355,13 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
                 {
                     idleTimer.removeListener(validationThread);
                 }
-            }
+            }*/
         }
     }
 
     /**
      * Updates the editor's dependent views and state after a document change.
-     * This method is only intended for use by {@link PerlReconcilingStrategy}.
+     * This method is only intended for use by {@link PikeReconcilingStrategy}.
      */
     public void reconcile()
     {
@@ -392,14 +392,14 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
                 source.parse();
 
                 if (outlinePage != null) outlinePage.updateContent(source);
-                if (foldReconciler != null) foldReconciler.reconcile();
-                if (tasksReconciler != null) tasksReconciler.reconcile();
+            //    if (foldReconciler != null) foldReconciler.reconcile();
+            //    if (tasksReconciler != null) tasksReconciler.reconcile();
             } });
     }
 
     public void refreshTaskView()
     {
-        tasksReconciler.reconcile();
+//        tasksReconciler.reconcile();
     }
 
     public void registerIdleListener(IdleTimerListener obj)
@@ -413,7 +413,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
      */
     public void revalidateSyntax()
     {
-        if (validationThread != null) validationThread.revalidate();
+  //      if (validationThread != null) validationThread.revalidate();
     }
 
     protected boolean affectsTextPresentation(PropertyChangeEvent event)
@@ -442,7 +442,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
     {
         super.createActions();
 
-        wireAction(
+  /*      wireAction(
             new ContentAssistAction(
                 PikeEditorMessages.getResourceBundle(),
                 "ContentAssistProposal.",
@@ -477,7 +477,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         wireAction(new PerlDocAction(this), PikeEditorCommandIds.PERL_DOC,
             PikeEditorActionIds.PERL_DOC);
         wireAction(new ExtractSubroutineAction(this), PikeEditorCommandIds.EXTRACT_SUBROUTINE,
-            PikeEditorActionIds.EXTRACT_SUBROUTINE);
+            PikeEditorActionIds.EXTRACT_SUBROUTINE);*/
     }
 
     protected void createNavigationActions()
@@ -699,7 +699,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
     private void installFoldReconciler()
     {
-        foldReconciler = new FoldReconciler(this);
+  //      foldReconciler = new FoldReconciler(this);
     }
 
     private void installIdleTimer()
@@ -716,16 +716,16 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         // load the module completion list in a low-priority background thread
     	Thread backgroundLoader = new Thread(new Runnable() {
 			public void run() {
-				try {
-			        ModuleCompletionHelper completionHelper =
-			            ModuleCompletionHelper.getInstance();
-					completionHelper.scanForModules(PikeEditor.this);
-				}
-				catch (CoreException e)
+//				try {
+//			        ModuleCompletionHelper completionHelper =
+//			            ModuleCompletionHelper.getInstance();
+//					completionHelper.scanForModules(PikeEditor.this);
+//				}
+/*				catch (CoreException e)
 				{
 					PDTPlugin.getDefault().getLog().log(e.getStatus());
 				}
-			} },
+*/			} },
             "PDT:ModuleCompletionHelper");
     	backgroundLoader.setPriority(Thread.MIN_PRIORITY);
     	backgroundLoader.start();
@@ -750,18 +750,18 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         if (resource == null) return;
         
         // Always check syntax when editor is opened
-        validationThread = new PikeSyntaxValidationThread();
-        validationThread.setPriority(Thread.MIN_PRIORITY);
-        validationThread.start();
-        validationThread.setDocument(
-            resource,
-            sourceViewer.getDocument());
+//        validationThread = new PikeSyntaxValidationThread();
+//        validationThread.setPriority(Thread.MIN_PRIORITY);
+//        validationThread.start();
+//        validationThread.setDocument(
+//            resource,
+//            sourceViewer.getDocument());
 
         // Register the validation thread if automatic checking is enabled
         if (PDTPlugin.getDefault().getSyntaxValidationPreference() &&
             idleTimer != null)
         {
-            registerIdleListener(validationThread);
+  //          registerIdleListener(validationThread);
         }
     }
 
@@ -770,7 +770,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         IResource resource = getResource();
         if (resource == null) return;
         
-        tasksReconciler = new TasksReconciler(this);
+   //     tasksReconciler = new TasksReconciler(this);
     }
 
     private void reconfigureBracketInserter()

@@ -8,6 +8,11 @@ public class CurlySymbol extends PikeSymbol {
 	        this.value = new Integer(value);
 	    }
 
+	    public CurlySymbol(int type, int line, int column, int offset, Object value) {
+			// TODO Auto-generated constructor stub
+		    	super(type, line, column, -1, -1, offset, value);
+		        this.value = value;
+		    }
 
 		public void setLevel(int level)
 	    {

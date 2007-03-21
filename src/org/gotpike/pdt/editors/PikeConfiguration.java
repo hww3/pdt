@@ -37,7 +37,7 @@ public class PikeConfiguration extends SourceViewerConfiguration {
 	}
 
 	public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer) {
-		PikePresentationReconciler reconciler = new PikePresentationReconciler(colorManager);
+		oldPikePresentationReconciler reconciler = new oldPikePresentationReconciler(colorManager);
 		return (PresentationReconciler)reconciler;
 		// return null;
 	}

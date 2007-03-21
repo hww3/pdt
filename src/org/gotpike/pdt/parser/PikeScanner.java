@@ -35,6 +35,7 @@
 package org.gotpike.pdt.parser;
 import java_cup.runtime.*;
 import java.io.Reader;
+import java.io.StringReader;
 import org.eclipse.jface.text.IDocument;
 
 
@@ -44,7 +45,7 @@ import org.eclipse.jface.text.IDocument;
  * on 3/16/07 6:51 PM from the specification file
  * <tt>/Users/hww3/Documents/workspace/PDT/src/pike.flex</tt>
  */
-class PikeScanner extends sym implements java_cup.runtime.Scanner {
+public class PikeScanner extends sym implements java_cup.runtime.Scanner {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -774,10 +775,14 @@ class PikeScanner extends sym implements java_cup.runtime.Scanner {
   /* user code: */
   public String filename = null;
   
-  PikeScanner(java.io.Reader in, String filename)
+  public PikeScanner(java.io.Reader in, String filename)
   {
     this.filename = filename;
     this.zzReader = in;
+  }
+  
+  public PikeScanner()
+  {
   }
   
   public void yyerror(String message)
@@ -818,7 +823,9 @@ class PikeScanner extends sym implements java_cup.runtime.Scanner {
         CurlySymbol parseStartCurly)
     {
         this.doc = doc;
-		this.zzReader = reader;        
+		this.zzReader = reader;
+		if(reader == null && doc != null)
+		  this.zzReader = new StringReader(doc.get());
         if (parseStartCurly != null) level = parseStartCurly.getLevel();
     }
 
@@ -829,20 +836,24 @@ class PikeScanner extends sym implements java_cup.runtime.Scanner {
   StringBuffer string = new StringBuffer();
   
   private PikeSymbol symbol(int type) {
-    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar);
+    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, new PikeSymbol(type, yyline+1, yycolumn+1, yychar));
   }
 
   private PikeSymbol symbol(int type, Object value) {
-    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, value);
+    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, new PikeSymbol(type, yyline+1, yycolumn+1, yychar,value));
   }
 
   private CurlySymbol curlysymbol(int type) {
     int _level = level; 
     if(type == LBRACE) level++;
     else level--; 
-    return new CurlySymbol(type, yyline+1, yycolumn+1, yychar, _level);
+    return new CurlySymbol(type, yyline+1, yycolumn+1, yychar, new CurlySymbol(type, yyline+1, yycolumn+1, yychar,_level));
   }
 
+  public int getCurlyLevel()
+  {
+    return level;
+  }
   /* assumes correct representation of a long value for 
      specified radix in String s */
   private long parseLong(String s, int radix) {
@@ -866,7 +877,7 @@ class PikeScanner extends sym implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  PikeScanner(java.io.Reader in) {
+  public PikeScanner(java.io.Reader in) {
     this.zzReader = in;
   }
 
@@ -876,7 +887,7 @@ class PikeScanner extends sym implements java_cup.runtime.Scanner {
    *
    * @param   in  the java.io.Inputstream to read input from.
    */
-  PikeScanner(java.io.InputStream in) {
+  public PikeScanner(java.io.InputStream in) {
     this(new java.io.InputStreamReader(in));
   }
 

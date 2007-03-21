@@ -44,12 +44,23 @@ public class PikeSymbol extends java_cup.runtime.Symbol {
 	  return left - right;
   }
 
+  public boolean includes(int offset)
+  {
+      return (this.offset <= offset) && (offset < this.offset + getLength());
+  }
+  
   public String getText()
   {
 	  // TODO: fix this!
 	return value.toString();  
   }
   
+  public void shift(int offsetDelta, int lineDelta)
+  {
+      offset += offsetDelta;
+      line = (getLine() + lineDelta);
+  }
+ 
   public String toString() {
     return "line "+line+", column "+column;
   }

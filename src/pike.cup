@@ -2,13 +2,16 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.9 2007-03-20 02:00:11 hww3 Exp $
+|| $Id: pike.cup,v 1.10 2007-03-21 03:26:34 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
 import java_cup.runtime.*;
+import org.gotpike.pdt.model.SourceFile;
 
 parser code  {: 
+
+  public SourceFile source;
 
   public void yyerror(String message)
   { 
@@ -433,11 +436,13 @@ push_compiler_frame0::= /* empty */
 
 def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
   LPAREN arguments close_paren_or_missing
-  block_or_semi {: System.out.println("have function: " + ident.toString()); :}
+  block_or_semi {: parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, new CurlySymbol(1,1,1,1,1)); System.out.println("have function: " + ident.toString()); :}
   | modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
-    error {: System.out.println("have function: " + ident.toString()); :}
+    error {: parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, new CurlySymbol(1,1,1,1,1)); System.out.println("have function: " + ident.toString()); :}
   | modifiers type_or_error optional_stars bad_identifier:ident
-    LPAREN arguments RPAREN block_or_semi {: System.out.println("have function: " + ident.toString()); :}
+    LPAREN arguments RPAREN block_or_semi:start 
+    {:     
+           parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, new CurlySymbol(1,1,1,1,1));  System.out.println("have function: " + ident.toString()); :}
   | modifiers type_or_error name_list SEMICOLON {: :}
   | inheritance {: :}
   | _import {: :}

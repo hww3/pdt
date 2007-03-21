@@ -3,7 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Pike Development Tools
 Bundle-SymbolicName: org.gotpike.pdt; singleton:=true
 Bundle-Version: 1.0.0
-Bundle-ClassPath: PDT.jar
+Bundle-ClassPath: PDT.jar,
+ JFlex.jar,
+ java_cup-0.10k.jar
 Bundle-Activator: org.gotpike.pdt.PDTPlugin
 Bundle-Vendor: pdt
 Bundle-Localization: plugin

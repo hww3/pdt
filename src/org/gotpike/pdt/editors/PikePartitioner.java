@@ -1,5 +1,6 @@
 package org.gotpike.pdt.editors;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -8,8 +9,9 @@ import org.eclipse.jface.text.*;
 
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.parser.CurlySymbol;
-import org.gotpike.pdt.parser.PikeSymbol;
 import org.gotpike.pdt.parser.PikeScanner;
+import org.gotpike.pdt.parser.PikeSymbol;
+
 import org.gotpike.pdt.parser.sym;
 
 /**
@@ -257,8 +259,8 @@ public class PikePartitioner implements
                     ? (PikeSymbol) tokens.get(lastUnaffectedTokenI-1)
                     : null;
     
-                if (t.getType() == PerlTokenTypes.OPEN_CURLY &&
-                    (prevT == null || prevT.getType() != PerlTokenTypes.OPER_ARROW))
+                if (t.getType() == sym.LBRACE &&
+                    (prevT == null || prevT.getType() != sym.TOK_ARROW))
                 {
                     break;
                 }
@@ -324,7 +326,7 @@ public class PikePartitioner implements
         try
         {
         	PikeSymbol t;
-            while ((t = nextToken(lexer)).getType() != Token.EOF_TYPE)
+            while ((t = nextToken(scanner)).getType() != sym.EOF)
             {
                 if (t.equals(sync))
                 {
@@ -337,7 +339,7 @@ public class PikePartitioner implements
                     
                     int start = tokens.size();
                     tokens.addSync();
-                    int pc = lexer.getCurlyLevel();
+                    int pc = scanner.getCurlyLevel();
                     int tokenCount = tokens.size();
 
                     for (int i = start; i < tokenCount; i++)
@@ -346,7 +348,7 @@ public class PikePartitioner implements
                         pt.shift(shiftDelta, lineShiftDelta);
                         if (pt instanceof CurlySymbol)
                         {
-                            if (pt.getType() == PerlTokenTypes.OPEN_CURLY)
+                            if (pt.getType() == sym.LBRACE)
                             {
                                 ((CurlySymbol) pt).setLevel(pc);
                                 pc++;
@@ -364,9 +366,9 @@ public class PikePartitioner implements
                 else tokens.add(t);
             }
         }
-        catch (TokenStreamException e)
+        catch(Exception e)
         {
-            if (e.getMessage().indexOf("unrecognized character at document offset") != -1)
+/*            if (e.getMessage().indexOf("unrecognized character at document offset") != -1)
             {
                 log.log(new Status(
                     IStatus.ERROR,
@@ -376,8 +378,8 @@ public class PikePartitioner implements
                     "Check if the text file encoding is set correctly in Preferences/Editors.",
                     e
                     ));
-            }
-            else
+            }*/
+            //else
             {
                 log.log(new Status(
                     IStatus.ERROR,
@@ -422,26 +424,8 @@ public class PikePartitioner implements
                     // imaginary zero-length open partition before each token
                     return new TypedRegion(offset, 0, PartitionTypes.DEFAULT);
                 }   
-                else
-                {
-                    if (i > 0 &&
-                        t.getOffset() == offset &&
-                        t.getType() == PerlTokenTypes.WS)
-                    {
-                        // if we are asked for partition at the beginning of
-                        // a whitespace token following a non-whitespace token
-                        // and preferOpenPartitions is false, we return the
-                        // previous non-whitespace partition instead
-                        
-                        PerlToken t2 = (PerlToken) tokens.get(i-1);
-                        if (t2.getOffset() + t2.getLength() == offset)
-                        {
-                            return token2Region(t2, i-1);
-                        }
-                        else return token2Region(t, i);
-                    }
-                    else return token2Region(t, i);
-                }
+                else return token2Region(t, i);
+                
             }
 
             if (i < tokens.size() - 1)
@@ -470,45 +454,9 @@ public class PikePartitioner implements
         {
         case sym.TOK_COMMENT:
             return PartitionTypes.COMMENT;
-        case sym.OPEN_HEREDOC:
-        case sym.HEREDOC_LINE:
-        case sym.CLOSE_HEREDOC:
-        case sym.OPEN_POD:
-        case sym.POD_BODY:
-        case sym.CLOSE_POD:
-            return PartitionTypes.POD;
-        case sym.KEYWORD1:
-        case sym.KEYWORD_USE:
-        case sym.KEYWORD_SUB:
-        case sym.KEYWORD_PACKAGE:
-            return PartitionTypes.KEYWORD1;
-        case sym.KEYWORD2:
-            return PartitionTypes.KEYWORD2;
-        case sym.VAR:
-        case sym.SPECIAL_VAR:
-            return PartitionTypes.VARIABLE;
-        case sym.OPEN_SQUOTE:
-        case sym.OPEN_DQUOTE:
-        case sym.OPEN_BQUOTE:
-            return PartitionTypes.LITERAL1;                    
-        case sym.MATCH_EXPR:
-        case sym.SUBST_EXPR:
-        case sym.OPEN_QUOTE: 
-        case sym.OPEN_SLASH:
-        case sym.OPEN_QMARK:
-            return PartitionTypes.LITERAL2;
-        case sym.CLOSE_QUOTE:
-        case sym.STRING_BODY:
-        case sym.STRING_SUFFIX:
-            return i > 0
-                ? getTokenContentType((PikeSymbol) tokens.get(i-1), i-1)
-                : PartitionTypes.DEFAULT;
-        case sym.NUMBER:
-            return PartitionTypes.NUMBER;
+
         default:
-            if (t instanceof OperatorToken ||
-                t instanceof CurlySymbol) return PartitionTypes.OPERATOR;
-            else return PartitionTypes.DEFAULT;
+            return PartitionTypes.DEFAULT;
         }
     }
     
@@ -539,7 +487,21 @@ public class PikePartitioner implements
     
     private PikeSymbol nextToken(PikeScanner scanner)
     {
-            return (PikeSymbol)scanner.next_token();
+            try {
+				return (PikeSymbol)(scanner.next_token());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+			     log.log(new Status(
+		                    IStatus.ERROR,
+		                    PDTPlugin.getPluginId(),
+		                    IStatus.OK,
+		                    "Could not parse source file. Report this exception as " +
+		                    "a bug, including the text fragment which triggers it, " +
+		                    "if possible.",
+		                    e
+		                    ));
+			     return null;
+			}
 
     }
     

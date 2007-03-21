@@ -33,10 +33,11 @@
 package org.gotpike.pdt.parser;
 import java_cup.runtime.*;
 import java.io.Reader;
+import java.io.StringReader;
 import org.eclipse.jface.text.IDocument;
 
 %%
-
+%public
 %class PikeScanner
 %extends sym
 
@@ -52,10 +53,14 @@ import org.eclipse.jface.text.IDocument;
 %{
   public String filename = null;
   
-  PikeScanner(java.io.Reader in, String filename)
+  public PikeScanner(java.io.Reader in, String filename)
   {
     this.filename = filename;
     this.zzReader = in;
+  }
+  
+  public PikeScanner()
+  {
   }
   
   public void yyerror(String message)
@@ -96,7 +101,9 @@ import org.eclipse.jface.text.IDocument;
         CurlySymbol parseStartCurly)
     {
         this.doc = doc;
-		this.zzReader = reader;        
+		this.zzReader = reader;
+		if(reader == null && doc != null)
+		  this.zzReader = new StringReader(doc.get());
         if (parseStartCurly != null) level = parseStartCurly.getLevel();
     }
 
@@ -107,20 +114,24 @@ import org.eclipse.jface.text.IDocument;
   StringBuffer string = new StringBuffer();
   
   private PikeSymbol symbol(int type) {
-    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar);
+    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, new PikeSymbol(type, yyline+1, yycolumn+1, yychar));
   }
 
   private PikeSymbol symbol(int type, Object value) {
-    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, value);
+    return new PikeSymbol(type, yyline+1, yycolumn+1, yychar, new PikeSymbol(type, yyline+1, yycolumn+1, yychar,value));
   }
 
   private CurlySymbol curlysymbol(int type) {
     int _level = level; 
     if(type == LBRACE) level++;
     else level--; 
-    return new CurlySymbol(type, yyline+1, yycolumn+1, yychar, _level);
+    return new CurlySymbol(type, yyline+1, yycolumn+1, yychar, new CurlySymbol(type, yyline+1, yycolumn+1, yychar,_level));
   }
 
+  public int getCurlyLevel()
+  {
+    return level;
+  }
   /* assumes correct representation of a long value for 
      specified radix in String s */
   private long parseLong(String s, int radix) {

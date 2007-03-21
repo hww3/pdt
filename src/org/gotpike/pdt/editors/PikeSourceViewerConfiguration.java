@@ -53,7 +53,7 @@ public class PikeSourceViewerConfiguration extends SourceViewerConfiguration
     {
         return PartitionTypes.getTypes();
     }
-
+/*
     public IContentAssistant getContentAssistant(ISourceViewer sourceViewer)
     {
         if (editor == null) return null;
@@ -81,6 +81,7 @@ public class PikeSourceViewerConfiguration extends SourceViewerConfiguration
         
         return assistant;
     }
+    */
 
     public String[] getDefaultPrefixes(
         ISourceViewer sourceViewer,

@@ -1,11 +1,23 @@
 package org.gotpike.pdt.model;
 
+import java.io.FileReader;
+import java.io.StringReader;
 import java.util.*;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.ListenerList;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.part.FileEditorInput;
+import org.gotpike.pdt.PDTPlugin;
+import org.gotpike.pdt.editors.PikePartitioner;
 import org.gotpike.pdt.parser.*;
 
 /**
@@ -34,8 +46,8 @@ public class SourceFile
         assert doc != null;
         this.log = log;
         this.doc = doc;
-        this.classes = Collections.EMPTY_LIST;
-        this.docs = Collections.EMPTY_LIST;
+        this.classes = new ArrayList();
+        this.docs = new ArrayList();
     }
     
     /**
@@ -96,7 +108,8 @@ public class SourceFile
     
     public synchronized void parse()
     {
-        this.classes = new ArrayList();
+    	System.out.println("whee!");
+ /*       this.classes = new ArrayList();
         this.docs = new ArrayList();
         
         PikePartitioner partitioner = (PikePartitioner) doc.getDocumentPartitioner();
@@ -114,14 +127,44 @@ public class SourceFile
             {
                 log.log(new Status(
                     Status.ERROR,
-                    PerlEditorPlugin.getPluginId(),
+                    PDTPlugin.getPluginId(),
                     IStatus.OK,
                     "Unexpected exception: " + e.getClass().getName() +
                     "; report it as a bug " +
-                    "in plug-in " + PerlEditorPlugin.getPluginId(),
+                    "in plug-in " + PDTPlugin.getPluginId(),
                     e));
             }
         }
+        */
+ /*   	 IWorkbench wb = PlatformUI.getWorkbench();
+    	 IWorkbenchWindow win = wb.getActiveWorkbenchWindow();
+    	 IWorkbenchPage page = win.getActivePage();
+    	 IEditorPart editor = page.getActiveEditor();
+    	 IFile original = ((FileEditorInput)editor.getEditorInput()).getFile();
+         IDocument edoc = ((TextEditor)editor).getDocumentProvider().getDocument(null);
+    	 if(edoc == doc)
+    	 {
+    		 System.out.println(original.getName());
+    		 System.out.println("whee!");
+    	 }
+*/
+    	PikeScanner s = new PikeScanner(new StringReader(doc.get()) /*, original.getName()*/);
+        parser p = new parser(s);
+        p.source = this;
+        
+        try {
+			this.addClass();
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        
+        try {
+			p.parse();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         fireSourceFileChanged();
     }
     
@@ -134,19 +177,36 @@ public class SourceFile
         listeners.remove(listener);
     }
     
+    public void addMethod(PikeSymbol keyword, PikeSymbol name, CurlySymbol front)
+    {
+    	Class cls = (Class)this.classes.get(0);
+        cls.addMethod(keyword, name, front);
+    }
+    
     private void addDoc(PikeSymbol docStart, PikeSymbol docEnd)
         throws BadLocationException
     {
         docs.add(new AutoDocComment(docStart, docEnd));
     }
     
+    private void addClass(PikeSymbol docStart, PikeSymbol docEnd)
+    throws BadLocationException
+{
+        classes.add(new Class());
+}
+    
+    private void addClass()
+    throws BadLocationException
+{
+    classes.add(new Class());
+}
     private void fireSourceFileChanged()
     {
         Object[] listeners = this.listeners.getListeners();
         for (int i = 0; i < listeners.length; i++)
             ((ISourceFileListener) listeners[i]).sourceFileChanged(this);
     }
-    
+   /* 
     private class ParsingState
     {
         private final int tokenCount;
@@ -233,8 +293,8 @@ public class SourceFile
         
         private void updateBlockLevel()
         {
-            if (type == PerlTokenTypes.OPEN_CURLY) blockLevel++;
-            else if (type == PerlTokenTypes.CLOSE_CURLY)
+            if (type == sym.LBRACE) blockLevel++;
+            else if (type == sym.RBRACE)
             {
                 closeMethod();
                 closeClass();
@@ -246,25 +306,25 @@ public class SourceFile
         {
             if (subKeyword == null)
             {
-                if (type == PerlTokenTypes.KEYWORD_SUB) subKeyword = t;
+                if (type == sym.KEYWORD_SUB) subKeyword = t;
             }
             else
             {
-                if (subName == null && type == PerlTokenTypes.WORD)
+                if (methodName == null && type == sym.TOK_IDENTIFIER)
                 {
-                    subName = t;
+                    methodName = t;
                 }
-                else if (type == PerlTokenTypes.SEMI)
+                else if (type == sym.SEMI)
                 {
                     subKeyword = null;
                     subName = null;
                 }
-                else if (type == PerlTokenTypes.OPEN_CURLY)
+                else if (type == sym.OPEN_CURLY)
                 {
                     if (subName != null)
                     {
-                        Method method = getCurrentClass().addSub(
-                            subKeyword, subName, (CurlySymbol) t);
+                        Method method = getCurrentClass().addMethod(
+                            subKeyword, methodName, (CurlySymbol) t);
                         methodStack.push(sub);
                     }
                     subKeyword = null;
@@ -277,7 +337,7 @@ public class SourceFile
         {
             if (classKeyword == null)
             {
-                if (type == PerlTokenTypes.KEYWORD_PACKAGE)
+                if (type == sym.KEYWORD_PACKAGE)
                 {
                     closeClass();
                     classKeyword = t;
@@ -285,7 +345,7 @@ public class SourceFile
             }
             else
             {
-                if (type == PerlTokenTypes.WORD)
+                if (type == sym.WORD)
                 {
                     openClass(new Class(
                         classes.size(), blockLevel, classKeyword, t));
@@ -298,11 +358,11 @@ public class SourceFile
         {
             if (docStart == null)
             {
-                if (type == PerlTokenTypes.OPEN_POD) docStart = t;
+                if (type == sym.OPEN_POD) docStart = t;
             }
             else
             {
-                if (type == PerlTokenTypes.CLOSE_POD)
+                if (type == sym.CLOSE_POD)
                 {
                     addDoc(docStart, t);
                     docStart = null;
@@ -314,11 +374,11 @@ public class SourceFile
         {
             if (inheritKeyword == null)
             {
-                if (type == PerlTokenTypes.KEYWORD_USE) inheritKeyword = t;
+                if (type == sym.KEYWORD_USE) inheritKeyword = t;
             }
             else
             {
-                if (type == PerlTokenTypes.WORD)
+                if (type == sym.WORD)
                 {
                     String text = t.getText();
                     if (!"constant".equals(text) &&
@@ -332,7 +392,7 @@ public class SourceFile
                 }
             }
         }
-    }
+    }*/
     
     private class MethodIterator implements Iterator
     {
@@ -356,7 +416,7 @@ public class SourceFile
                 if (pkgIterator.hasNext())
                 {
                     Class pkg = (Class) pkgIterator.next();
-                    subIterator = pkg.getSubs().iterator();
+                    subIterator = pkg.getMethods().iterator();
                 }
                 else return false;
             }
@@ -368,6 +428,7 @@ public class SourceFile
             return subIterator.next();
         }
     }
+
     
     private class InheritIterator implements Iterator
     {
@@ -391,7 +452,7 @@ public class SourceFile
                 if (pkgIterator.hasNext())
                 {
                     Class pkg = (Class) pkgIterator.next();
-                    subIterator = pkg.getSubs().iterator();
+                    subIterator = pkg.getInherits().iterator();
                 }
                 else return false;
             }
@@ -403,38 +464,5 @@ public class SourceFile
             return subIterator.next();
         }
     }
-    private class ClassIterator implements Iterator
-    {
-        private Iterator pkgIterator;
-        private Iterator useIterator;
-        
-        public ClassIterator()
-        {
-            pkgIterator = classes.iterator();
-        }
-        
-        public void remove()
-        {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean hasNext()
-        {
-            while (useIterator == null || !useIterator.hasNext())
-            {
-                if (pkgIterator.hasNext())
-                {
-                    Class pkg = (Class) pkgIterator.next();
-                    useIterator = pkg.getUses().iterator();
-                }
-                else return false;
-            }
-            return true;
-        }
-
-        public Object next()
-        {
-            return useIterator.next();
-        }
-    }
+    
 }

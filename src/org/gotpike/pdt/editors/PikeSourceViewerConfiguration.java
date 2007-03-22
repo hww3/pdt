@@ -133,7 +133,7 @@ public class PikeSourceViewerConfiguration extends SourceViewerConfiguration
     
     public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
     {
-        return new PikePresentationReconciler(prefs);
+        return new PikePresentationReconciler(editor.getColorManager());
     }
 
     public IReconciler getReconciler(ISourceViewer sourceViewer)

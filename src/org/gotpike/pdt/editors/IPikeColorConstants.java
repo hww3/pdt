@@ -8,7 +8,7 @@ public interface IPikeColorConstants {
 	RGB PIKE_CHAR = new RGB(128, 128, 64);
 	RGB PIKE_CPP = new RGB(255, 0, 0);
 	RGB PIKE_AUTODOC = new RGB(128, 128, 0);
-	RGB PIKE_DATATYPE = new RGB(255, 204, 0);
+	RGB PIKE_DATATYPE = new RGB(150, 150, 0);
 	RGB PIKE_RESERVED = new RGB(200, 0, 200);
 	RGB DEFAULT = new RGB(0, 0, 0);
 }

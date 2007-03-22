@@ -1,5 +1,6 @@
 package org.gotpike.pdt.editors;
 
+import org.eclipse.core.internal.utils.ArrayIterator;
 import org.eclipse.core.runtime.ILog;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -15,9 +16,11 @@ import org.gotpike.pdt.model.IMultilineElement;
 import org.gotpike.pdt.model.SourceFile;
 import org.gotpike.pdt.preferences.PreferenceConstants;
 import org.gotpike.pdt.util.StatusFactory;
+import org.gotpike.pdt.model.Class;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 
@@ -127,8 +130,16 @@ public class FoldReconciler
         computeFoldPositions(tuples, getSourceFile().getDocs(),
             initialized ? false : isFoldPerldoc());
 
-        computeFoldPositions(tuples, getSourceFile().getMethods(),
-            initialized ? false : isFoldSubroutines());
+        List l = getSourceFile().getClasses();
+
+        if(!l.isEmpty())
+        {
+        	Object c = l.get(0);
+        	Class cls = (Class)c;
+            Iterator x = cls.getMethods().iterator();
+            computeFoldPositions(tuples, x,
+                initialized ? false : isFoldSubroutines());
+        }
 
         // TODO: add new fold position computations here
 
@@ -153,8 +164,10 @@ public class FoldReconciler
 
             if (e.getStartLine() == e.getEndLine())
             {
+            	System.out.println("single line element.");
                 continue;
             }
+        	System.out.println("multi line element.");
 
             int offset = doc.getLineOffset(e.getStartLine());
             int length =

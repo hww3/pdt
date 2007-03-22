@@ -2,15 +2,17 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.10 2007-03-21 03:26:34 hww3 Exp $
+|| $Id: pike.cup,v 1.11 2007-03-22 04:47:30 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
 import java_cup.runtime.*;
 import org.gotpike.pdt.model.SourceFile;
+import org.gotpike.pdt.parser.Block;
 
 parser code  {: 
 
+  
   public SourceFile source;
 
   public void yyerror(String message)
@@ -344,8 +346,8 @@ optional_rename_inherit::= COLON TOK_IDENTIFIER
 /* NOTE: This rule pushes a string "name" on the stack in addition
  * to resolving the program reference.
  */
-low_program_ref::= string_constant
-  | idents
+low_program_ref::= string_constant:constant {: RESULT = constant; :}
+  | idents:idents {: RESULT = idents; :}
   ;
 
 /* NOTE: Pushes the resolved program on the stack. */
@@ -353,16 +355,16 @@ program_ref::= low_program_ref
   ;
 
 inherit_ref::=
-  low_program_ref
+  low_program_ref:ref {: RESULT = ref; :}
   ;
 
-inheritance::= modifiers TOK_INHERIT inherit_ref optional_rename_inherit SEMICOLON
-  | modifiers TOK_INHERIT inherit_ref error SEMICOLON
-  | modifiers TOK_INHERIT inherit_ref error TOK_LEX_EOF
-  | modifiers TOK_INHERIT inherit_ref error RBRACE
-  | modifiers TOK_INHERIT error SEMICOLON
-  | modifiers TOK_INHERIT error TOK_LEX_EOF
-  | modifiers TOK_INHERIT error RBRACE 
+inheritance::= modifiers TOK_INHERIT inherit_ref:ref optional_rename_inherit SEMICOLON {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_INHERIT inherit_ref error SEMICOLON {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_INHERIT inherit_ref error TOK_LEX_EOF {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_INHERIT inherit_ref error RBRACE {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_INHERIT error SEMICOLON {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_INHERIT error TOK_LEX_EOF {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_INHERIT error RBRACE  {: parser.source.currentModifiers = 0; :}
   ;
 
 _import::= TOK_IMPORT idents SEMICOLON
@@ -381,13 +383,13 @@ constant_list::= constant_name
   | constant_list COMMA constant_name
   ;
 
-constant::= modifiers TOK_CONSTANT constant_list SEMICOLON
-  | modifiers TOK_CONSTANT error SEMICOLON
-  | modifiers TOK_CONSTANT error TOK_LEX_EOF
-  | modifiers TOK_CONSTANT error RBRACE {: parser.yyerror("Missing ';'."); :}
+constant::= modifiers TOK_CONSTANT constant_list SEMICOLON {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_CONSTANT error SEMICOLON {: parser.source.currentModifiers = 0; :}
+  | modifiers TOK_CONSTANT error TOK_LEX_EOF {: parser.source.currentModifiers = 0; :} 
+  | modifiers TOK_CONSTANT error RBRACE {: parser.source.currentModifiers = 0; parser.yyerror("Missing ';'."); :}
   ;
 
-block_or_semi::= block
+block_or_semi::= block:block {: RESULT = block; :}
   | SEMICOLON
   | TOK_LEX_EOF {:  parser.yyerror("Expected ';'."); :}
   | error
@@ -436,14 +438,32 @@ push_compiler_frame0::= /* empty */
 
 def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
   LPAREN arguments close_paren_or_missing
-  block_or_semi {: parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, new CurlySymbol(1,1,1,1,1)); System.out.println("have function: " + ident.toString()); :}
+  block_or_semi:block
+  
+      {: 
+          if(block != null)
+          {
+            Block rblock = (Block)block;
+            parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, rblock.start, rblock.end); 
+            System.out.println("have function: " + ident.toString() + " " + (block!=null?block.toString():"null")); 
+          }
+          parser.source.currentModifiers = 0;
+      :}
+  
   | modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
-    error {: parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, new CurlySymbol(1,1,1,1,1)); System.out.println("have function: " + ident.toString()); :}
+    error 
   | modifiers type_or_error optional_stars bad_identifier:ident
-    LPAREN arguments RPAREN block_or_semi:start 
+    LPAREN arguments RPAREN block_or_semi:block
     {:     
-           parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, new CurlySymbol(1,1,1,1,1));  System.out.println("have function: " + ident.toString()); :}
-  | modifiers type_or_error name_list SEMICOLON {: :}
+         if(block != null)
+          {
+            Block rblock = (Block)block;
+            parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, rblock.start, rblock.end); 
+            System.out.println("have function: " + ident.toString() + " " + (block!=null?block.toString():"null")); 
+          }
+          parser.source.currentModifiers = 0;
+    :}
+  | modifiers type_or_error name_list SEMICOLON {: parser.source.currentModifiers = 0; :}
   | inheritance {: :}
   | _import {: :}
   | constant {: :}
@@ -463,7 +483,7 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
   | modifiers
    LBRACE 
       program
-   close_brace_or_eof
+   close_brace_or_eof {: parser.source.currentModifiers = 0; :}
   ;
 
 optional_dot_dot_dot::= TOK_DOT_DOT_DOT
@@ -474,7 +494,7 @@ optional_dot_dot_dot::= TOK_DOT_DOT_DOT
   | /* empty */
   ;
 
-optional_identifier::= TOK_IDENTIFIER
+optional_identifier::= TOK_IDENTIFIER:ident {: RESULT = ident; :}
   | bad_identifier
   | /* empty */
   ;
@@ -500,12 +520,12 @@ arguments2::= new_arg_name
 modifier::=
     TOK_NO_MASK    
   | TOK_FINAL_ID   
-  | TOK_STATIC     
+  | TOK_STATIC {: parser.source.currentModifiers |= 4; :}
   | TOK_EXTERN     
   | TOK_OPTIONAL   
-  | TOK_PRIVATE    
+  | TOK_PRIVATE {: parser.source.currentModifiers |= 2; :}   
   | TOK_LOCAL_ID   
-  | TOK_PUBLIC     
+  | TOK_PUBLIC    {: parser.source.currentModifiers = 0; :} 
   | TOK_PROTECTED  
   | TOK_INLINE     
   | TOK_VARIANT    
@@ -577,7 +597,9 @@ modifiers::= modifier_list
  ;
 
 modifier_list::= /* empty */ 
-  | modifier modifier_list 
+  | modifier:modifier modifier_list {: System.out.println("modifier: " + parser.source.currentModifiers);
+     parser.source.currentModifiers = 0 ; 
+   :}
   ;
 
 optional_stars::= optional_stars MULT 
@@ -731,12 +753,13 @@ new_local_name2::= TOK_IDENTIFIER
 line_number_info::= /* empty */
   ;
 
-block::= LBRACE
+block::= LBRACE:start
   line_number_info
-  statements end_block
+  statements end_block:end
+  {: RESULT = new Block((CurlySymbol)start, (CurlySymbol)end); :}
   ;
 
-end_block::= RBRACE
+end_block::= RBRACE:end {: RESULT = end; :}
   | TOK_LEX_EOF
   {:
     parser.yyerror("Missing '}'.");
@@ -855,8 +878,8 @@ local_function2::= optional_stars TOK_IDENTIFIER push_compiler_frame1 func_args
   | optional_stars TOK_IDENTIFIER push_compiler_frame1 error
   ;
 
-create_arg::= modifiers type_or_error optional_stars optional_dot_dot_dot TOK_IDENTIFIER
-  | modifiers type_or_error optional_stars bad_identifier
+create_arg::= modifiers type_or_error optional_stars optional_dot_dot_dot TOK_IDENTIFIER   {: parser.source.currentModifiers = 0 ; :}
+  | modifiers type_or_error optional_stars bad_identifier   {: parser.source.currentModifiers = 0 ; :}
   ;
 
 create_arguments2::= create_arg
@@ -886,9 +909,9 @@ failsafe_program::= LBRACE program end_block
 		:}
                 ;
 
-class::= modifiers TOK_CLASS line_number_info optional_identifier
+class::= modifiers:modifiers TOK_CLASS line_number_info optional_identifier:identifier {: System.out.println("identifier:" + (identifier!=null?((PikeSymbol)identifier).value:"null")); parser.source.addClass((String)(identifier!=null?((PikeSymbol)identifier).value:"(anonymous)")); parser.source.currentModifiers = 0 ; :}
   optional_create_arguments failsafe_program
-
+  {: parser.source.endClass(); :}
   ;
 
 simple_identifier::= TOK_IDENTIFIER

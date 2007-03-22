@@ -36,6 +36,11 @@ public class SourceFile
     private List docs;
     private List classes;
     private PikeEditor editor;
+    
+    // used during parsing to keep track of state.
+    private Stack currentClass;
+    public int currentModifiers;
+    
     /**
      * Creates a SourceFile which will be reflecting contents of the given
      * source document. As a second step of initialisation, {@link #parse}
@@ -47,6 +52,7 @@ public class SourceFile
         assert doc != null;
         this.log = log;
         this.doc = doc;
+        this.currentClass = new Stack();
         this.classes = new ArrayList();
         this.docs = new ArrayList();
         this.editor = editor;
@@ -103,9 +109,10 @@ public class SourceFile
     public synchronized void parse()
     {
     	System.out.println("whee!");
- /*       this.classes = new ArrayList();
-        this.docs = new ArrayList();
-        
+       this.classes = new ArrayList();
+       this.docs = new ArrayList();
+       this.currentClass.clear(); 
+ /*       
         PikePartitioner partitioner = (PikePartitioner) doc.getDocumentPartitioner();
         if (partitioner == null) return;
         synchronized (partitioner.getTokensLock())
@@ -157,6 +164,7 @@ public class SourceFile
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return;
 		}
         fireSourceFileChanged();
     }
@@ -170,10 +178,20 @@ public class SourceFile
         listeners.remove(listener);
     }
     
-    public void addMethod(PikeSymbol keyword, PikeSymbol name, CurlySymbol front)
+    public Method addMethod(PikeSymbol keyword, PikeSymbol name, CurlySymbol front)
     {
-    	Class cls = (Class)this.classes.get(0);
-        cls.addMethod(keyword, name, front);
+    	Class cls = (Class)currentClass.peek();
+        return cls.addMethod(keyword, name, front);
+    }
+    
+    public Method addMethod(PikeSymbol keyword, PikeSymbol name, CurlySymbol front, CurlySymbol back)
+    {
+    	Method meth;
+    	Class cls = (Class)currentClass.peek();
+    	System.out.println("addMethod: " + front.toString() + " " + back.toString());
+        meth = cls.addMethod(keyword, name, front);
+        meth.setCloseCurly(back);
+        return meth;
     }
     
     private void addDoc(PikeSymbol docStart, PikeSymbol docEnd)
@@ -183,11 +201,29 @@ public class SourceFile
     }
     
     
-    private void addClass(String name)
+    public void addClass(String name)
     throws BadLocationException
 {
-    classes.add(new Class(name));
+    	
+    Class cls = new Class(name);
+    cls.setModifiers(currentModifiers);
+    if(currentClass.empty())
+    {
+    	classes.add(cls);
+    	cls.setTop();
+    }
+    else
+    {
+    	Class parent = (Class)currentClass.peek();
+    	parent.addClass(cls);
+    }
+    currentClass.push(cls);
 }
+    public void endClass()
+    {
+    	currentClass.pop();
+    }
+    
     private void fireSourceFileChanged()
     {
         Object[] listeners = this.listeners.getListeners();

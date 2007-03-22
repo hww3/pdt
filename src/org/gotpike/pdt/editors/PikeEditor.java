@@ -40,12 +40,12 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
     /**
      * Editor id, as declared in the plug-in manifest.
      */
-    public static final String PERL_EDITOR_ID =
-        "org.epic.perleditor.editors.PerlEditor";
+    public static final String PIKE_EDITOR_ID =
+        "org.gotpike.pdt.editors.PikeEditor";
 
     private PikePairMatcher bracketMatcher;
     private PikeBracketInserter bracketInserter;
-//    private FoldReconciler foldReconciler;
+    private FoldReconciler foldReconciler;
 //    private TasksReconciler tasksReconciler;
     private PikeOutlinePage outlinePage;
 //    private PikeSyntaxValidationThread validationThread;
@@ -68,10 +68,13 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
      */
     private boolean syncFromOutline;
 
+    private ColorManager colorManager;
+    
     public PikeEditor()
     {
         setDocumentProvider(PDTPlugin.getDefault().getDocumentProvider());
         PDTPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
+        colorManager = new ColorManager();
         setKeyBindingScopes(new String[] { "org.epic.perleditor.perlEditorScope" });
     }
 
@@ -392,7 +395,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
                 source.parse();
 
                 if (outlinePage != null) outlinePage.updateContent(source);
-            //    if (foldReconciler != null) foldReconciler.reconcile();
+                if (foldReconciler != null) foldReconciler.reconcile();
             //    if (tasksReconciler != null) tasksReconciler.reconcile();
             } });
     }
@@ -699,7 +702,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
     private void installFoldReconciler()
     {
-  //      foldReconciler = new FoldReconciler(this);
+        foldReconciler = new FoldReconciler(this);
     }
 
     private void installIdleTimer()
@@ -1272,4 +1275,8 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
             }
         }
     }
+
+	public ColorManager getColorManager() {
+		return colorManager;
+	}
 }

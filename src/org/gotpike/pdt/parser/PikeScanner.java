@@ -1517,217 +1517,217 @@ public class PikeScanner extends sym implements java_cup.runtime.Scanner {
           { return symbol(TOK_RSH);
           }
         case 199: break;
-        case 76: 
-          { return symbol(TOK_COMMENT, yytext());
-          }
-        case 200: break;
         case 41: 
           { return symbol(TOK_FLOAT, new Float(yytext().substring(0,yylength()-1)));
           }
-        case 201: break;
+        case 200: break;
         case 32: 
           { throw new RuntimeException("Unterminated string at end of line");
           }
-        case 202: break;
+        case 201: break;
         case 86: 
           { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\''));
           }
-        case 203: break;
+        case 202: break;
         case 17: 
           { return curlysymbol(RBRACE);
           }
-        case 204: break;
+        case 203: break;
         case 67: 
           { string.append( '\"' );
           }
-        case 205: break;
+        case 204: break;
         case 87: 
           { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\\'));
           }
-        case 206: break;
+        case 205: break;
         case 19: 
           { return symbol(RBRACK);
           }
-        case 207: break;
+        case 206: break;
         case 20: 
           { return symbol(SEMICOLON);
           }
-        case 208: break;
+        case 207: break;
         case 115: 
           { return symbol(TOK_INHERIT);
           }
-        case 209: break;
+        case 208: break;
         case 124: 
           { return symbol(TOK_FUNCTION_ID);
           }
-        case 210: break;
+        case 209: break;
         case 55: 
           { return symbol(TOK_COLON_COLON);
           }
-        case 211: break;
+        case 210: break;
         case 68: 
           { string.append( '\'' );
           }
-        case 212: break;
+        case 211: break;
         case 69: 
           { string.append( '\\' );
           }
-        case 213: break;
+        case 212: break;
         case 26: 
           { return symbol(MINUS);
           }
-        case 214: break;
+        case 213: break;
         case 92: 
           { return symbol(TOK_NUMBER, new Long(parseLong(yytext().substring(2,yylength()-1),16)));
           }
-        case 215: break;
+        case 214: break;
         case 47: 
           { return symbol(TOK_LSH);
           }
-        case 216: break;
+        case 215: break;
         case 8: 
           { return symbol(DOT);
           }
-        case 217: break;
+        case 216: break;
         case 64: 
           { return symbol(TOK_MOD_EQ);
           }
-        case 218: break;
+        case 217: break;
         case 91: 
           { yybegin(YYINITIAL); return symbol(TOK_NUMBER, new Character('\f'));
           }
-        case 219: break;
+        case 218: break;
         case 107: 
           { return symbol(TOK_STATIC);
           }
-        case 220: break;
+        case 219: break;
         case 104: 
           { return symbol(TOK_WHILE);
           }
-        case 221: break;
+        case 220: break;
         case 25: 
           { return symbol(COLON);
           }
-        case 222: break;
+        case 221: break;
         case 50: 
           { return symbol(TOK_MULTISET_END);
           }
-        case 223: break;
+        case 222: break;
         case 51: 
           { return symbol(TOK_GE);
           }
-        case 224: break;
+        case 223: break;
         case 74: 
           { string.append( '\f' );
           }
-        case 225: break;
+        case 224: break;
         case 120: 
           { return symbol(TOK_VARIANT);
           }
-        case 226: break;
+        case 225: break;
         case 52: 
           { return symbol(TOK_IF);
           }
-        case 227: break;
+        case 226: break;
         case 106: 
           { return symbol(TOK_SSCANF);
           }
-        case 228: break;
+        case 227: break;
         case 16: 
           { return curlysymbol(LBRACE);
           }
-        case 229: break;
+        case 228: break;
         case 102: 
           { return symbol(TOK_MIXED_ID);
           }
-        case 230: break;
+        case 229: break;
         case 114: 
           { return symbol(TOK_PUBLIC);
           }
-        case 231: break;
+        case 230: break;
         case 5: 
           { return symbol(TOK_NOT);
           }
-        case 232: break;
+        case 231: break;
         case 4: 
           { return symbol(MULT);
           }
-        case 233: break;
+        case 232: break;
         case 2: 
           { /* ignore */
           }
-        case 234: break;
+        case 233: break;
         case 28: 
           { return symbol(AT);
           }
-        case 235: break;
+        case 234: break;
         case 18: 
           { return symbol(LBRACK);
           }
-        case 236: break;
+        case 235: break;
         case 31: 
           { string.append( yytext() );
           }
-        case 237: break;
+        case 236: break;
         case 66: 
           { char val = (char) Integer.parseInt(yytext().substring(1),8);
                         				   string.append( val );
           }
-        case 238: break;
+        case 237: break;
         case 38: 
           { return symbol(TOK_NUMBER, new Integer((int) parseLong(yytext(),8)));
           }
-        case 239: break;
+        case 238: break;
         case 98: 
           { return symbol(TOK_CATCH);
           }
-        case 240: break;
+        case 239: break;
         case 96: 
           { return symbol(TOK_ARRAY_ID);
           }
-        case 241: break;
+        case 240: break;
         case 63: 
           { return symbol(TOK_XOR_EQ);
           }
-        case 242: break;
+        case 241: break;
         case 125: 
           { return symbol(TOK_MULTISET_ID);
           }
-        case 243: break;
+        case 242: break;
         case 81: 
           { return symbol(TOK_RSH_EQ);
           }
-        case 244: break;
+        case 243: break;
         case 34: 
           { throw new RuntimeException("Unterminated character literal at end of line");
           }
-        case 245: break;
+        case 244: break;
         case 48: 
           { return symbol(TOK_LE);
           }
-        case 246: break;
+        case 245: break;
         case 21: 
           { return symbol(COMMA);
           }
-        case 247: break;
+        case 246: break;
         case 95: 
           { return symbol(TOK_VOID_ID);
           }
-        case 248: break;
+        case 247: break;
         case 36: 
           { return symbol(TOK_MULT_EQ);
           }
-        case 249: break;
+        case 248: break;
         case 82: 
           { return symbol(TOK_INT_ID);
           }
-        case 250: break;
+        case 249: break;
         case 77: 
           { return symbol(TOK_NUMBER, new Long(parseLong(yytext().substring(0,yylength()-1),8)));
           }
-        case 251: break;
+        case 250: break;
         case 37: 
           { return symbol(TOK_NE);
+          }
+        case 251: break;
+        case 76: 
+          { 
           }
         case 252: break;
         default: 

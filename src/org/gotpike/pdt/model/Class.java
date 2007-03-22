@@ -37,7 +37,10 @@ public class Class implements IMultilineElement
     private final String name;
     private final List methods;
     private final List inherits;
+    private final List classes;
     private PikeSymbol lastToken;
+	private boolean top = false;
+	private int modifiers;
     
     /**
      * Creates the default ("main") package.
@@ -49,6 +52,7 @@ public class Class implements IMultilineElement
         this.name = name;
         this.methods = new ArrayList();
         this.inherits = new ArrayList();
+        this.classes = new ArrayList();
     }
     
     /**
@@ -64,6 +68,7 @@ public class Class implements IMultilineElement
         this.name = name;
         this.methods = new ArrayList();
         this.inherits = new ArrayList();
+        this.classes = new ArrayList();
     }
     
     public Method addMethod(
@@ -131,6 +136,11 @@ public class Class implements IMultilineElement
         return Collections.unmodifiableList(methods);
     }
     
+    public List getClasses()
+    {
+        return Collections.unmodifiableList(classes);
+    }
+ 
     public List getInherits()
     {
         return Collections.unmodifiableList(inherits);
@@ -145,4 +155,23 @@ public class Class implements IMultilineElement
     {
         this.lastToken = lastToken;
     }
+
+	public void addClass(Class cls) {
+		classes.add(cls);
+	}
+
+	public boolean getTop()
+	{
+		return top;
+	}
+	
+	public void setTop() {
+		top  = true;
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setModifiers(int currentModifiers) {
+		this.modifiers = currentModifiers;
+	}
 }

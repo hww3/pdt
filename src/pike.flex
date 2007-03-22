@@ -325,7 +325,7 @@ SingleCharacter = [^\r\n\'\\]
   {DoubleLiteral}[dD]            { return symbol(TOK_FLOAT, new Double(yytext().substring(0,yylength()-1))); }
   
   /* comments */
-  {Comment}                      { return symbol(TOK_COMMENT, yytext()); }
+  {Comment}                      {  }
 
   /* whitespace */
   {WhiteSpace}                   { /* ignore */ }

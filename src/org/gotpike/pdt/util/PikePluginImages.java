@@ -31,17 +31,7 @@ public class PikePluginImages
      */
     public static final String IMG_ICON_EDITOR = NAME_PREFIX
         + "epic.gif"; //$NON-NLS-1$
-    public static final String IMG_ICON_SUBROUTINE = NAME_PREFIX
-        + "subroutine.gif"; //$NON-NLS-1$
-    public static final String IMG_ICON_SUBROUTINE_NODE = NAME_PREFIX
-        + "subroutine_node.gif"; //$NON-NLS-1$
-    public static final String IMG_ICON_PACKAGE_NODE = NAME_PREFIX
-        + "package_node.gif"; //$NON-NLS-1$
-    public static final String IMG_ICON_USE = NAME_PREFIX
-        + "use.gif"; //$NON-NLS-1$
-    public static final String IMG_ICON_USE_NODE = NAME_PREFIX
-        + "use_node.gif"; //$NON-NLS-1$
-    public static final String IMG_ICON_VARIABLE = NAME_PREFIX
+     public static final String IMG_ICON_VARIABLE = NAME_PREFIX
         + "variable.gif"; //$NON-NLS-1$
     public static final String IMG_ICON_CONSTRUCTOR = NAME_PREFIX
         + "constructor.gif"; //$NON-NLS-1$
@@ -60,15 +50,23 @@ public class PikePluginImages
     public static final String IMG_OBJS_TEMPLATE = NAME_PREFIX
         + "template_obj.gif"; //$NON-NLS-1$
 
+	public static final String IMG_ICON_METHOD = NAME_PREFIX
+        + "methpub_obj.gif"; //$NON-NLS-1$
+	public static final String IMG_ICON_CLASS = NAME_PREFIX
+    + "class_default_obj.gif"; //$NON-NLS-1$
+	public static final String IMG_ICON_CLASS_INNER = NAME_PREFIX
+    + "innerclass_public_obj.gif"; //$NON-NLS-1$
+	public static final String IMG_ICON_INHERIT = NAME_PREFIX
+    + "class_default_obj.gif"; //$NON-NLS-1$
+
     static
     {
         createManaged("", IMG_ICON_EDITOR);
-        createManaged("", IMG_ICON_SUBROUTINE);
-        createManaged("", IMG_ICON_SUBROUTINE_NODE);
-        createManaged("", IMG_ICON_PACKAGE_NODE);
-        createManaged("", IMG_ICON_USE);
-        createManaged("", IMG_ICON_USE_NODE);
         createManaged("", IMG_ICON_VARIABLE);
+        createManaged("", IMG_ICON_METHOD);
+        createManaged("", IMG_ICON_CLASS);
+        createManaged("", IMG_ICON_CLASS_INNER);
+        createManaged("", IMG_ICON_INHERIT);
         createManaged("", IMG_ICON_CONSTRUCTOR);
         createManaged("", IMG_ICON_SEARCH);
         createManaged("", IMG_ICON_MARK_OCCURRENCES);

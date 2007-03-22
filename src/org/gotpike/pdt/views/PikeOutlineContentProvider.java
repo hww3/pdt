@@ -60,13 +60,15 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         {
             List i = ((Class)parentElement).getInherits();
             List m = ((Class)parentElement).getMethods();
-            ArrayList c = new ArrayList();
+            List c = ((Class)parentElement).getClasses();
+            ArrayList x = new ArrayList();
             
-            c.addAll((List)i);
-            c.addAll(m);
+            x.addAll((List)i);
+            x.addAll(m);
+            x.addAll(c);
             
-            Object[] x = c.toArray();
-            return x;
+            Object[] y = x.toArray();
+            return y;
         }
  
         return EMPTY_ARRAY;
@@ -171,6 +173,7 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
      */
     private void updateViewer()
     {
+    	System.out.println("UpdateViewer()");
         viewer.refresh();
         viewer.expandToLevel(3);
     }

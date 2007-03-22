@@ -17,15 +17,18 @@ public class PikeOutlineLabelProvider extends LabelProvider
         {
             Method sub = (Method) element;
             if ("new".equals(sub.getName())) return PikePluginImages.get(PikePluginImages.IMG_ICON_CONSTRUCTOR);
-            else return PikePluginImages.get(PikePluginImages.IMG_ICON_SUBROUTINE);
+            else return PikePluginImages.get(PikePluginImages.IMG_ICON_METHOD);
         }
         else if (element instanceof Inherit)
         {
-            return PikePluginImages.get(PikePluginImages.IMG_ICON_USE);
+            return PikePluginImages.get(PikePluginImages.IMG_ICON_INHERIT);
         }
         else if (element instanceof Class)
         {
-            return PikePluginImages.get(PikePluginImages.IMG_ICON_PACKAGE_NODE);
+        	if(((Class) element).getTop())
+        		return PikePluginImages.get(PikePluginImages.IMG_ICON_CLASS);
+        	else
+        		return PikePluginImages.get(PikePluginImages.IMG_ICON_CLASS_INNER);
         }
 
         return null;

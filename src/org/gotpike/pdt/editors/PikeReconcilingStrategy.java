@@ -28,9 +28,14 @@ class PikeReconcilingStrategy
         // this does not get called because we are non-incremental
     }
 
-    public void reconcile(IRegion partition)
+    public void reconcile()
     {
         editor.reconcile();        
+    }
+    
+    public void reconcile(IRegion partition)
+    {
+        editor.reconcile(partition);        
     }
 
     public void setProgressMonitor(IProgressMonitor monitor)

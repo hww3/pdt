@@ -22,7 +22,7 @@ public class PikeDoubleClickStrategy implements ITextDoubleClickStrategy {
 		try {
 			String type = doc.getPartition(caretPos).getType();
 			System.out.println("type: " + type);
-			if(type == EditorConstants.PIKE_AUTODOC)
+			if(type == PartitionTypes.AUTODOC)
 			{	
 				int start, end;
 				start = doc.getPartition(caretPos).getOffset();
@@ -30,7 +30,7 @@ public class PikeDoubleClickStrategy implements ITextDoubleClickStrategy {
 				selectRange(start -1, end);
 				return true;
 			}
-			if(type == EditorConstants.PIKE_COMMENT)
+			if(type == PartitionTypes.COMMENT)
 			{
 				int start, end;
 				start = doc.getPartition(caretPos).getOffset();

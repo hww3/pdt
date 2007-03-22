@@ -35,42 +35,37 @@ public class PikePresentationReconciler extends PresentationReconciler {
 		DefaultDamagerRepairer dr;
 		
 		dr = new DefaultDamagerRepairer(new PikeDefaultScanner(colorManager));
-		setDamager(dr, IDocument.DEFAULT_CONTENT_TYPE);
-		setRepairer(dr, IDocument.DEFAULT_CONTENT_TYPE);
+		setDamager(dr, PartitionTypes.DEFAULT);
+		setRepairer(dr, PartitionTypes.DEFAULT);
 
 		PikeAutoDocScanner ps = new PikeAutoDocScanner(colorManager);
 		ps.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_COMMENT))));
 		dr = new DefaultDamagerRepairer(ps);
 		
-		setDamager(dr, EditorConstants.PIKE_AUTODOC);
-		setRepairer(dr, EditorConstants.PIKE_AUTODOC);
+		setDamager(dr, PartitionTypes.AUTODOC);
+		setRepairer(dr, PartitionTypes.AUTODOC);
 		
 		RuleBasedScanner s = new RuleBasedScanner();
 		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_COMMENT))));	
 		dr= new DefaultDamagerRepairer(s);
-		setDamager(dr, EditorConstants.PIKE_COMMENT);
-		setRepairer(dr, EditorConstants.PIKE_COMMENT);
+		setDamager(dr, PartitionTypes.COMMENT);
+		setRepairer(dr, PartitionTypes.COMMENT);
 	
 		s = new RuleBasedScanner();
 		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_STRING))));
 	
 		dr= new DefaultDamagerRepairer(s);
-		setDamager(dr, EditorConstants.PIKE_STRING);
-		setRepairer(dr, EditorConstants.PIKE_STRING);
+		setDamager(dr, PartitionTypes.STRING);
+		setRepairer(dr, PartitionTypes.STRING);
 
+		
 		s = new RuleBasedScanner();
 		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_CHAR))));
 	
 		dr= new DefaultDamagerRepairer(s);
-		setDamager(dr, EditorConstants.PIKE_CHAR);
-		setRepairer(dr, EditorConstants.PIKE_CHAR);
+		setDamager(dr, PartitionTypes.CHAR);
+		setRepairer(dr, PartitionTypes.CHAR);
 		
-		s = new RuleBasedScanner();
-		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_CPP))));
-	
-		dr= new DefaultDamagerRepairer(s);
-		setDamager(dr, EditorConstants.PIKE_CPP);
-		setRepairer(dr, EditorConstants.PIKE_CPP);
 
 	}
 }

@@ -46,7 +46,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
     private PikePairMatcher bracketMatcher;
     private PikeBracketInserter bracketInserter;
     private FoldReconciler foldReconciler;
-//    private TasksReconciler tasksReconciler;
+    private TasksReconciler tasksReconciler;
     private PikeOutlinePage outlinePage;
 //    private PikeSyntaxValidationThread validationThread;
     private ISourceViewer sourceViewer;
@@ -366,7 +366,13 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
      * Updates the editor's dependent views and state after a document change.
      * This method is only intended for use by {@link PikeReconcilingStrategy}.
      */
+    
     public void reconcile()
+    {
+    	reconcile(null);
+    }
+    
+    public void reconcile(IRegion partition)
     {
         // the problem is, we might be called after the ISourceViewer
         // has been disposed; this occurs BEFORE dispose() is invoked
@@ -396,13 +402,13 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
 
                 if (outlinePage != null) outlinePage.updateContent(source);
                 if (foldReconciler != null) foldReconciler.reconcile();
-            //    if (tasksReconciler != null) tasksReconciler.reconcile();
+                if (tasksReconciler != null) tasksReconciler.reconcile();
             } });
     }
 
     public void refreshTaskView()
     {
-//        tasksReconciler.reconcile();
+        tasksReconciler.reconcile();
     }
 
     public void registerIdleListener(IdleTimerListener obj)
@@ -773,7 +779,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         IResource resource = getResource();
         if (resource == null) return;
         
-   //     tasksReconciler = new TasksReconciler(this);
+        tasksReconciler = new TasksReconciler(this);
     }
 
     private void reconfigureBracketInserter()

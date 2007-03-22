@@ -141,8 +141,7 @@ class PikeBracketInserter implements VerifyKeyListener
                 // A quote is a closing char when inserted to terminate a string literal,
                 // otherwise it is an opening char:
                 String partitionType = doc.getPartition(offset-1).getType();
-                return PartitionTypes.LITERAL1.equals(partitionType) ||
-                       PartitionTypes.LITERAL2.equals(partitionType);
+                return PartitionTypes.STRING.equals(partitionType);
             }
             catch (BadLocationException e)
             {

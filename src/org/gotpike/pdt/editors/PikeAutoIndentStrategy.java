@@ -172,12 +172,11 @@ public final class PikeAutoIndentStrategy extends DefaultIndentLineAutoEditStrat
         while (offset >= 0)
         {
             ITypedRegion p = document.getPartition(offset);
-            if (PartitionTypes.OPERATOR.equals(p.getType()))
+            if (PartitionTypes.DEFAULT.equals(p.getType()))
             {
                 String op = document.get(p.getOffset(), p.getLength());
-                if ("=".equals(op) ||
-                    "(".equals(op) ||
-                    "=>".equals(op)) return true;
+                if ("(".equals(op) ||
+                    ":".equals(op)) return true;
                 else return false;
             }
             else

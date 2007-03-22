@@ -29,7 +29,7 @@ public class PikeSourceViewerConfiguration extends SourceViewerConfiguration
     public PikeSourceViewerConfiguration(
         IPreferenceStore store, PikeEditor textEditor)
     {
-        assert store != null;
+ //       assert store != null;
         
         prefs = store;
         editor = textEditor;

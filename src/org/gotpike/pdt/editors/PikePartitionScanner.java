@@ -13,10 +13,10 @@ import org.eclipse.jface.text.rules.Token;
 public class PikePartitionScanner extends RuleBasedPartitionScanner {
 	public PikePartitionScanner() {
 
-		IToken pikeComment = new Token(EditorConstants.PIKE_COMMENT);
-		IToken pikeAutoDoc = new Token(EditorConstants.PIKE_AUTODOC);
-		IToken pikeString = new Token(EditorConstants.PIKE_STRING);
-		IToken pikeChar = new Token(EditorConstants.PIKE_CHAR);
+		IToken pikeComment = new Token(PartitionTypes.COMMENT);
+		IToken pikeAutoDoc = new Token(PartitionTypes.AUTODOC);
+		IToken pikeString = new Token(PartitionTypes.STRING);
+		IToken pikeChar = new Token(PartitionTypes.CHAR);
 
 		ArrayList rulelist = new ArrayList();
 		

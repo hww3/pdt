@@ -206,10 +206,10 @@ public class OccurrencesUpdater implements ISelectionChangedListener
             offset = index + text.length();
             String contentType = doc.getContentType(index);
             if (contentType.equals(type)
-                || (contentType.equals(PartitionTypes.LITERAL1) && type
+                /*|| (contentType.equals(PartitionTypes.LITERAL1) && type
                 	.equals(PartitionTypes.VARIABLE))
                 || (contentType.equals(PartitionTypes.VARIABLE) && type
-                    .equals(PartitionTypes.LITERAL1)))
+                    .equals(PartitionTypes.LITERAL1))*/)
             {
                 if (offset < doc.getLength())
                 {
@@ -288,7 +288,7 @@ public class OccurrencesUpdater implements ISelectionChangedListener
         {
             return false;
         }
-        else if (contentType.equals(PartitionTypes.VARIABLE))
+        else if (contentType.equals(PartitionTypes.DEFAULT))
         {
             if (!getBoolPref(MarkOccurrencesPreferences.VARIABLE))
             {
@@ -302,30 +302,30 @@ public class OccurrencesUpdater implements ISelectionChangedListener
                 return false;
             }
         }
-        else if (contentType.equals(PartitionTypes.KEYWORD1)
-            || contentType.equals(PartitionTypes.KEYWORD2))
+        else if (contentType.equals(PartitionTypes.DEFAULT)
+            || contentType.equals(PartitionTypes.DEFAULT))
         {
             if (!getBoolPref(MarkOccurrencesPreferences.KEYWORD))
             {
                 return false;
             }
         }
-        else if (contentType.equals(PartitionTypes.LITERAL1)
-            || contentType.equals(PartitionTypes.LITERAL2))
+        else if (contentType.equals(PartitionTypes.DEFAULT)
+            || contentType.equals(PartitionTypes.DEFAULT))
         {
             if (!getBoolPref(MarkOccurrencesPreferences.LITERAL))
             {
                 return false;
             }
         }
-        else if (contentType.equals(PartitionTypes.NUMBER))
+        else if (contentType.equals(PartitionTypes.DEFAULT))
         {
             if (!getBoolPref(MarkOccurrencesPreferences.NUMBER))
             {
                 return false;
             }
         }
-        else if (contentType.equals(PartitionTypes.OPERATOR))
+        else if (contentType.equals(PartitionTypes.DEFAULT))
         {
             if (!getBoolPref(MarkOccurrencesPreferences.OPERATOR))
             {

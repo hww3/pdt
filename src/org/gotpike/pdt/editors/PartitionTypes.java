@@ -11,26 +11,19 @@ public class PartitionTypes
     public final static String DEFAULT = "__dftl_partition_content_type";
     public final static String COMMENT = "COMMENT";
     public final static String AUTODOC = "AUTODOC";
-    public final static String KEYWORD1 = "KEYWORD1";
-    public final static String KEYWORD2 = "KEYWORD2";
-    public final static String VARIABLE = "VARIABLE";
-    public final static String LITERAL1 = "LITERAL1";
-    public final static String LITERAL2 = "LITERAL2";
-    public final static String NUMBER = "NUMBER";
-    public final static String OPERATOR = "OPERATOR";
-    
+    public final static String STRING = "STRING";
+    public static final String RESERVED = "RESERVED";
+	public static final String CHAR = "CHAR";
+	
     private final static String[] contentTypes = new String[] {
         DEFAULT,
-        COMMENT,
-        KEYWORD1,
-        KEYWORD2,
-        VARIABLE,
-        LITERAL1,
-        LITERAL2,
         AUTODOC,
-        NUMBER,
-        OPERATOR
+        COMMENT,
+        STRING,
+        RESERVED
         };
+
+	
     
     public static String[] getTypes()
     {

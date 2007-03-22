@@ -19,6 +19,8 @@ import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.PikeCore;
 import org.gotpike.pdt.PikeProject;
 import org.gotpike.pdt.editors.PikeEditor;
+import org.gotpike.pdt.editors.PikePartitionScanner;
+import org.gotpike.pdt.editors.SourceParser;
 import org.gotpike.pdt.model.ISourceElement;
 import org.gotpike.pdt.model.SourceFile;
 import org.gotpike.pdt.util.FileUtilities;
@@ -346,7 +348,7 @@ abstract class AbstractOpenDeclaration
             int bread;
             while ((bread = r.read(buf)) > 0) sw.write(buf, 0, bread);
             Document doc = new Document(sw.toString());
-            PikePartitioner p = new PikePartitioner(getLog());
+            PikePartitionScanner p = new PikePartitionScanner();
             doc.setDocumentPartitioner(p);
             p.connect(doc);
             return doc;

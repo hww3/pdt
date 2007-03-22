@@ -20,12 +20,7 @@ public class PikeConfiguration extends SourceViewerConfiguration {
 	}
 	
 	public String[] getConfiguredContentTypes(ISourceViewer sourceViewer) {
-		return new String[] {
-			IDocument.DEFAULT_CONTENT_TYPE,
-			EditorConstants.PIKE_AUTODOC,
-			EditorConstants.PIKE_COMMENT,
-			EditorConstants.PIKE_CPP,
-			EditorConstants.PIKE_STRING};
+		return PartitionTypes.getTypes();
 	}
 	
 	public ITextDoubleClickStrategy getDoubleClickStrategy(

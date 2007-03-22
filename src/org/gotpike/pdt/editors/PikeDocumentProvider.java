@@ -3,7 +3,7 @@ package org.gotpike.pdt.editors;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
-import org.eclipse.jface.text.rules.DefaultPartitioner;
+import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
 public class PikeDocumentProvider extends FileDocumentProvider {
@@ -12,15 +12,14 @@ public class PikeDocumentProvider extends FileDocumentProvider {
 		IDocument document = super.createDocument(element);
 		if (document != null) {
 			IDocumentPartitioner partitioner =
-				new DefaultPartitioner(
+				new FastPartitioner(
 					new PikePartitionScanner(),
 					new String[] {
-						EditorConstants.PIKE_RESERVED,
-						EditorConstants.PIKE_AUTODOC,
-						EditorConstants.PIKE_COMMENT,
-						EditorConstants.PIKE_STRING,
-						EditorConstants.PIKE_CHAR,
-						EditorConstants.DEFAULT
+						PartitionTypes.RESERVED,
+						PartitionTypes.AUTODOC,
+						PartitionTypes.COMMENT,
+						PartitionTypes.STRING,
+						PartitionTypes.DEFAULT
 						});
 			partitioner.connect(document);
 			document.setDocumentPartitioner(partitioner);

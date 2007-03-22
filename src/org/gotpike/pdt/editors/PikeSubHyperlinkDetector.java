@@ -96,11 +96,11 @@ public class PikeSubHyperlinkDetector implements IHyperlinkDetector
 
         public void open()
         {
-            OpenDeclarationAction action =
-                (OpenDeclarationAction) editor.getAction(PikeEditorActionIds.OPEN_DECLARATION);
+    //        OpenDeclarationAction action =
+    //            (OpenDeclarationAction) editor.getAction(PikeEditorActionIds.OPEN_DECLARATION);
             
-            if (action != null) action.run(
-                new TextSelection(subNameRegion.getOffset(), subNameRegion.getLength()));
+    //        if (action != null) action.run(
+    //            new TextSelection(subNameRegion.getOffset(), subNameRegion.getLength()));
         }
     }
 }

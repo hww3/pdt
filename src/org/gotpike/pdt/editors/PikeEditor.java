@@ -75,7 +75,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         setDocumentProvider(PDTPlugin.getDefault().getDocumentProvider());
         PDTPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
         colorManager = new ColorManager();
-        setKeyBindingScopes(new String[] { "org.epic.perleditor.perlEditorScope" });
+        setKeyBindingScopes(new String[] { "org.gotpike.pdt.PikeEditorScope" });
     }
 
     public void createPartControl(Composite parent)

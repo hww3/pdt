@@ -152,6 +152,7 @@ public class PikeEditorPreferencePage extends PreferencePage implements IWorkben
 		{ PreferencesMessages.markupColor, PreferenceConstants.EDITOR_MARKUP_COLOR},
 		{ PreferencesMessages.operatorColor, PreferenceConstants.EDITOR_OPERATOR_COLOR},
 		{ PreferencesMessages.numberColor, PreferenceConstants.EDITOR_NUMBER_COLOR},
+		{ PreferencesMessages.stringColor, PreferenceConstants.EDITOR_STRING_COLOR},
 	    { PreferencesMessages.invalidColor, PreferenceConstants.EDITOR_INVALID_COLOR},
 	};
 

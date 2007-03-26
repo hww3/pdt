@@ -134,5 +134,7 @@ public class PreferencesMessages extends NLS
 
     public static String initiallyFold;
 
+	public static String stringColor;
+
 
 }

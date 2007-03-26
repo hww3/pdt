@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.12 2007-03-26 04:20:39 hww3 Exp $
+|| $Id: pike.cup,v 1.13 2007-03-26 04:31:08 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -444,7 +444,6 @@ close_bracket_or_missing::= RBRACK
 
 push_compiler_frame0::= /* empty */
   {:
-      System.out.println("have a method!\n");
    :}
   ;
 
@@ -457,7 +456,6 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
           {
             Block rblock = (Block)block;
             parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, rblock.start, rblock.end); 
-            System.out.println("have function: " + ident.toString() + " " + (block!=null?block.toString():"null")); 
           }
           parser.source.currentModifiers = 0;
       :}
@@ -471,7 +469,7 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
           {
             Block rblock = (Block)block;
             parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, rblock.start, rblock.end); 
-            System.out.println("have function: " + ident.toString() + " " + (block!=null?block.toString():"null")); 
+//            System.out.println("have function: " + ident.toString() + " " + (block!=null?block.toString():"null")); 
           }
           parser.source.currentModifiers = 0;
     :}
@@ -609,7 +607,7 @@ modifiers::= modifier_list
  ;
 
 modifier_list::= /* empty */ 
-  | modifier:modifier modifier_list {: System.out.println("modifier: " + parser.source.currentModifiers);
+  | modifier:modifier modifier_list {: // System.out.println("modifier: " + parser.source.currentModifiers);
      parser.source.currentModifiers = 0 ; 
    :}
   ;

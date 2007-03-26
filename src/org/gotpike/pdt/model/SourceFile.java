@@ -196,7 +196,7 @@ public class SourceFile
     {
     	Method meth;
     	Class cls = (Class)currentClass.peek();
-    	System.out.println("addMethod: " + front.toString() + " " + back.toString());
+  //  	System.out.println("addMethod: " + front.toString() + " " + back.toString());
         meth = cls.addMethod(keyword, name, front);
         meth.setCloseCurly(back);
         return meth;
@@ -427,7 +427,7 @@ public class SourceFile
     }*/
 
 	public void addConstants(ConstantList list, int currentModifiers2) {
-		System.out.println("adding " + list.list.size() + " constants.");
+	//	System.out.println("adding " + list.list.size() + " constants.");
 		for(int i = 0; i < list.list.size(); i++)
         {
         	addConstant((PikeSymbol) list.list.get(i), currentModifiers2);
@@ -438,7 +438,7 @@ public class SourceFile
 	public Constant addConstant(PikeSymbol c, int modifiers)
 	{
 		Constant constant;
-	   	System.out.println("addConstant: " + c.toString() + " " + modifiers);
+//	   	System.out.println("addConstant: " + c.toString() + " " + modifiers);
 		Class cls = (Class)currentClass.peek();
     	constant = cls.addConstant(c, modifiers);
         

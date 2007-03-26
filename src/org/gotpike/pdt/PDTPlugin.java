@@ -188,7 +188,7 @@ public class PDTPlugin extends AbstractUIPlugin {
     {
         return colorProvider.getColor(rgb);
     }
-
+	
     /**
      * Returns a color represented by the given preference setting.
      */

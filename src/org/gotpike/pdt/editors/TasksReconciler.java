@@ -45,7 +45,6 @@ public class TasksReconciler
     
     // TODO: this is a nasty waste of resources.
 	public void reconcile() {
-		
 		IEditorInput input = (IEditorInput) editor.getEditorInput();
         if (!(input instanceof IFileEditorInput)) return;
         

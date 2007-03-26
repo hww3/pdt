@@ -439,30 +439,20 @@ public class PreferenceConstants {
 	public static final String EDITOR_BOLD_SUFFIX= "Bold";
 
 	public static final String  EDITOR_STRING_COLOR = IPikeColorConstants.STRING_COLOR;
-	public static final String  EDITOR_KEYWORD1_COLOR = IPikeColorConstants.KEYWORD1_COLOR;
-	public static final String  EDITOR_KEYWORD2_COLOR = IPikeColorConstants.KEYWORD2_COLOR;
-	public static final String  EDITOR_VARIABLE_COLOR = IPikeColorConstants.VARIABLE_COLOR;
+	public static final String  EDITOR_KEYWORD_COLOR = IPikeColorConstants.KEYWORD_COLOR;
+	public static final String  EDITOR_MODIFIER_COLOR = IPikeColorConstants.MODIFIER_COLOR;
+	public static final String  EDITOR_DATATYPE_COLOR = IPikeColorConstants.DATATYPE_COLOR;
 	public static final String  EDITOR_COMMENT1_COLOR = IPikeColorConstants.COMMENT1_COLOR;
-	public static final String  EDITOR_COMMENT2_COLOR = IPikeColorConstants.COMMENT2_COLOR;
-	public static final String  EDITOR_LITERAL1_COLOR = IPikeColorConstants.LITERAL1_COLOR;
-	public static final String  EDITOR_LITERAL2_COLOR = IPikeColorConstants.LITERAL2_COLOR;
-	public static final String  EDITOR_LABEL_COLOR = IPikeColorConstants.LABEL_COLOR;
-	public static final String  EDITOR_FUNCTION_COLOR = IPikeColorConstants.FUNCTION_COLOR;
 	public static final String  EDITOR_MARKUP_COLOR = IPikeColorConstants.MARKUP_COLOR;
 	public static final String  EDITOR_OPERATOR_COLOR = IPikeColorConstants.OPERATOR_COLOR;
 	public static final String  EDITOR_NUMBER_COLOR = IPikeColorConstants.NUMBER_COLOR;
 	public static final String  EDITOR_INVALID_COLOR = IPikeColorConstants.INVALID_COLOR;
 
 	public static final String  EDITOR_STRING_COLOR_BOLD = IPikeColorConstants.STRING_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final  String  EDITOR_KEYWORD1_COLOR_BOLD = IPikeColorConstants.KEYWORD1_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_KEYWORD2_COLOR_BOLD = IPikeColorConstants.KEYWORD2_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_VARIABLE_COLOR_BOLD = IPikeColorConstants.VARIABLE_COLOR + EDITOR_BOLD_SUFFIX;
+	public static final String  EDITOR_KEYWORD_COLOR_BOLD = IPikeColorConstants.KEYWORD_COLOR + EDITOR_BOLD_SUFFIX;
+	public static final String  EDITOR_MODIFIER_COLOR_BOLD = IPikeColorConstants.MODIFIER_COLOR + EDITOR_BOLD_SUFFIX;
+	public static final String  EDITOR_DATATYPE_COLOR_BOLD = IPikeColorConstants.DATATYPE_COLOR + EDITOR_BOLD_SUFFIX;
 	public static final String  EDITOR_COMMENT1_COLOR_BOLD = IPikeColorConstants.COMMENT1_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_COMMENT2_COLOR_BOLD = IPikeColorConstants.COMMENT2_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_LITERAL1_COLOR_BOLD = IPikeColorConstants.LITERAL1_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_LITERAL2_COLOR_BOLD = IPikeColorConstants.LITERAL2_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_LABEL_COLOR_BOLD = IPikeColorConstants.LABEL_COLOR + EDITOR_BOLD_SUFFIX;
-	public static final String  EDITOR_FUNCTION_COLOR_BOLD = IPikeColorConstants.FUNCTION_COLOR + EDITOR_BOLD_SUFFIX;
 	public static final String  EDITOR_MARKUP_COLOR_BOLD = IPikeColorConstants.MARKUP_COLOR + EDITOR_BOLD_SUFFIX;
 	public static final String  EDITOR_OPERATOR_COLOR_BOLD = IPikeColorConstants.OPERATOR_COLOR + EDITOR_BOLD_SUFFIX;
 	public static final String  EDITOR_NUMBER_COLOR_BOLD = IPikeColorConstants.NUMBER_COLOR + EDITOR_BOLD_SUFFIX;
@@ -589,32 +579,17 @@ public class PreferenceConstants {
 			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_STRING_COLOR, new RGB(0, 0, 0));
 			store.setDefault(PreferenceConstants.EDITOR_STRING_COLOR_BOLD, false);
 
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_KEYWORD1_COLOR, new RGB(160, 32, 240));
-			store.setDefault(PreferenceConstants.EDITOR_KEYWORD1_COLOR_BOLD, false);
+			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_KEYWORD_COLOR, new RGB(160, 32, 240));
+			store.setDefault(PreferenceConstants.EDITOR_KEYWORD_COLOR_BOLD, false);
 
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_KEYWORD2_COLOR, new RGB(160, 0, 240));
-			store.setDefault(PreferenceConstants.EDITOR_KEYWORD2_COLOR_BOLD, false);
+			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_MODIFIER_COLOR, new RGB(160, 0, 240));
+			store.setDefault(PreferenceConstants.EDITOR_MODIFIER_COLOR_BOLD, false);
 
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_VARIABLE_COLOR, new RGB(160, 0, 240));
-			store.setDefault(PreferenceConstants.EDITOR_VARIABLE_COLOR_BOLD, false);
+			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_DATATYPE_COLOR, new RGB(160, 0, 240));
+			store.setDefault(PreferenceConstants.EDITOR_DATATYPE_COLOR_BOLD, false);
 
 			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_COMMENT1_COLOR, new RGB(178, 0, 34));
 			store.setDefault(PreferenceConstants.EDITOR_COMMENT1_COLOR_BOLD, false);
-
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_COMMENT2_COLOR, new RGB(178, 34, 0));
-			store.setDefault(PreferenceConstants.EDITOR_COMMENT2_COLOR_BOLD, true);
-
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_LITERAL1_COLOR, new RGB(0, 0, 255));
-			store.setDefault(PreferenceConstants.EDITOR_LITERAL1_COLOR_BOLD, false);
-
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_LITERAL2_COLOR, new RGB(160, 32, 240));
-			store.setDefault(PreferenceConstants.EDITOR_LITERAL2_COLOR_BOLD, false);
-
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_LABEL_COLOR, new RGB(160, 0, 240));
-			store.setDefault(PreferenceConstants.EDITOR_LABEL_COLOR_BOLD, false);
-
-			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_FUNCTION_COLOR, new RGB(160, 32, 0));
-			store.setDefault(PreferenceConstants.EDITOR_FUNCTION_COLOR_BOLD, false);
 
 			PreferenceConverter.setDefault(store, PreferenceConstants.EDITOR_MARKUP_COLOR, new RGB(178, 0, 34));
 			store.setDefault(PreferenceConstants.EDITOR_MARKUP_COLOR_BOLD, false);

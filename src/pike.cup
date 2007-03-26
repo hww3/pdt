@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.11 2007-03-22 04:47:30 hww3 Exp $
+|| $Id: pike.cup,v 1.12 2007-03-26 04:20:39 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -17,15 +17,27 @@ parser code  {:
 
   public void yyerror(String message)
   { 
-    PikeScanner scanner = (PikeScanner)getScanner();
-    message = ((scanner.filename!=null)?scanner.filename:"-") + ":" + (scanner.getYyline()+1) + /*" " +scanner.getYycolumn() + */": " + message;
-   
-  
-    report_error(message, null);
+	  PikeScanner scanner = (PikeScanner)getScanner();
+	  String filename = (scanner.filename!=null)?scanner.filename:"-";
+  //    int severity = 0;
+      
+  //    source.reportError(message, filename, (scanner.getYyline()+1), scanner.getYycolumn(), severity);
+    
+      message = filename + ":" + (scanner.getYyline()+1) + /*" " +scanner.getYycolumn() + */": " + message;
+    
+      report_error(message, null);
   }
   
   public void report_error(String message, Object info) {
-    StringBuffer m = new StringBuffer("Error");
+    StringBuffer m = new StringBuffer("Parser Error");
+
+	  PikeScanner scanner = (PikeScanner)getScanner();
+	  String filename = (scanner.filename!=null)?scanner.filename:"-";
+      int severity = 0;
+      
+      // TODO: report the token location instead of the lexer location.
+      source.reportError(message, filename, (scanner.getYyline()+1), scanner.getYycolumn(), severity);
+
 
     if (info instanceof java_cup.runtime.Symbol) 
       m.append( "(" +info.toString()+")" );
@@ -374,16 +386,16 @@ _import::= TOK_IMPORT idents SEMICOLON
   | TOK_IMPORT error RBRACE {: parser.yyerror("Missing SEMICOLON."); :}
   ;
 
-constant_name::= TOK_IDENTIFIER EQ safe_expr0
+constant_name::= TOK_IDENTIFIER:ident EQ safe_expr0 {: RESULT = (PikeSymbol)ident; :}
   | bad_identifier EQ safe_expr0
   | error EQ safe_expr0
   ;
 
-constant_list::= constant_name
-  | constant_list COMMA constant_name
+constant_list::= constant_name:name {: RESULT = new ConstantList((PikeSymbol)name); :}
+  | constant_list:constantlist COMMA constant_name:name1 {: System.out.println(name1); RESULT = ((ConstantList)constantlist); ((ConstantList)constantlist).add((PikeSymbol)name1); :}
   ;
 
-constant::= modifiers TOK_CONSTANT constant_list SEMICOLON {: parser.source.currentModifiers = 0; :}
+constant::= modifiers TOK_CONSTANT constant_list:list SEMICOLON {: parser.source.addConstants((ConstantList)list, parser.source.currentModifiers); parser.source.currentModifiers = 0;:}
   | modifiers TOK_CONSTANT error SEMICOLON {: parser.source.currentModifiers = 0; :}
   | modifiers TOK_CONSTANT error TOK_LEX_EOF {: parser.source.currentModifiers = 0; :} 
   | modifiers TOK_CONSTANT error RBRACE {: parser.source.currentModifiers = 0; parser.yyerror("Missing ';'."); :}

@@ -134,6 +134,8 @@ public class PikeSourceViewerConfiguration extends SourceViewerConfiguration
     public IPresentationReconciler getPresentationReconciler(ISourceViewer sourceViewer)
     {
     	assert editor != null;
+    	if (editor == null) return null;
+    	
     	ColorManager m = editor.getColorManager();
     	assert m != null;
         IPresentationReconciler r = new PikePresentationReconciler(m);

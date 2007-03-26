@@ -7,11 +7,13 @@ import org.eclipse.jface.text.rules.IWordDetector;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.rules.WordRule;
+import org.gotpike.pdt.PDTPlugin;
+import org.gotpike.pdt.preferences.PreferenceConstants;
 
 public class PikeAutoDocScanner extends RuleBasedScanner {
 
 	public PikeAutoDocScanner(ColorManager manager) {
-		IToken pikeAutoDoc = new Token(new TextAttribute(manager.getColor(IPikeColorConstants.PIKE_AUTODOC)));
+		IToken pikeAutoDoc = new Token(new TextAttribute(PDTPlugin.getDefault().getColor(PreferenceConstants.EDITOR_COMMENT1_COLOR)));
 
 		IRule[] rules = new IRule[1];
 		

@@ -12,6 +12,8 @@ import org.eclipse.jface.text.presentation.PresentationReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.RuleBasedScanner;
 import org.eclipse.jface.text.rules.Token;
+import org.gotpike.pdt.PDTPlugin;
+import org.gotpike.pdt.preferences.PreferenceConstants;
 
 /**
  * @author e10401
@@ -31,6 +33,7 @@ public class PikePresentationReconciler extends PresentationReconciler {
 	public PikePresentationReconciler(ColorManager colorManager) {
 		super();
 		this.colorManager = colorManager;
+		PDTPlugin plugin = PDTPlugin.getDefault();
 		
 		DefaultDamagerRepairer dr;
 		
@@ -39,20 +42,20 @@ public class PikePresentationReconciler extends PresentationReconciler {
 		setRepairer(dr, PartitionTypes.DEFAULT);
 
 		PikeAutoDocScanner ps = new PikeAutoDocScanner(colorManager);
-		ps.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_COMMENT))));
+		ps.setDefaultReturnToken(new Token(new TextAttribute(plugin.getColor(PreferenceConstants.EDITOR_COMMENT1_COLOR))));
 		dr = new DefaultDamagerRepairer(ps);
 		
 		setDamager(dr, PartitionTypes.AUTODOC);
 		setRepairer(dr, PartitionTypes.AUTODOC);
 		
 		RuleBasedScanner s = new RuleBasedScanner();
-		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_COMMENT))));	
+		s.setDefaultReturnToken(new Token(new TextAttribute(plugin.getColor(PreferenceConstants.EDITOR_COMMENT1_COLOR))));	
 		dr= new DefaultDamagerRepairer(s);
 		setDamager(dr, PartitionTypes.COMMENT);
 		setRepairer(dr, PartitionTypes.COMMENT);
 	
 		s = new RuleBasedScanner();
-		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_STRING))));
+		s.setDefaultReturnToken(new Token(new TextAttribute(plugin.getColor(PreferenceConstants.EDITOR_STRING_COLOR))));
 	
 		dr= new DefaultDamagerRepairer(s);
 		setDamager(dr, PartitionTypes.STRING);
@@ -60,7 +63,7 @@ public class PikePresentationReconciler extends PresentationReconciler {
 
 		
 		s = new RuleBasedScanner();
-		s.setDefaultReturnToken(new Token(new TextAttribute(colorManager.getColor(IPikeColorConstants.PIKE_CHAR))));
+		s.setDefaultReturnToken(new Token(new TextAttribute(plugin.getColor(PreferenceConstants.EDITOR_STRING_COLOR))));
 	
 		dr= new DefaultDamagerRepairer(s);
 		setDamager(dr, PartitionTypes.CHAR);

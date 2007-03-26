@@ -37,6 +37,7 @@ import java_cup.runtime.*;
 import java.io.Reader;
 import java.io.StringReader;
 import org.eclipse.jface.text.IDocument;
+import org.gotpike.pdt.model.SourceFile;
 
 
 /**
@@ -774,6 +775,14 @@ public class PikeScanner extends sym implements java_cup.runtime.Scanner {
 
   /* user code: */
   public String filename = null;
+  public SourceFile source = null;
+  
+  public PikeScanner(java.io.Reader in, String filename, SourceFile source)
+  {
+    this.filename = filename;
+    this.zzReader = in;
+    this.source = source;
+  }
   
   public PikeScanner(java.io.Reader in, String filename)
   {
@@ -787,11 +796,17 @@ public class PikeScanner extends sym implements java_cup.runtime.Scanner {
   
   public void yyerror(String message)
   { 
-    report_error(message, null);
+     report_error(message, null);
   }
   
   public void report_error(String message, Object info) {
-    StringBuffer m = new StringBuffer("Error ");
+    StringBuffer m = new StringBuffer("Lexer Error ");
+ 	  String filename = (this.filename!=null)?this.filename:"-";
+      int severity = 0;
+      
+      if(source != null)
+        source.reportError(message, filename, (getYyline()+1), getYycolumn(), severity);
+  
 
     if (info instanceof java_cup.runtime.Symbol) 
       m.append( "(" +info.toString()+")" );

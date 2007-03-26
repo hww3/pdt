@@ -41,6 +41,7 @@ public class Class implements IMultilineElement
     private PikeSymbol lastToken;
 	private boolean top = false;
 	private int modifiers;
+    private final List constants;
     
     /**
      * Creates the default ("main") package.
@@ -53,6 +54,7 @@ public class Class implements IMultilineElement
         this.methods = new ArrayList();
         this.inherits = new ArrayList();
         this.classes = new ArrayList();
+        this.constants = new ArrayList();
     }
     
     /**
@@ -61,7 +63,7 @@ public class Class implements IMultilineElement
     public Class(
         int index,
         int blockLevel,
-        String name)
+        String name) 
     {
         this.index = index;
         this.blockLevel = blockLevel;
@@ -69,6 +71,7 @@ public class Class implements IMultilineElement
         this.methods = new ArrayList();
         this.inherits = new ArrayList();
         this.classes = new ArrayList();
+        this.constants = new ArrayList();
     }
     
     public Method addMethod(
@@ -146,6 +149,11 @@ public class Class implements IMultilineElement
         return Collections.unmodifiableList(inherits);
     }
     
+	public List getConstants() 
+	{
+       return Collections.unmodifiableList(constants);
+	}
+	
     public int hashCode()
     {
         return index;
@@ -174,4 +182,12 @@ public class Class implements IMultilineElement
 	public void setModifiers(int currentModifiers) {
 		this.modifiers = currentModifiers;
 	}
+
+	public Constant addConstant(PikeSymbol c, int modifiers2) {
+		Constant constant = new Constant(c, modifiers2);
+		constants.add(constant);
+		return constant;
+	}
+
+
 }

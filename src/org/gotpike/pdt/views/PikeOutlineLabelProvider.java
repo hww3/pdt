@@ -3,6 +3,7 @@ package  org.gotpike.pdt.views;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import org.gotpike.pdt.model.Constant;
 import org.gotpike.pdt.model.ISourceElement;
 import org.gotpike.pdt.model.Inherit;
 import org.gotpike.pdt.model.Method;
@@ -18,6 +19,10 @@ public class PikeOutlineLabelProvider extends LabelProvider
             Method sub = (Method) element;
             if ("new".equals(sub.getName())) return PikePluginImages.get(PikePluginImages.IMG_ICON_CONSTRUCTOR);
             else return PikePluginImages.get(PikePluginImages.IMG_ICON_METHOD);
+        }
+        else if (element instanceof Constant)
+        {
+            return PikePluginImages.get(PikePluginImages.IMG_ICON_CONSTANT);
         }
         else if (element instanceof Inherit)
         {

@@ -58,14 +58,12 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         }
         else if (parentElement instanceof Class)
         {
-            List i = ((Class)parentElement).getInherits();
-            List m = ((Class)parentElement).getMethods();
-            List c = ((Class)parentElement).getClasses();
             ArrayList x = new ArrayList();
             
-            x.addAll((List)i);
-            x.addAll(m);
-            x.addAll(c);
+            x.addAll(((Class)parentElement).getInherits());
+            x.addAll(((Class)parentElement).getMethods());
+            x.addAll(((Class)parentElement).getClasses());
+            x.addAll(((Class)parentElement).getConstants());
             
             Object[] y = x.toArray();
             return y;

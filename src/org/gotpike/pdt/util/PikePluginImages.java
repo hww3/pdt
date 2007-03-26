@@ -59,11 +59,15 @@ public class PikePluginImages
 	public static final String IMG_ICON_INHERIT = NAME_PREFIX
     + "class_default_obj.gif"; //$NON-NLS-1$
 
+	public static final String IMG_ICON_CONSTANT = NAME_PREFIX
+    + "field_public_obj.gif"; //$NON-NLS-1$
+
     static
     {
         createManaged("", IMG_ICON_EDITOR);
         createManaged("", IMG_ICON_VARIABLE);
         createManaged("", IMG_ICON_METHOD);
+        createManaged("", IMG_ICON_CONSTANT);
         createManaged("", IMG_ICON_CLASS);
         createManaged("", IMG_ICON_CLASS_INNER);
         createManaged("", IMG_ICON_INHERIT);

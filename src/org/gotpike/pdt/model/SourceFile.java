@@ -5,21 +5,27 @@ import java.io.StringReader;
 import java.util.*;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.ListenerList;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.texteditor.MarkerUtilities;
+import org.gotpike.pdt.Constants;
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.editors.PikeEditor;
 import org.gotpike.pdt.editors.PikePartitioner;
 import org.gotpike.pdt.parser.*;
+import org.gotpike.pdt.util.MarkerUtil;
+import org.gotpike.pdt.util.StatusFactory;
 
 /**
  * A parsed Pike source file. This class provides access to 
@@ -108,7 +114,7 @@ public class SourceFile
     
     public synchronized void parse()
     {
-    	System.out.println("whee!");
+    	//System.out.println("whee!");
        this.classes = new ArrayList();
        this.docs = new ArrayList();
        this.currentClass.clear(); 
@@ -141,7 +147,7 @@ public class SourceFile
     	   IFile original = ((FileEditorInput)editor.getEditorInput()).getFile();
            fn = original.getFullPath().toOSString();
     	 
-    	PikeScanner s = new PikeScanner(new StringReader(doc.get()), fn);
+    	PikeScanner s = new PikeScanner(new StringReader(doc.get()), fn, this);
         parser p = new parser(s);
         p.source = this;
         
@@ -160,6 +166,8 @@ public class SourceFile
 		}
         
         try {
+        	 MarkerUtil markerUtil = new MarkerUtil(original);         
+             markerUtil.removeObsoleteProblemMarkers();
 			p.parse();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -417,7 +425,59 @@ public class SourceFile
             }
         }
     }*/
+
+	public void addConstants(ConstantList list, int currentModifiers2) {
+		System.out.println("adding " + list.list.size() + " constants.");
+		for(int i = 0; i < list.list.size(); i++)
+        {
+        	addConstant((PikeSymbol) list.list.get(i), currentModifiers2);
+        }
+		
+	}
     
- 
+	public Constant addConstant(PikeSymbol c, int modifiers)
+	{
+		Constant constant;
+	   	System.out.println("addConstant: " + c.toString() + " " + modifiers);
+		Class cls = (Class)currentClass.peek();
+    	constant = cls.addConstant(c, modifiers);
+        
+        return constant;
+		
+	}
+	
+	public void reportError(String message, String filename, int line, int column, int severity)
+	{
+	  handleError(message,filename,line,column,severity==1?true:false);
+	}
+	
+	protected void handleError(String message, String filename, int line, int column, boolean isFatal)
+	{
+		IFile file = ((FileEditorInput)editor.getEditorInput()).getFile();
+	    Map map = new HashMap();
+	    MarkerUtilities.setLineNumber(map, line);
+	    MarkerUtilities.setMessage(map, message);
+	    map.put(IMarker.MESSAGE, message);
+	    map.put(IMarker.LOCATION, file.getFullPath().toString());
+        int offset = 0;
+		try {
+			offset = doc.getLineInformation(line-1).getOffset() + column;
+		} catch (BadLocationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	  //  Integer charStart = doc.getChar(offset);
+
+
+        map.put(IMarker.CHAR_START, offset);
+
+	 //   Integer charEnd = getCharEnd(line, column);
+//	    if (charEnd != null)
+        map.put(IMarker.CHAR_END, offset);
+
+	    map.put(IMarker.SEVERITY, new Integer(IMarker.SEVERITY_ERROR));
+
+	    new MarkerUtil(file).addMarker(map, IMarker.PROBLEM);
+	}
     
 }

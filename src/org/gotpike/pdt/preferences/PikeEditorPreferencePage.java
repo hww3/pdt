@@ -90,24 +90,14 @@ public class PikeEditorPreferencePage extends PreferencePage implements IWorkben
 
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_STRING_COLOR),
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_STRING_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_KEYWORD1_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_KEYWORD1_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_KEYWORD2_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_KEYWORD2_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_VARIABLE_COLOR),
-	    new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_VARIABLE_COLOR_BOLD),
+		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_KEYWORD_COLOR),
+		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_KEYWORD_COLOR_BOLD),
+		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_MODIFIER_COLOR),
+		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_MODIFIER_COLOR_BOLD),
+		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_DATATYPE_COLOR),
+	    new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_DATATYPE_COLOR_BOLD),
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_COMMENT1_COLOR),
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_COMMENT1_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_COMMENT2_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_COMMENT2_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_LITERAL1_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_LITERAL1_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_LITERAL2_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_LITERAL2_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_LABEL_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_LABEL_COLOR_BOLD),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_FUNCTION_COLOR),
-		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_FUNCTION_COLOR_BOLD),
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_MARKUP_COLOR),
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.BOOLEAN, PreferenceConstants.EDITOR_MARKUP_COLOR_BOLD),
 		new OverlayPreferenceStore.OverlayKey(OverlayPreferenceStore.STRING, PreferenceConstants.EDITOR_OPERATOR_COLOR),
@@ -155,15 +145,10 @@ public class PikeEditorPreferencePage extends PreferencePage implements IWorkben
 
 	private final String[][] fSyntaxColorListModel= new String[][] {
 		{ PreferencesMessages.nullColor, PreferenceConstants.EDITOR_FOREGROUND_COLOR},
-		{ PreferencesMessages.keyword1Color, PreferenceConstants.EDITOR_KEYWORD1_COLOR},
-		{ PreferencesMessages.keyword2Color, PreferenceConstants.EDITOR_KEYWORD2_COLOR},
-		{ PreferencesMessages.variableColor, PreferenceConstants.EDITOR_VARIABLE_COLOR},
+		{ PreferencesMessages.keywordColor, PreferenceConstants.EDITOR_KEYWORD_COLOR},
+		{ PreferencesMessages.modifierColor, PreferenceConstants.EDITOR_MODIFIER_COLOR},
+		{ PreferencesMessages.datatypeColor, PreferenceConstants.EDITOR_DATATYPE_COLOR},
 		{ PreferencesMessages.comment1Color, PreferenceConstants.EDITOR_COMMENT1_COLOR},
-		{ PreferencesMessages.comment2Color, PreferenceConstants.EDITOR_COMMENT2_COLOR},
-		{ PreferencesMessages.literal1Color, PreferenceConstants.EDITOR_LITERAL1_COLOR},
-		{ PreferencesMessages.literal2Color, PreferenceConstants.EDITOR_LITERAL2_COLOR},
-		{ PreferencesMessages.labelColor, PreferenceConstants.EDITOR_LABEL_COLOR},
-		{ PreferencesMessages.functionColor, PreferenceConstants.EDITOR_FUNCTION_COLOR},
 		{ PreferencesMessages.markupColor, PreferenceConstants.EDITOR_MARKUP_COLOR},
 		{ PreferencesMessages.operatorColor, PreferenceConstants.EDITOR_OPERATOR_COLOR},
 		{ PreferencesMessages.numberColor, PreferenceConstants.EDITOR_NUMBER_COLOR},
@@ -1063,7 +1048,7 @@ public class PikeEditorPreferencePage extends PreferencePage implements IWorkben
 
 		return new Control[]{labelControl, textControl};
 	}
-
+	
 	private String loadPreviewContentFromFile(String filename) {
 		String line;
 		String separator= System.getProperty("line.separator");

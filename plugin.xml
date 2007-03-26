@@ -102,15 +102,20 @@
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
-      <page
-            name="Sample Preferences"
-            class="org.gotpike.pdt.preferences.SamplePreferencePage"
-            id="org.gotpike.pdt.preferences.SamplePreferencePage">
-      </page>
-      <page
+       <page
             class="org.gotpike.pdt.preferences.PikeMainPreferencePage"
             id="org.gotpike.pdt.preferences.PikeMainPreferencePage"
-            name="Pike Development Tools"/>
+            name="Pike"/>
+       <page
+       		category="org.gotpike.pdt.preferences.PikeMainPreferencePage"
+            class="org.gotpike.pdt.preferences.PikeEditorPreferencePage"
+            id="org.gotpike.pdt.preferences.PikeEditorPreferencePage"
+            name="Editor"/>
+       <page
+       		category="org.gotpike.pdt.preferences.PikeMainPreferencePage"
+            class="org.gotpike.pdt.preferences.TaskTagsPreferencePage"
+            id="org.gotpike.pdt.preferences.TaskTagsPreferencePage"
+            name="Task Tags"/>
    </extension>
    <extension
          point="org.eclipse.ui.propertyPages">
@@ -189,6 +194,12 @@
             icon="icons/project_folder.gif"
             id="org.gotpike.pdt.pikeProjectNatureImage"
             natureId="org.gotpike.pdt.pikenature"/>
+   </extension>
+   <extension
+         id="markers.pdt"
+         name="PDT Base Marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.gotpike.pdt.pikeProblemMarker"/>
    </extension>
 
 </plugin>

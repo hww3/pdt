@@ -28,7 +28,7 @@ public class MarkerUtil {
 	//private TextEditor fTextEditor;
 	private IResource fResource;
 
-	private static final String EPIC_MARKER_USED_FLAG = "epic.markerUsedFlag";
+	private static final String PDT_MARKER_USED_FLAG = "org.gotpike.pdt.markerUsedFlag";
 
 
 //	public MarkerUtil(TextEditor textEditor, ISourceViewer viewer) {
@@ -71,7 +71,7 @@ public class MarkerUtil {
 	   					continue;
 	   				}
 	   			}
-                markers[i].setAttribute(EPIC_MARKER_USED_FLAG, false);
+                markers[i].setAttribute(PDT_MARKER_USED_FLAG, false);
 			}
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
@@ -104,7 +104,6 @@ public class MarkerUtil {
 
             for(int i = 0; i < markers.length; i++)
             {
-                if (markers[i].getCreationTime() < 1161441375673L)
                     markers[i].delete();
             }
         }
@@ -131,7 +130,7 @@ public class MarkerUtil {
 	   					continue;
 	   				}
 	   			}
-				if(!markers[i].getAttribute(EPIC_MARKER_USED_FLAG, false)) {
+				if(!markers[i].getAttribute(PDT_MARKER_USED_FLAG, false)) {
 					markers[i].delete();
 				}
 			}
@@ -148,7 +147,7 @@ public class MarkerUtil {
 	 * @param markerType Marker type
 	 */
 	public void addMarker(Map attributes, String markerType) {
-		attributes.put(EPIC_MARKER_USED_FLAG, Boolean.TRUE);
+		attributes.put(PDT_MARKER_USED_FLAG, Boolean.TRUE);
 		AddEditorMarker ed = new AddEditorMarker();
 		ed.addMarker(fResource, attributes, markerType);
 	}
@@ -196,7 +195,7 @@ public class MarkerUtil {
 					found = true;
 					if(setUsedFlag) {
 						try {
-							marker.setAttribute(EPIC_MARKER_USED_FLAG, true);
+							marker.setAttribute(PDT_MARKER_USED_FLAG, true);
 						} catch (CoreException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();

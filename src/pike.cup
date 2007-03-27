@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.13 2007-03-26 04:31:08 hww3 Exp $
+|| $Id: pike.cup,v 1.14 2007-03-27 01:01:15 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -392,7 +392,7 @@ constant_name::= TOK_IDENTIFIER:ident EQ safe_expr0 {: RESULT = (PikeSymbol)iden
   ;
 
 constant_list::= constant_name:name {: RESULT = new ConstantList((PikeSymbol)name); :}
-  | constant_list:constantlist COMMA constant_name:name1 {: System.out.println(name1); RESULT = ((ConstantList)constantlist); ((ConstantList)constantlist).add((PikeSymbol)name1); :}
+  | constant_list:constantlist COMMA constant_name:name1 {: RESULT = ((ConstantList)constantlist); ((ConstantList)constantlist).add((PikeSymbol)name1); :}
   ;
 
 constant::= modifiers TOK_CONSTANT constant_list:list SEMICOLON {: parser.source.addConstants((ConstantList)list, parser.source.currentModifiers); parser.source.currentModifiers = 0;:}

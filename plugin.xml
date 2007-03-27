@@ -201,5 +201,32 @@
          point="org.eclipse.core.resources.markers">
       <super type="org.gotpike.pdt.pikeProblemMarker"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="org.gotpike.pdt.commands.source"
+            name="Pike Source"/>
+      <command
+            categoryId="org.eclipse.ui.category.navigate"
+            description="Matching Bracket"
+            id="org.gotpike.pdt.commands.jump2Bracket"
+            name="Matching Bracket"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+         <key
+            sequence="M1+M2+P"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            commandId="org.gotpike.pdt.commands.jump2Bracket"
+            contextId="org.gotpike.pdt.pikeEditorScope" />
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            description="Editing Pike Source Code Context"
+            id="org.gotpike.pdt.pikeEditorScope"
+            name="Editing Pike Source"
+            parentId="org.eclipse.ui.textEditorScope"/>
+   </extension>
 
 </plugin>

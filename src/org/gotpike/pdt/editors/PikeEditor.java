@@ -24,6 +24,8 @@ import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.texteditor.*;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.gotpike.pdt.PDTPlugin;
+import org.gotpike.pdt.actions.ClearMarkerAction;
+import org.gotpike.pdt.actions.Jump2BracketAction;
 import org.gotpike.pdt.model.ISourceElement;
 import org.gotpike.pdt.model.SourceFile;
 import org.gotpike.pdt.preferences.MarkOccurrencesPreferences;
@@ -75,7 +77,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         setDocumentProvider(PDTPlugin.getDefault().getDocumentProvider());
         PDTPlugin.getDefault().getPreferenceStore().addPropertyChangeListener(this);
         colorManager = new ColorManager();
-        setKeyBindingScopes(new String[] { "org.gotpike.pdt.PikeEditorScope" });
+        setKeyBindingScopes(new String[] { "org.gotpike.pdt.pikeEditorScope" });
     }
 
     public void createPartControl(Composite parent)
@@ -458,7 +460,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
                 this),
             PikeEditorCommandIds.CONTENT_ASSIST,
             PikeEditorActionIds.CONTENT_ASSIST);
-
+*/
         // each marker clearing action gets its own wiring
         wireAction(new ClearMarkerAction.Critic(this), PikeEditorCommandIds.CLEAR_MARKER,
             PikeEditorActionIds.CLEAR_CRITIC_MARKERS);
@@ -466,7 +468,10 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
             PikeEditorActionIds.CLEAR_POD_MARKERS);
         wireAction(new ClearMarkerAction.AllMarkers(this), PikeEditorCommandIds.CLEAR_MARKER,
             PikeEditorActionIds.CLEAR_ALL_MARKERS);
-
+        
+        wireAction(new Jump2BracketAction(this), PikeEditorCommandIds.MATCHING_BRACKET,
+                PikeEditorActionIds.MATCHING_BRACKET);
+/*
         wireAction(new PodCheckerAction(this), PikeEditorCommandIds.POD_CHECKER,
             PikeEditorActionIds.POD_CHECKER);
         wireAction(new ToggleCommentAction(this), PikeEditorCommandIds.TOGGLE_COMMENT,
@@ -475,8 +480,7 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
             PikeEditorActionIds.PERL_CRITIC);
         wireAction(new FormatSourceAction(this), PikeEditorCommandIds.FORMAT_SOURCE,
             PikeEditorActionIds.FORMAT_SOURCE);
-        wireAction(new Jump2BracketAction(this), PikeEditorCommandIds.MATCHING_BRACKET,
-            PikeEditorActionIds.MATCHING_BRACKET);
+
         wireAction(new ExportHtmlSourceAction(this), PikeEditorCommandIds.HTML_EXPORT,
             PikeEditorActionIds.HTML_EXPORT);
         wireAction(new ValidateSourceAction(this), PikeEditorCommandIds.VALIDATE_SYNTAX,
@@ -800,10 +804,10 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
             preferenceStore.getBoolean(PreferenceConstants.AUTO_COMPLETION_QUOTE2));
     }
 
-    private void wireAction(IAction action, String commandId, String perlActionId)
+    private void wireAction(IAction action, String commandId, String pikeActionId)
     {
         action.setActionDefinitionId(commandId);
-        setAction(perlActionId, action);
+        setAction(pikeActionId, action);
     }
 
     /**

@@ -2,19 +2,30 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pike Development Tools
 Bundle-SymbolicName: org.gotpike.pdt; singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 0.0.1
 Bundle-ClassPath: PDT.jar,
  JFlex.jar,
  java_cup-0.10k.jar
 Bundle-Activator: org.gotpike.pdt.PDTPlugin
 Bundle-Vendor: pdt
 Bundle-Localization: plugin
-Export-Package: org.gotpike.pdt,
+Export-Package: JFlex,
+ JFlex.anttask,
+ JFlex.gui,
+ JFlex.tests,
+ META-INF,
+ java_cup,
+ java_cup.runtime,
+ java_cup.simple_calc,
+ org.gotpike.pdt,
  org.gotpike.pdt.actions,
  org.gotpike.pdt.builders,
+ org.gotpike.pdt.content,
  org.gotpike.pdt.decorators,
  org.gotpike.pdt.editors,
  org.gotpike.pdt.editors.rule,
+ org.gotpike.pdt.model,
+ org.gotpike.pdt.parser,
  org.gotpike.pdt.popup.actions,
  org.gotpike.pdt.preferences,
  org.gotpike.pdt.properties,

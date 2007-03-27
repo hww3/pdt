@@ -45,10 +45,6 @@ public class PDTPlugin extends AbstractUIPlugin {
 
 	private static final String PIKE_EXECUTABLE_DEFAULT = "pike";
 
-	public static final String WEB_BROWSER_PREFERENCE = "WEB_BROWSER";
-
-	private static final String WEB_BROWSER_DEFAULT = "http://";
-
 	public static final String WARNINGS_PREFERENCE = "SHOW_WARNINGS";
 
     public static final String DEBUG_CONSOLE_PREFERENCE = "ENABLE_DEBUG_CONSOLE";
@@ -254,19 +250,6 @@ public class PDTPlugin extends AbstractUIPlugin {
 				value == true ? "1" : "0");
 	}
 	
-	public String getWebBrowserPreference() {
-		return getPreferenceStore().getString(WEB_BROWSER_PREFERENCE);
-	}
-
-	public String getDefaultWebBrowserPreference() {
-		return WEB_BROWSER_DEFAULT;
-	}
-
-	public void setWebBrowserPreference(String value) {
-
-		getPreferenceStore().setValue(WEB_BROWSER_PREFERENCE, value);
-	}
-
 	public boolean getSyntaxValidationPreference() {
 		String value = getPreferenceStore().getString(SYNTAX_VALIDATION_PREFERENCE);
 
@@ -284,7 +267,7 @@ public class PDTPlugin extends AbstractUIPlugin {
 
 	
     /**
-     * @return false if no valid Perl interpreter has been available in
+     * @return false if no valid Pike interpreter has been available in
      *         Preferences since the plug-in's activation;
      *         true otherwise
      */

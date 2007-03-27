@@ -70,7 +70,7 @@ public class Perspective implements IPerspectiveFactory {
 
 //		layout.addShowViewShortcut("org.epic.perleditor.views.ExplainErrorsView");//$NON-NLS-1$
 //		layout.addShowViewShortcut("org.epic.perleditor.views.PerlDocView");//$NON-NLS-1$
-//		layout.addShowViewShortcut("org.epic.core.views.browser.BrowserView");//$NON-NLS-1$
+//		layout.addShowViewShortcut("org.gotpike.pdt.views.browser.BrowserView");//$NON-NLS-1$
 		
 		// add perspective shortcuts
 		layout.addPerspectiveShortcut("org.eclipse.ui.resourcePerspective");//$NON-NLS-1$

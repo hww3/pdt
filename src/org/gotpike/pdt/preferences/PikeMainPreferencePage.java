@@ -140,6 +140,7 @@ public class PikeMainPreferencePage
             PerlEditorPlugin.getDefault().getSuspendAtFirstPreference());
         suspendAtFirstCheckBox.setLayoutData(data);
 */        
+		/*
 		//WebBrowser preferences
 		Composite browserComposite = new Composite(top, SWT.NULL);
 		GridLayout browserLayout = new GridLayout();
@@ -157,7 +158,7 @@ public class PikeMainPreferencePage
 		browserLabelText.setLayoutData(data);
 		browserLabelText.setText(
 			PDTPlugin.getDefault().getWebBrowserPreference());
-
+*/
 		Composite syntaxIntervalComposite = new Composite(top, SWT.NULL);
 
 		GridLayout syncIntervalLayout = new GridLayout();
@@ -219,10 +220,10 @@ public class PikeMainPreferencePage
 			
 		warningsCheckBox.setSelection(
 			PDTPlugin.getDefault().getDefaultWarningsPreference());
-
+/*
 		browserLabelText.setText(
 			PDTPlugin.getDefault().getDefaultWebBrowserPreference());
-			
+			*/
 		
 		validateCheckBox.setSelection(
 				PDTPlugin.getDefault().getDefaultSyntaxValidationPreference());
@@ -255,9 +256,9 @@ public class PikeMainPreferencePage
             validateCheckBox.getSelection());
 
 		PDTPlugin.getDefault().getPreferenceStore().setValue(PDTPlugin.SYNTAX_VALIDATION_INTERVAL_PREFERENCE, syntaxCheckInterval.getSelection());
-		PDTPlugin.getDefault().setWebBrowserPreference(
+/*		PDTPlugin.getDefault().setWebBrowserPreference(
 			browserLabelText.getText());
-			
+*/			
 		return super.performOk();
 	}
 }

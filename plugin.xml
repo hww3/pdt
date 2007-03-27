@@ -130,16 +130,8 @@
    <extension
          point="org.eclipse.ui.views">
       <category
-            name="Sample Category"
-            id="org.gotpike.pdt">
-      </category>
-      <view
-            name="Sample View"
-            icon="icons/sample.gif"
-            category="org.gotpike.pdt"
-            class="org.gotpike.pdt.views.SampleView"
-            id="org.gotpike.pdt.views.SampleView">
-      </view>
+            id="org.gotpike.pdt.views"
+            name="Pike"/>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
@@ -227,6 +219,13 @@
             id="org.gotpike.pdt.pikeEditorScope"
             name="Editing Pike Source"
             parentId="org.eclipse.ui.textEditorScope"/>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.consoleLineTrackers">
+      <consoleLineTracker
+            class="org.gotpike.pdt.debug.PikeLineTracker"
+            id="org.gotpike.pdt.pikelinetracker"
+            processType="pike"/>
    </extension>
 
 </plugin>

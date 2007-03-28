@@ -169,7 +169,13 @@ public class SourceFile
         	 MarkerUtil markerUtil = new MarkerUtil(original);         
              markerUtil.removeObsoleteProblemMarkers();
 			p.parse();
-		} catch (Exception e) {
+		} 
+        catch(RuntimeException e)
+        {
+        	handleError(e.getMessage(), s.filename, s.getYyline(), s.getYycolumn(), true);
+        }	
+        	catch (Exception e) {
+        
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;

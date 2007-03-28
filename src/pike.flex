@@ -180,6 +180,8 @@ DocumentationComment = "/*!" {CommentContent} \*+ "/"
 CommentContent = ( [^*] | \*+[^!/] )*
 
 
+PreProcessorConstruct = ("#" {InputCharacter}* {LineTerminator})
+
 /* identifiers */
 Identifier = [:jletter:][:jletterdigit:]*
 
@@ -341,6 +343,9 @@ SingleCharacter = [^\r\n\'\\]
   
   /* comments */
   {Comment}                      {  }
+
+ /* preprocessor */
+  ^{PreProcessorConstruct} {  }
 
   /* whitespace */
   {WhiteSpace}                   { /* ignore */ }

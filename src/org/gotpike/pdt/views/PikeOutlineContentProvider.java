@@ -50,7 +50,8 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
         if (model != null) model.addListener(listener);
     }
 
-    public Object[] getChildren(Object parentElement)
+    @SuppressWarnings("unchecked")
+	public Object[] getChildren(Object parentElement)
     {    	
         if (parentElement instanceof SourceFile)
         {

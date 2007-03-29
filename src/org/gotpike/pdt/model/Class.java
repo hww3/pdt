@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.gotpike.pdt.parser.CurlySymbol;
+import org.gotpike.pdt.parser.InheritItem;
 import org.gotpike.pdt.parser.PikeSymbol;
 
 
@@ -42,6 +43,7 @@ public class Class implements IMultilineElement
 	private boolean top = false;
 	private int modifiers;
     private final List constants;
+    private PikeSymbol classname = null;
     
     /**
      * Creates the default ("main") package.
@@ -51,6 +53,18 @@ public class Class implements IMultilineElement
         this.index = 0;
         this.blockLevel = 0;
         this.name = name;
+        this.methods = new ArrayList();
+        this.inherits = new ArrayList();
+        this.classes = new ArrayList();
+        this.constants = new ArrayList();
+    }
+    
+    public Class(PikeSymbol name)
+    {
+    	this.classname = name;
+        this.index = 0;
+        this.blockLevel = 0;
+        this.name = name.getText();
         this.methods = new ArrayList();
         this.inherits = new ArrayList();
         this.classes = new ArrayList();
@@ -84,14 +98,7 @@ public class Class implements IMultilineElement
         methods.add(ret);
         return ret;
     }
-    
-    public Inherit addInherit(PikeSymbol className, PikeSymbol name)
-        throws BadLocationException
-    {
-        Inherit ret = new Inherit(this, inherits.size(), className, name);
-        inherits.add(ret);
-        return ret;
-    }
+
     
     public boolean equals(Object obj)
     {
@@ -111,6 +118,9 @@ public class Class implements IMultilineElement
 
     public int getStartLine()
     {
+    	if(classname != null)
+    		return classname.getLine();
+    		
         return 0;
     }
     
@@ -131,7 +141,9 @@ public class Class implements IMultilineElement
 
     public int getOffset()
     {
-        return  -1;
+    	if(classname != null)
+    		return classname.getOffset();
+        return  0;
     }
     
     public List getMethods()
@@ -187,6 +199,12 @@ public class Class implements IMultilineElement
 		Constant constant = new Constant(c, modifiers2);
 		constants.add(constant);
 		return constant;
+	}
+
+	public Inherit addInherit(InheritItem in) {
+		Inherit inherit = new Inherit(this, in.ref, in.name, in.modifiers);
+		inherits.add(inherit);
+		return inherit;
 	}
 
 

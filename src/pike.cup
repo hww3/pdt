@@ -2,13 +2,14 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.14 2007-03-27 01:01:15 hww3 Exp $
+|| $Id: pike.cup,v 1.15 2007-03-29 05:48:09 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
 import java_cup.runtime.*;
 import org.gotpike.pdt.model.SourceFile;
 import org.gotpike.pdt.parser.Block;
+import org.gotpike.pdt.parser.InheritItem;
 
 parser code  {: 
 
@@ -370,7 +371,7 @@ inherit_ref::=
   low_program_ref:ref {: RESULT = ref; :}
   ;
 
-inheritance::= modifiers TOK_INHERIT inherit_ref:ref optional_rename_inherit SEMICOLON {: parser.source.currentModifiers = 0; :}
+inheritance::= modifiers TOK_INHERIT inherit_ref:ref optional_rename_inherit:name SEMICOLON {: parser.source.addInherit(new InheritItem((PikeSymbol)ref, (PikeSymbol)name, parser.source.currentModifiers)); parser.source.currentModifiers = 0; :}
   | modifiers TOK_INHERIT inherit_ref error SEMICOLON {: parser.source.currentModifiers = 0; :}
   | modifiers TOK_INHERIT inherit_ref error TOK_LEX_EOF {: parser.source.currentModifiers = 0; :}
   | modifiers TOK_INHERIT inherit_ref error RBRACE {: parser.source.currentModifiers = 0; :}
@@ -919,7 +920,7 @@ failsafe_program::= LBRACE program end_block
 		:}
                 ;
 
-class::= modifiers:modifiers TOK_CLASS line_number_info optional_identifier:identifier {: System.out.println("identifier:" + (identifier!=null?((PikeSymbol)identifier).value:"null")); parser.source.addClass((String)(identifier!=null?((PikeSymbol)identifier).value:"(anonymous)")); parser.source.currentModifiers = 0 ; :}
+class::= modifiers:modifiers TOK_CLASS line_number_info optional_identifier:identifier {: System.out.println("identifier:" + (identifier!=null?((PikeSymbol)identifier).value:"null")); if(identifier != null)  parser.source.addClass((PikeSymbol)identifier, parser.source.currentModifiers); else parser.source.addClass("(anonymous)"); parser.source.currentModifiers = 0 ; :}
   optional_create_arguments failsafe_program
   {: parser.source.endClass(); :}
   ;
@@ -1297,27 +1298,27 @@ idents2::= idents
   | TOK_LOCAL_ID TOK_COLON_COLON bad_identifier
   ;
 
-idents::= low_idents
-  | idents DOT TOK_IDENTIFIER
-  | DOT TOK_IDENTIFIER
-  | TOK_GLOBAL DOT TOK_IDENTIFIER
+idents::= low_idents:idents {: RESULT = idents; :}
+  | idents:idents DOT TOK_IDENTIFIER:ident {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)idents).getLine(), ((PikeSymbol)idents).getColumn(), identsleft, identright, ((PikeSymbol)idents).getOffset(), ((PikeSymbol)idents).getText() + "." + ((PikeSymbol)ident).getText()); :}
+  | DOT:dot TOK_IDENTIFIER:ident {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)dot).getLine(), ((PikeSymbol)dot).getColumn(), dotleft, identright, ((PikeSymbol)dot).getOffset(), "." + ((PikeSymbol)ident).getText()); :}
+  | TOK_GLOBAL:global DOT TOK_IDENTIFIER:ident {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)global).getLine(), ((PikeSymbol)global).getColumn(), globalleft, identright, ((PikeSymbol)global).getOffset(), "global." + ((PikeSymbol)ident).getText()); :}
   | idents DOT bad_identifier {::}
   | idents DOT error {::}
   ;
 
-inherit_specifier::= TOK_IDENTIFIER TOK_COLON_COLON
-  | TOK_GLOBAL TOK_COLON_COLON
-  | inherit_specifier TOK_IDENTIFIER TOK_COLON_COLON
+inherit_specifier::= TOK_IDENTIFIER:ident TOK_COLON_COLON:tok {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)ident).getLine(), ((PikeSymbol)ident).getColumn(), identleft, tokright, ((PikeSymbol)ident).getOffset(), ((PikeSymbol)ident).getText() + ((PikeSymbol)tok).getText()); :}
+  | TOK_GLOBAL:ident TOK_COLON_COLON:tok {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)ident).getLine(), ((PikeSymbol)ident).getColumn(), identleft, tokright, ((PikeSymbol)ident).getOffset(), ((PikeSymbol)ident).getText() + ((PikeSymbol)tok).getText()); :}
+  | inherit_specifier:ident TOK_IDENTIFIER:tok1 TOK_COLON_COLON:tok {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)ident).getLine(), ((PikeSymbol)ident).getColumn(), identleft, tokright, ((PikeSymbol)ident).getOffset(), ((PikeSymbol)ident).getText() + ((PikeSymbol)tok1).getText() + ((PikeSymbol)tok).getText()); :}
   | inherit_specifier bad_identifier TOK_COLON_COLON 
   ;
 
-low_idents::= TOK_IDENTIFIER
-  | TOK_PREDEF TOK_COLON_COLON TOK_IDENTIFIER
+low_idents::= TOK_IDENTIFIER:ident {: RESULT = ident;  :}
+  | TOK_PREDEF:predef TOK_COLON_COLON TOK_IDENTIFIER:ident {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)predef).getLine(), ((PikeSymbol)predef).getColumn(), predefleft, identright, ((PikeSymbol)predef).getOffset(), ((PikeSymbol)predef).getText() + "::" + ((PikeSymbol)ident).getText()); :}
   | TOK_PREDEF TOK_COLON_COLON bad_identifier
-  | inherit_specifier TOK_IDENTIFIER
+  | inherit_specifier:spec TOK_IDENTIFIER:ident {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)spec).getLine(), ((PikeSymbol)spec).getColumn(), specleft, identright, ((PikeSymbol)spec).getOffset(), ((PikeSymbol)spec).getText() + ((PikeSymbol)ident).getText()); :}
   | inherit_specifier bad_identifier 
   | inherit_specifier error 
-  | TOK_COLON_COLON TOK_IDENTIFIER
+  | TOK_COLON_COLON:tok TOK_IDENTIFIER:ident {: RESULT = new PikeSymbol(sym.TOK_IDENTIFIER, ((PikeSymbol)tok).getLine(), ((PikeSymbol)tok).getColumn(), tokleft, identright,((PikeSymbol)tok).getOffset(), ((PikeSymbol)tok).getText() + ((PikeSymbol)ident).getText()); :}
   | TOK_COLON_COLON bad_identifier
   ;
 

@@ -192,6 +192,14 @@ public class SourceFile
         listeners.remove(listener);
     }
     
+    public Inherit addInherit(InheritItem in)
+    {
+    	Class cls = (Class)currentClass.peek();
+    	
+    	
+    	return cls.addInherit(in);
+    }
+    
     public Method addMethod(PikeSymbol keyword, PikeSymbol name, CurlySymbol front)
     {
     	Class cls = (Class)currentClass.peek();
@@ -233,6 +241,17 @@ public class SourceFile
     }
     currentClass.push(cls);
 }
+    public void addClass(PikeSymbol name, int modifiers)
+    throws BadLocationException
+{
+    	
+    Class cls = new Class(name);
+    cls.setModifiers(modifiers);
+   	Class parent = (Class)currentClass.peek();
+  	parent.addClass(cls);
+    currentClass.push(cls);
+}
+    
     public void endClass()
     {
     	currentClass.pop();

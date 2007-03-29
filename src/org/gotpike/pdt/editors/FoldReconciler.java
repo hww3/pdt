@@ -164,10 +164,10 @@ public class FoldReconciler
 
             if (e.getStartLine() == e.getEndLine())
             {
-            	System.out.println("single line element.");
+         //   	System.out.println("single line element.");
                 continue;
             }
-        	System.out.println("multi line element.");
+       // 	System.out.println("multi line element.");
 
             int offset = doc.getLineOffset(e.getStartLine());
             int length =

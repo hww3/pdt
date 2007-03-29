@@ -3,28 +3,28 @@ package org.gotpike.pdt.model;
 import org.gotpike.pdt.parser.PikeSymbol;
 
 /**
- * An ISourceElement representing a "use Module" statement.
+ * An ISourceElement representing an "inherit" statement.
  * 
  * @author jploski
  */
 public class Inherit implements IClassElement
 {
     private final Class parent;
-    private final int index;
+    private final int modifiers;
     private final PikeSymbol className;
     private final PikeSymbol name;
     
-    public Inherit(Class parent, int index, PikeSymbol className, PikeSymbol name)
+    public Inherit(Class parent, PikeSymbol className, PikeSymbol name, int modifiers)
     {
         this.parent = parent;
-        this.index = index;
+        this.modifiers = modifiers;
         this.className = className;
         this.name = name;
     }
     
-    public int getIndex()
+    public int getModifiers()
     {
-        return index;
+        return modifiers;
     }
 
     public int getLength()
@@ -34,17 +34,17 @@ public class Inherit implements IClassElement
 
     public String getName()
     {
-        return (String)name.value;
+        return (String)className.value;
     }
     
     public PikeSymbol getNameToken()
     {
-        return name;
+        return className;
     }
 
     public int getOffset()
     {
-        return name.getOffset();
+          return className.getOffset();
     }
     
     public Class getParent()
@@ -52,13 +52,15 @@ public class Inherit implements IClassElement
         return parent;
     }
     
-    public String getClassName()
+    public String getRefName()
     {
-        return (String)className.value;
+    	if(name != null)
+          return (String)name.value;
+    	else return "";
     }
     
     public String toString()
     {
-        return "use #" + index + " " + getName() + " @" + getOffset(); 
+        return "inherit #" + modifiers + " " + getName() + " @" + getOffset(); 
     }
 }

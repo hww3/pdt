@@ -16,6 +16,7 @@ import org.eclipse.core.filebuffers.ITextFileBufferManager;
 import org.eclipse.core.filesystem.EFS;
 import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -337,30 +338,42 @@ public class FileUtil
     {
     	ResourceNavigator view;
     	IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		view = (ResourceNavigator)PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if(view != null)
-		{
-			TreeViewer tv = view.getTreeViewer();
-			ISelection sel = tv.getSelection();
-			IStructuredSelection s = (IStructuredSelection)sel;
-			Iterator i = s.iterator();
-			while(i.hasNext())
-			{
-				System.out.println(i.next());
-			}
-		}
 
-        IPath location = null;
+ 
+    	IPath location = null;
+    	 
+        
         if (file.isAbsolute())
+        {
             location = new Path(file.getAbsolutePath());
+	        IFile[] files = workspace.getRoot().findFilesForLocation(location);
+	        if (files == null || files.length == 0)
+	        	return null;
+	        else if(files.length == 1)
+	            return files[0];
+	        else
+	        	return selectWorkspaceFile(files);
+        }
         else
-            location = new Path(workspace.getRoot().getLocation() + File.separator + file.getPath());
-        IFile[] files = workspace.getRoot().findFilesForLocation(location);
-        if (files == null || files.length == 0)
-            return null;
-        if (files.length == 1)
-            return files[0];
-        return selectWorkspaceFile(files);
+        {
+        	IFile[] files;
+           	IProject [] projects = workspace.getRoot().getProjects();
+        	for(int i = 0; i < projects.length; i++)
+        	{
+        		if(projects[i].isOpen())
+        		{
+        			String pn = projects[i].getName();
+        			location = new Path(workspace.getRoot().getLocation() + File.separator + pn + File.separator + file.getPath());
+        	        files = workspace.getRoot().findFilesForLocation(location);
+        	        if(files != null && files.length == 1 && files[0].exists())
+        	            return files[0];
+        	        else if(files != null && files.length > 1)
+        	        	return selectWorkspaceFile(files);
+        	    	continue;    
+        		}
+        	}
+        	return null;
+        }
     }
 
     private static IFile selectWorkspaceFile(IFile[] files)

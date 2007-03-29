@@ -57,7 +57,7 @@ public class PikePluginImages
 	public static final String IMG_ICON_CLASS_INNER = NAME_PREFIX
     + "innerclass_public_obj.gif"; //$NON-NLS-1$
 	public static final String IMG_ICON_INHERIT = NAME_PREFIX
-    + "class_default_obj.gif"; //$NON-NLS-1$
+    + "inherit_obj.gif"; //$NON-NLS-1$
 
 	public static final String IMG_ICON_CONSTANT = NAME_PREFIX
     + "field_public_obj.gif"; //$NON-NLS-1$

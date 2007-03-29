@@ -28,7 +28,7 @@ public class Constant implements IMultilineElement, IClassElement
     
     public String getName()
     {
-    	System.out.println("name: " + name);
+    	//System.out.println("name: " + name);
         return (String)(name.value);
     }
 

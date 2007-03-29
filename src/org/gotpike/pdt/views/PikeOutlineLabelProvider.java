@@ -16,9 +16,9 @@ public class PikeOutlineLabelProvider extends LabelProvider
     {
         if (element instanceof Method)
         {
-            Method sub = (Method) element;
-            if ("new".equals(sub.getName())) return PikePluginImages.get(PikePluginImages.IMG_ICON_CONSTRUCTOR);
-            else return PikePluginImages.get(PikePluginImages.IMG_ICON_METHOD);
+          //  Method sub = (Method) element;
+          //  if ("create".equals(sub.getName())) return PikePluginImages.get(PikePluginImages.IMG_ICON_CONSTRUCTOR);
+            return PikePluginImages.get(PikePluginImages.IMG_ICON_METHOD);
         }
         else if (element instanceof Constant)
         {

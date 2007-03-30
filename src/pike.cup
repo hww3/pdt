@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.15 2007-03-29 05:48:09 hww3 Exp $
+|| $Id: pike.cup,v 1.16 2007-03-30 03:36:43 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -350,7 +350,7 @@ string_constant::= string
   | string_constant PLUS string
   ;
 
-optional_rename_inherit::= COLON TOK_IDENTIFIER 
+optional_rename_inherit::= COLON TOK_IDENTIFIER:ident {: RESULT = ident; :}
   | COLON bad_identifier 
   | COLON error 
   | 

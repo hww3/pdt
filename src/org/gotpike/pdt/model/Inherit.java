@@ -34,7 +34,7 @@ public class Inherit implements IClassElement
 
     public String getName()
     {
-        return (String)className.value;
+        return (String)className.value + ((name != null) ? (" : " + getRefName()) : "");
     }
     
     public PikeSymbol getNameToken()

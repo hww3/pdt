@@ -63,7 +63,7 @@ public class Method implements IMultilineElement, IClassElement
     
     public String getName()
     {
-        return (String)name.value;
+        return (String)name.value + "()";
     }
 
     public PikeSymbol getNameToken()

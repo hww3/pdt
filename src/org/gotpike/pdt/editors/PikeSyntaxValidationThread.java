@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.*;
 import org.eclipse.jface.text.*;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.gotpike.pdt.PDTPlugin;
-import org.gotpike.pdt.util.PikeValidator;
+import org.gotpike.pdt.util.PikeValidator_old;
 import org.gotpike.pdt.util.StringReaderThread;
 
 /**
@@ -81,7 +81,7 @@ public class PikeSyntaxValidationThread
                 code = null;
             }
             
-            try { PikeValidator.instance().validate(resource, text); }
+            try { PikeValidator_old.instance().validate(resource, text); }
             catch (CoreException e)
             {
                 if (PDTPlugin.getDefault().hasPikeInterpreter() &&

@@ -9,7 +9,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.ResourceMessages;
 import org.gotpike.pdt.decorators.PikeDecorator;
-import org.gotpike.pdt.util.PikeValidator;
+import org.gotpike.pdt.util.PikeValidator_old;
 
 /**
  * This low-priority job is started by PerlBuilder and executes
@@ -113,7 +113,7 @@ class PikeBuilderJob extends Job
     {
         try
         {
-            if (PikeValidator.instance().validate(resource))
+            if (PikeValidator_old.instance().validate(resource))
             {
                 validatedResources.add(resource);
                 markParentFoldersUpdated(resource);

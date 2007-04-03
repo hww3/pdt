@@ -25,6 +25,8 @@ import org.gotpike.pdt.editors.PikeEditor;
 import org.gotpike.pdt.editors.PikePartitioner;
 import org.gotpike.pdt.parser.*;
 import org.gotpike.pdt.util.MarkerUtil;
+import org.gotpike.pdt.util.PikeValidator;
+import org.gotpike.pdt.util.PikeValidator_old;
 import org.gotpike.pdt.util.StatusFactory;
 
 /**
@@ -118,31 +120,7 @@ public class SourceFile
        this.classes = new ArrayList();
        this.docs = new ArrayList();
        this.currentClass.clear(); 
- /*       
-        PikePartitioner partitioner = (PikePartitioner) doc.getDocumentPartitioner();
-        if (partitioner == null) return;
-        synchronized (partitioner.getTokensLock())
-        {
-            try
-            {
-                ParsingState state = new ParsingState(partitioner.getTokens());
-
-                while (state.hasMoreTokens()) state.processToken();
-                state.finish();
-            }
-            catch (BadLocationException e)
-            {
-                log.log(new Status(
-                    Status.ERROR,
-                    PDTPlugin.getPluginId(),
-                    IStatus.OK,
-                    "Unexpected exception: " + e.getClass().getName() +
-                    "; report it as a bug " +
-                    "in plug-in " + PDTPlugin.getPluginId(),
-                    e));
-            }
-        }
-        */
+ 
         String fn = "unknown";
     	   IFile original = ((FileEditorInput)editor.getEditorInput()).getFile();
            fn = original.getFullPath().toOSString();
@@ -168,7 +146,9 @@ public class SourceFile
         try {
         	 MarkerUtil markerUtil = new MarkerUtil(original);         
              markerUtil.removeObsoleteProblemMarkers();
-			p.parse();
+			 p.parse();
+			 PikeValidator validator = new PikeValidator(this, original.getName());
+			 validator.validate(doc.get());
 		} 
         catch(RuntimeException e)
         {
@@ -263,194 +243,7 @@ public class SourceFile
         for (int i = 0; i < listeners.length; i++)
             ((ISourceFileListener) listeners[i]).sourceFileChanged(this);
     }
-   /* 
-    private class ParsingState
-    {
-        private final int tokenCount;
-        private final List tokens;
-        private int tIndex;
-        private PikeSymbol t;
-        private int type;
-        private int blockLevel;
-        
-        private Stack classStack;
-        private Stack methodStack;
-        private PikeSymbol docStart;
-        private PikeSymbol methodName;
-        private PikeSymbol className;
-        
-        public ParsingState(List tokens)
-        {
-            this.tIndex = 0;
-            this.tokens = tokens;
-            this.tokenCount = tokens.size();
-            this.classStack = new Stack();
-            this.methodStack = new Stack();
-        }
-        
-        public void finish()
-        {
-            closeClass();
-            closeMethod();
-        }
-        
-        public boolean hasMoreTokens()
-        {
-            return tIndex < tokenCount;
-        }
-        
-        public void processToken() throws BadLocationException
-        {
-            this.t = (PikeSymbol) tokens.get(tIndex);
-            this.type = t.getType();
-            
-            updateBlockLevel();
-            updateClassState();
-            updateMethodState();
-            updateInheritState();
-            updateDocState();
-            
-            tIndex++;
-        } 
-        
-        private void closeClass()
-        {            
-            if (classStack.isEmpty()) return;
-
-            Class cclass = (Class) classStack.peek();
-            if (blockLevel > cclass.getBlockLevel()) return;
-            //System.err.println("closePackage " + pkg.getName() + " " + t);
-            classStack.pop();
-            cclass.setLastToken((PikeSymbol) tokens.get(tIndex-1));
-        }
-        
-        private void closeMethod()
-        {
-            if (methodStack.isEmpty()) return;
-            
-            Method method = (Method) methodStack.peek();
-            if (blockLevel-1 > method.getBlockLevel()) return;
-            methodStack.pop();
-            if (t instanceof CurlySymbol) // could be false on finish()
-                method.setCloseCurly((CurlySymbol) t);
-        }
-        
-        private Class getCurrentClass()
-        {
-            if (classStack.isEmpty()) openClass(new Class());
-            return (Class) classStack.peek();
-        }
-        
-        private void openClass(Class pkg)
-        {
-            //System.err.println("openPackage " + pkg.getName() + " " + t);
-            classStack.push(pkg);
-            classes.add(pkg);
-        }
-        
-        private void updateBlockLevel()
-        {
-            if (type == sym.LBRACE) blockLevel++;
-            else if (type == sym.RBRACE)
-            {
-                closeMethod();
-                closeClass();
-                blockLevel--;
-            }
-        }
-        
-        private void updateMethodState() throws BadLocationException
-        {
-            if (subKeyword == null)
-            {
-                if (type == sym.KEYWORD_SUB) subKeyword = t;
-            }
-            else
-            {
-                if (methodName == null && type == sym.TOK_IDENTIFIER)
-                {
-                    methodName = t;
-                }
-                else if (type == sym.SEMI)
-                {
-                    subKeyword = null;
-                    subName = null;
-                }
-                else if (type == sym.OPEN_CURLY)
-                {
-                    if (subName != null)
-                    {
-                        Method method = getCurrentClass().addMethod(
-                            subKeyword, methodName, (CurlySymbol) t);
-                        methodStack.push(sub);
-                    }
-                    subKeyword = null;
-                    subName = null;
-                }
-            }
-        }
-        
-        private void updateClassState()
-        {
-            if (classKeyword == null)
-            {
-                if (type == sym.KEYWORD_PACKAGE)
-                {
-                    closeClass();
-                    classKeyword = t;
-                }
-            }
-            else
-            {
-                if (type == sym.WORD)
-                {
-                    openClass(new Class(
-                        classes.size(), blockLevel, classKeyword, t));
-                    classKeyword = null;
-                }
-            }
-        }
-        
-        private void updateDocState() throws BadLocationException
-        {
-            if (docStart == null)
-            {
-                if (type == sym.OPEN_POD) docStart = t;
-            }
-            else
-            {
-                if (type == sym.CLOSE_POD)
-                {
-                    addDoc(docStart, t);
-                    docStart = null;
-                }
-            }
-        }
-        
-        private void updateInheritState() throws BadLocationException
-        {
-            if (inheritKeyword == null)
-            {
-                if (type == sym.KEYWORD_USE) inheritKeyword = t;
-            }
-            else
-            {
-                if (type == sym.WORD)
-                {
-                    String text = t.getText();
-                    if (!"constant".equals(text) &&
-                        !"warnings".equals(text) &&
-                        !"strict".equals(text) &&
-                        !"vars".equals(text))
-                    {
-                        getCurrentClass().addClass(inheritKeyword, t);
-                    }
-                    inheritKeyword = null;
-                }
-            }
-        }
-    }*/
-
+ 
 	public void addConstants(ConstantList list, int currentModifiers2) {
 	//	System.out.println("adding " + list.list.size() + " constants.");
 		for(int i = 0; i < list.list.size(); i++)

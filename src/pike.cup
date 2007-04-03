@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.16 2007-03-30 03:36:43 hww3 Exp $
+|| $Id: pike.cup,v 1.17 2007-04-03 02:14:10 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -458,6 +458,10 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
             Block rblock = (Block)block;
             parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, rblock.start, rblock.end); 
           }
+          else
+          { /* a function declaraion */
+          	System.out.println("whee! " + ((PikeSymbol)ident).getText());
+          }
           parser.source.currentModifiers = 0;
       :}
   
@@ -472,9 +476,13 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
             parser.source.addMethod((PikeSymbol)ident, (PikeSymbol)ident, rblock.start, rblock.end); 
 //            System.out.println("have function: " + ident.toString() + " " + (block!=null?block.toString():"null")); 
           }
+          else
+          { /* a function declaraion */
+          	System.out.println("whee! " + ((PikeSymbol)ident).getText());
+          }
           parser.source.currentModifiers = 0;
     :}
-  | modifiers type_or_error name_list SEMICOLON {: parser.source.currentModifiers = 0; :}
+  | modifiers type_or_error name_list:ident SEMICOLON {: System.out.println("var: " + ((PikeSymbol)ident).getText()); parser.source.currentModifiers = 0; :}
   | inheritance {: :}
   | _import {: :}
   | constant {: :}

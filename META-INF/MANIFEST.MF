@@ -2,10 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pike Development Tools
 Bundle-SymbolicName: org.gotpike.pdt; singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 1.1.0
 Bundle-ClassPath: PDT.jar,
  JFlex.jar,
- java_cup-0.10k.jar
+ java_cup-0.10k.jar,
+ xmlrpc-client-1.0.1.jar
 Bundle-Activator: org.gotpike.pdt.PDTPlugin
 Bundle-Vendor: pdt
 Bundle-Localization: plugin
@@ -44,5 +45,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.team.core,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
- org.eclipse.ui.views
+ org.eclipse.ui.views,
+ org.eclipse.ui.console,
+ org.eclipse.core.filesystem
 Eclipse-LazyStart: true

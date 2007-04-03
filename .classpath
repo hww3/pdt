@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="jdom.jar"/>
 	<classpathentry kind="lib" path="JFlex.jar"/>
+	<classpathentry kind="lib" path="xmlrpc-client-1.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

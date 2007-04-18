@@ -14,7 +14,7 @@ int main(int argc, array(string) argv)
 
     write("PDT Validator starting on port " + my_port + "\n");
 
-   port = Protocols.HTTP.Server.Port(handle_request, my_port); 
+   Thread.Thread(Protocols.HTTP.Server.Port, handle_request, my_port)->wait(); 
    return -1; 
 }
 
@@ -81,15 +81,18 @@ mixed validate(string code, string fn)
 {
 	.error_handler e = .error_handler();
 	master()->set_inhibit_compile_errors(e);
-	mixed errors = catch {
+	mixed err = catch {
 	program p = compile_string(code, fn);
 	};
 	
 	master()->set_inhibit_compile_errors(0);
-	if(errors)
+
+	array errors = e->get();
+	array warnings = e->get_warnings();
+
+	if(sizeof(errors + warnings))
 	{
-		// werror("%O\n", e->get());
-	  return e->get();
+		return errors + warnings;
 	}
 }
 

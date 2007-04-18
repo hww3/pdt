@@ -23,6 +23,7 @@ import org.gotpike.pdt.preferences.SourceFormatterPreferences;
 import org.gotpike.pdt.preferences.TaskTagPreferences;
 import org.gotpike.pdt.util.PikeColorProvider;
 import org.gotpike.pdt.util.PikeExecutor;
+import org.gotpike.pdt.util.PikeValidator;
 import org.osgi.framework.BundleContext;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -63,6 +64,8 @@ public class PDTPlugin extends AbstractUIPlugin {
 	private PikeColorProvider colorProvider = new PikeColorProvider();
 	private boolean requirePikeCheckPassed;
 	private boolean requirePikeErrorDisplayed;
+
+	private PikeValidator validator;
 
 	/**
 	 * The constructor.
@@ -126,6 +129,8 @@ public class PDTPlugin extends AbstractUIPlugin {
 	public static IWorkspace getWorkspace() {
 		return ResourcesPlugin.getWorkspace();
 	}
+	
+
 
 
 	public static IWorkbenchWindow getWorkbenchWindow() {
@@ -193,6 +198,13 @@ public class PDTPlugin extends AbstractUIPlugin {
         return getColor(
             PreferenceConverter.getColor(getPreferenceStore(), preferenceKey)
             );
+    }
+    
+    public PikeValidator getValidator()
+    {
+    	if(validator == null)
+    		validator = new PikeValidator();
+    	return validator;
     }
     
 	/**

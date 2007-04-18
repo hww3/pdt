@@ -1,39 +1,79 @@
 package org.gotpike.pdt.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 
+import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.model.SourceFile;
+
 
 import redstone.xmlrpc.XmlRpcArray;
 import redstone.xmlrpc.XmlRpcClient;
 import redstone.xmlrpc.XmlRpcException;
 import redstone.xmlrpc.XmlRpcFault;
 
-public class PikeValidator {
+public class PikeValidator implements Runnable {
 
-	SourceFile sf;
-	String fn;
 	XmlRpcClient x;
+	Process p;
+	StringBuffer output = new StringBuffer();
+	private String code;
+	private SourceFile sf;
+	private String fn;
 	
-	public PikeValidator(SourceFile sf, String fn)
+	public PikeValidator()
 	{
-		this.sf = sf;
-		this.fn = fn;
+		String command = PDTPlugin.getDefault().getPreferenceStore().getString(PDTPlugin.PIKE_EXECUTABLE_PREFERENCE);
+		try {
+			File f = new File(command);
+			command = f.getAbsolutePath();
+			System.out.println(command);
+			p = Runtime.getRuntime().exec(command + " /Users/hww3/Documents/workspace/PDT/validator.pike");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	        ProcessOutputHandler handler = new ProcessOutputHandler(p) {
+	            public void handleOutput(byte[] buf, int count) {
+	                output.append(new String(buf, 0, count));
+	            }
+	        };
 	}
 	
-	public void validate(String code) throws MalformedURLException, XmlRpcException, XmlRpcFault
+	public synchronized void validate(String code, SourceFile sf, String fn) throws MalformedURLException, XmlRpcException, XmlRpcFault
+	{
+		this.code = code;
+		this.sf = sf;
+		this.fn = fn;
+		
+  		  Thread t = new Thread(this);
+		  t.start();
+	}
+	
+	public synchronized void run()
 	{
 		if(x == null)
-  		  x = new XmlRpcClient("http://localhost:8908", true);
+			try {
+				x = new XmlRpcClient("http://localhost:8908", true);
+			} catch (MalformedURLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		
 		ArrayList<String> arglist = new ArrayList<String>();
 		
 		arglist.add(code);
 		arglist.add(fn);
 		
-		Object result = x.invoke("validate", arglist);
-		//System.out.println("result: " + result.toString());
+		Object result = null;
+		try {
+			result = x.invoke("validate", arglist);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
 		
 		if(result instanceof XmlRpcArray)
 		{
@@ -42,7 +82,7 @@ public class PikeValidator {
 			{
 				XmlRpcArray e = r.getArray(i);
 			//	System.out.println("marking error " + i + " of "  + r.size() + ": "+ e.toString());
-				sf.reportError(e.getString(2), e.getString(0), Integer.parseInt(e.getString(1)), 0, 1);
+				sf.reportError(e.getString(2), e.getString(0), Integer.parseInt(e.getString(1)), 0, 0);
 			}
 		
 		}

@@ -83,7 +83,7 @@ public class PikeMainPreferencePage
 				String dir = fileBrowser.open();
 				if (dir != null) {
 					// Surround interpreter name by ""
-					executableText.setText("\"" + dir + "\"");
+					executableText.setText( dir );
 				}
 			}
 		});

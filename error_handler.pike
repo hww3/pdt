@@ -17,8 +17,8 @@
 
   //!
   void print_warnings(string prefix) {
-   // if(warnings && strlen(warnings))
-   //   werror(prefix+"\n"+warnings);
+ if(warnings && strlen(warnings))
+   werror(prefix+"\n"+(warnings*"\n"));
   }
 
   //!
@@ -36,12 +36,13 @@
   //!
   void compile_error(string file, int line, string err)
   {
-    got_error(file, line, "Error: " + err);
+    got_error(file, line, "Error: " + err, 1);
   }
   
   //!
   void compile_warning(string file, int line, string err)
   {
+  	werror("got warning: %s\n", err);
     got_error(file, line, "Warning: " + err, 1);
   }
  

@@ -147,8 +147,8 @@ public class SourceFile
         	 MarkerUtil markerUtil = new MarkerUtil(original);         
              markerUtil.removeObsoleteProblemMarkers();
 			 p.parse();
-			 PikeValidator validator = new PikeValidator(this, original.getName());
-			 validator.validate(doc.get());
+			 PikeValidator validator = PDTPlugin.getDefault().getValidator();
+			 validator.validate(doc.get(), this, fn);
 		} 
         catch(RuntimeException e)
         {

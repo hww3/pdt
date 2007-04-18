@@ -30,6 +30,14 @@ public class PikeValidator implements Runnable {
 			File f = new File(command);
 			command = f.getAbsolutePath();
 			System.out.println(command);
+			
+			/*
+			 * Bundle bundle = Platform.getBundle(yourPluginId);
+   Path path = new Path("icons/sample.gif");
+   URL fileURL = FileLocator.find(bundle, path, null);
+   InputStream in = fileURL.openStream();
+			 */
+			
 			p = Runtime.getRuntime().exec(command + " /Users/hww3/Documents/workspace/PDT/validator.pike");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

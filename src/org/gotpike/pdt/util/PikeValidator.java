@@ -3,8 +3,13 @@ package org.gotpike.pdt.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.model.SourceFile;
 
@@ -22,6 +27,10 @@ public class PikeValidator implements Runnable {
 	private String code;
 	private SourceFile sf;
 	private String fn;
+	int validatorPort = 9080;
+	
+	// TODO: we need to get a better way of picking a port. Right now, we just pick a random
+	// port from a starting point and run with it.
 	
 	public PikeValidator()
 	{
@@ -38,7 +47,19 @@ public class PikeValidator implements Runnable {
    InputStream in = fileURL.openStream();
 			 */
 			
-			p = Runtime.getRuntime().exec(command + " /Users/hww3/Documents/workspace/PDT/validator.pike");
+			Random r = new Random();
+			validatorPort = validatorPort + r.nextInt(1048);
+			
+			URL baseURL =FileLocator.find(PDTPlugin.getDefault().getBundle(), new Path("/validator.pike"), null);
+			baseURL = FileLocator.toFileURL(baseURL);
+			String scriptname = baseURL.getPath();
+			System.out.println("VALIDATOR Script IS " + scriptname);
+			p = Runtime.getRuntime().exec(command + " " + scriptname + " " + validatorPort);
+			
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+			    public void run() { p.destroy(); }
+			});
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,7 +85,8 @@ public class PikeValidator implements Runnable {
 	{
 		if(x == null)
 			try {
-				x = new XmlRpcClient("http://localhost:8908", true);
+				System.out.println("http://localhost:" + validatorPort);
+				x = new XmlRpcClient("http://localhost:" + validatorPort , true);
 			} catch (MalformedURLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -77,6 +99,7 @@ public class PikeValidator implements Runnable {
 		
 		Object result = null;
 		try {
+			System.out.println("calling validate.");
 			result = x.invoke("validate", arglist);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block

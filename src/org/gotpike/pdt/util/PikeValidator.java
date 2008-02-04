@@ -61,12 +61,14 @@ public class PikeValidator implements Runnable {
 			script = f.getAbsolutePath();
 				
 			System.out.println("running " + command + " " + script);
-			p = Runtime.getRuntime().exec(command + " " + script);
+			p = Runtime.getRuntime().exec(command + " " + script + " " + validatorPort);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() { p.destroy(); }
+		});
 
 	        ProcessOutputHandler handler = new ProcessOutputHandler(p) {
 	            public void handleOutput(byte[] buf, int count) {
@@ -106,7 +108,7 @@ public class PikeValidator implements Runnable {
 			result = x.invoke("validate", arglist);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e1.getMessage();
 		} 
 		
 		if(result instanceof XmlRpcArray)

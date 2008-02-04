@@ -3,15 +3,16 @@ package org.gotpike.pdt.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.model.SourceFile;
+import org.osgi.framework.Bundle;
 
 
 import redstone.xmlrpc.XmlRpcArray;
@@ -34,39 +35,42 @@ public class PikeValidator implements Runnable {
 	
 	public PikeValidator()
 	{
+		Bundle b = Platform.getBundle(PDTPlugin.getPluginId());
+		URL u = null;
+		
+		try {
+			u = FileLocator.toFileURL(b.getEntry("/validator.pike"));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
 		String command = PDTPlugin.getDefault().getPreferenceStore().getString(PDTPlugin.PIKE_EXECUTABLE_PREFERENCE);
+		String script;
 		try {
 			File f = new File(command);
 			command = f.getAbsolutePath();
+
 			System.out.println(command);
-			
-			/*
-			 * Bundle bundle = Platform.getBundle(yourPluginId);
-   Path path = new Path("icons/sample.gif");
-   URL fileURL = FileLocator.find(bundle, path, null);
-   InputStream in = fileURL.openStream();
-			 */
-			
-			Random r = new Random();
-			validatorPort = validatorPort + r.nextInt(1048);
-			
-			URL baseURL =FileLocator.find(PDTPlugin.getDefault().getBundle(), new Path("/validator.pike"), null);
-			baseURL = FileLocator.toFileURL(baseURL);
-			String scriptname = baseURL.getPath();
-			System.out.println("VALIDATOR Script IS " + scriptname);
-			p = Runtime.getRuntime().exec(command + " " + scriptname + " " + validatorPort);
-			
-			Runtime.getRuntime().addShutdownHook(new Thread() {
-			    public void run() { p.destroy(); }
-			});
-			
+
+			try {
+				  f = new File(u.toURI());
+				} catch(URISyntaxException e) {
+				  f = new File(u.getPath());
+				}
+			script = f.getAbsolutePath();
+				
+			System.out.println("running " + command + " " + script);
+			p = Runtime.getRuntime().exec(command + " " + script);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+
 	        ProcessOutputHandler handler = new ProcessOutputHandler(p) {
 	            public void handleOutput(byte[] buf, int count) {
-	                output.append(new String(buf, 0, count));
+	                System.out.println(new String(buf, 0, count));
 	            }
 	        };
 	}
@@ -99,7 +103,6 @@ public class PikeValidator implements Runnable {
 		
 		Object result = null;
 		try {
-			System.out.println("calling validate.");
 			result = x.invoke("validate", arglist);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block

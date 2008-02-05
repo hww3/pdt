@@ -65,6 +65,7 @@ public class PikeOutlineContentProvider implements ITreeContentProvider
             x.addAll(((Class)parentElement).getMethods());
             x.addAll(((Class)parentElement).getClasses());
             x.addAll(((Class)parentElement).getConstants());
+            x.addAll(((Class)parentElement).getVariables());
             
             Object[] y = x.toArray();
             return y;

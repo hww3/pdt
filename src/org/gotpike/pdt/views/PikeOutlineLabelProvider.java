@@ -8,6 +8,7 @@ import org.gotpike.pdt.model.ISourceElement;
 import org.gotpike.pdt.model.Inherit;
 import org.gotpike.pdt.model.Method;
 import org.gotpike.pdt.model.Class;
+import org.gotpike.pdt.model.Variable;
 import org.gotpike.pdt.util.PikePluginImages;
 
 public class PikeOutlineLabelProvider extends LabelProvider
@@ -27,6 +28,10 @@ public class PikeOutlineLabelProvider extends LabelProvider
         else if (element instanceof Inherit)
         {
             return PikePluginImages.get(PikePluginImages.IMG_ICON_INHERIT);
+        }
+        else if (element instanceof Variable)
+        {
+            return PikePluginImages.get(PikePluginImages.IMG_ICON_VARIABLE);
         }
         else if (element instanceof Class)
         {

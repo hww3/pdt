@@ -5,8 +5,8 @@ Bundle-SymbolicName: org.gotpike.pdt; singleton:=true
 Bundle-Version: 1.1.0
 Bundle-ClassPath: PDT.jar,
  JFlex.jar,
- java_cup-0.10k.jar,
- xmlrpc-client-1.0.1.jar
+ xmlrpc-client-1.0.1.jar,
+ java-cup-11a.jar
 Bundle-Activator: org.gotpike.pdt.PDTPlugin
 Bundle-Vendor: pdt
 Bundle-Localization: plugin

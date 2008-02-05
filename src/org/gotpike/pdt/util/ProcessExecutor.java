@@ -95,7 +95,7 @@ public class ProcessExecutor
         throws InterruptedException, IOException
     {
         if (disposed) throw new IllegalStateException("ProcessExecutor disposed");
-        
+        System.out.println("ProcessExecutor starting " + commandLine.toString() + " - " + input);
         Process proc = null;
         
         try

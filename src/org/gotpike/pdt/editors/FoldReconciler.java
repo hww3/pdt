@@ -139,6 +139,12 @@ public class FoldReconciler
             Iterator x = cls.getMethods().iterator();
             computeFoldPositions(tuples, x,
                 initialized ? false : isFoldSubroutines());
+            x = cls.getClasses().iterator();
+            computeFoldPositions(tuples, x,
+                initialized ? false : isFoldSubroutines());
+            x = cls.getClasses().iterator();
+            while(x.hasNext())
+            	computeFoldPositions((Class)x.next(), tuples);           
         }
 
         // TODO: add new fold position computations here
@@ -146,6 +152,21 @@ public class FoldReconciler
         return tuples;
     }
 
+    private void computeFoldPositions(Class cls, Set t) throws BadLocationException
+    {
+        Class c;
+              Iterator x = cls.getMethods().iterator();
+              computeFoldPositions(t, x,
+                initialized ? false : isFoldSubroutines());
+            
+            x = cls.getClasses().iterator();
+            while(x.hasNext())
+            	computeFoldPositions((Class)x.next(), t);
+
+        // TODO: add new fold position computations here
+
+    }
+    
     /**
      * Computes fold elements for a given collection of <code>SourceElement</code>s
      *
@@ -177,8 +198,11 @@ public class FoldReconciler
              * store the position and annotation - the position is needed to create the fold, while
              * the annotation is needed to remove it
              */
-            Tuple t = new Tuple(new Position(offset, length), new ProjectionAnnotation(collapse));
-            tuples.add(t);
+            if(length > 1)
+            {
+              Tuple t = new Tuple(new Position(offset, length), new ProjectionAnnotation(collapse));
+              tuples.add(t);
+            }
         }
     }
 

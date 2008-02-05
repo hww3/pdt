@@ -2,7 +2,7 @@
 || This file is part of Pike. For copyright information see COPYRIGHT.
 || Pike is distributed under GPL, LGPL and MPL. See the file COPYING
 || for more information.
-|| $Id: pike.cup,v 1.17 2007-04-03 02:14:10 hww3 Exp $
+|| $Id: pike.cup,v 1.18 2008-02-05 01:35:14 hww3 Exp $
 */
 package org.gotpike.pdt.parser;
 
@@ -10,6 +10,7 @@ import java_cup.runtime.*;
 import org.gotpike.pdt.model.SourceFile;
 import org.gotpike.pdt.parser.Block;
 import org.gotpike.pdt.parser.InheritItem;
+import java.util.ArrayList;
 
 parser code  {: 
 
@@ -464,9 +465,10 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
           }
           parser.source.currentModifiers = 0;
       :}
-  
+/*
   | modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler_frame0
-    error 
+	error   {: System.out.println("VAR"); :} 
+*/
   | modifiers type_or_error optional_stars bad_identifier:ident
     LPAREN arguments RPAREN block_or_semi:block
     {:     
@@ -482,7 +484,7 @@ def::= modifiers type_or_error optional_stars TOK_IDENTIFIER:ident push_compiler
           }
           parser.source.currentModifiers = 0;
     :}
-  | modifiers type_or_error name_list:ident SEMICOLON {: System.out.println("var: " + ((PikeSymbol)ident).getText()); parser.source.currentModifiers = 0; :}
+  | modifiers type_or_error name_list:list SEMICOLON {: parser.source.addVariables((ArrayList)list); System.out.println("var: "); parser.source.currentModifiers = 0; :}
   | inheritance {: :}
   | _import {: :}
   | constant {: :}
@@ -735,20 +737,20 @@ opt_mapping_type::= LPAREN
 
 
 
-name_list::= new_name
-  | name_list COMMA new_name
+name_list::= new_name:name {: ArrayList l = new ArrayList(); l.add(name); RESULT = l; :}
+  | name_list:list COMMA new_name:name {: ((ArrayList)list).add(name); RESULT = list; :}
   ;
 
-new_name::= optional_stars TOK_IDENTIFIER
-  | optional_stars bad_identifier {::}
-  | optional_stars TOK_IDENTIFIER EQ
-  expr0
+new_name::= optional_stars TOK_IDENTIFIER:ident {: RESULT = ident; :}
+  | optional_stars bad_identifier:ident {: RESULT = ident; :}
+  | optional_stars TOK_IDENTIFIER:ident EQ
+  expr0 {: RESULT = ident; :}
   | optional_stars TOK_IDENTIFIER EQ error
   | optional_stars TOK_IDENTIFIER EQ TOK_LEX_EOF
   {:
     parser.yyerror("Unexpected end of file in variable definition.");
   :}
-  | optional_stars bad_identifier EQ expr0
+  | optional_stars bad_identifier:ident EQ expr0 {: RESULT = ident; :}
   ;
 
 
@@ -897,12 +899,12 @@ local_function2::= optional_stars TOK_IDENTIFIER push_compiler_frame1 func_args
   | optional_stars TOK_IDENTIFIER push_compiler_frame1 error
   ;
 
-create_arg::= modifiers type_or_error optional_stars optional_dot_dot_dot TOK_IDENTIFIER   {: parser.source.currentModifiers = 0 ; :}
+create_arg::= modifiers type_or_error optional_stars optional_dot_dot_dot TOK_IDENTIFIER:ident   {: RESULT=ident; parser.source.currentModifiers = 0 ; :}
   | modifiers type_or_error optional_stars bad_identifier   {: parser.source.currentModifiers = 0 ; :}
   ;
 
-create_arguments2::= create_arg
-  | create_arguments2 COMMA create_arg 
+create_arguments2::= create_arg:ident {: ArrayList list = new ArrayList(); list.add(ident); RESULT = list; :}
+  | create_arguments2:list COMMA create_arg:ident {: ((ArrayList)list).add(ident); RESULT = list; :}
   | create_arguments2 COLON create_arg
   {:
     parser.yyerror("Unexpected ':' in create argument list.");
@@ -910,17 +912,17 @@ create_arguments2::= create_arg
   ;
 
 create_arguments::= /* empty */ optional_comma
-  | create_arguments2 optional_comma
+  | create_arguments2:list optional_comma {: RESULT = list; :}
   ;
 
 push_compiler_frame01::= /* empty */
   ;
 
 optional_create_arguments::= /* empty */ 
-  | LPAREN push_compiler_frame01 create_arguments close_paren_or_missing
+  | LPAREN push_compiler_frame01 create_arguments:ident {: RESULT = ident; :} close_paren_or_missing
   ;
 
-failsafe_program::= LBRACE program end_block
+failsafe_program::= LBRACE program end_block:end {: RESULT = end; :}
                 | error 
                 | TOK_LEX_EOF
                 {:
@@ -929,8 +931,8 @@ failsafe_program::= LBRACE program end_block
                 ;
 
 class::= modifiers:modifiers TOK_CLASS line_number_info optional_identifier:identifier {: System.out.println("identifier:" + (identifier!=null?((PikeSymbol)identifier).value:"null")); if(identifier != null)  parser.source.addClass((PikeSymbol)identifier, parser.source.currentModifiers); else parser.source.addClass("(anonymous)"); parser.source.currentModifiers = 0 ; :}
-  optional_create_arguments failsafe_program
-  {: parser.source.endClass(); :}
+  optional_create_arguments:args {: parser.source.addVariables((ArrayList)args); :} failsafe_program:prog
+  {: parser.source.endClass((PikeSymbol)prog); :}
   ;
 
 simple_identifier::= TOK_IDENTIFIER

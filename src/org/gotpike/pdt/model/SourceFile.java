@@ -41,12 +41,12 @@ public class SourceFile
     private final ListenerList listeners = new ListenerList(1);
     private final ILog log;
     private final IDocument doc;
-    private List docs;
-    private List classes;
+    private List<AutoDocComment> docs;
+    private List<Class> classes;
     private PikeEditor editor;
     
     // used during parsing to keep track of state.
-    private Stack currentClass;
+    private Stack<Class> currentClass;
     public int currentModifiers;
     
     /**
@@ -60,9 +60,9 @@ public class SourceFile
         assert doc != null;
         this.log = log;
         this.doc = doc;
-        this.currentClass = new Stack();
-        this.classes = new ArrayList();
-        this.docs = new ArrayList();
+        this.currentClass = new Stack<Class>();
+        this.classes = new ArrayList<Class>();
+        this.docs = new ArrayList<AutoDocComment>();
         this.editor = editor;
     }
     
@@ -117,8 +117,8 @@ public class SourceFile
     public synchronized void parse()
     {
     	//System.out.println("whee!");
-       this.classes = new ArrayList();
-       this.docs = new ArrayList();
+       this.classes = new ArrayList<Class>();
+       this.docs = new ArrayList<AutoDocComment>();
        this.currentClass.clear(); 
  
         String fn = "unknown";
@@ -232,8 +232,10 @@ public class SourceFile
     currentClass.push(cls);
 }
     
-    public void endClass()
+    public void endClass(PikeSymbol lastToken)
     {
+    	Class c = currentClass.peek();
+    	c.setLastToken(lastToken);
     	currentClass.pop();
     }
     
@@ -262,6 +264,31 @@ public class SourceFile
         
         return constant;
 		
+	}
+	
+	// NOTE 
+	// we don't handle modifiers yet, or type, just name.
+	public void addVariables(ArrayList v)
+	{
+		for(int i = 0; i < v.size(); i++)
+		{
+			PikeSymbol t = (PikeSymbol)v.get(i);
+			PikeSymbol n = (PikeSymbol)v.get(i);
+			
+			Class cls = (Class)currentClass.peek();
+			cls.addVariable(t, n, 0);
+		}
+		
+	}
+	
+	// NOTE 
+	// we don't handle modifiers yet, or type, just name.
+	public void addVariable(PikeSymbol v)
+	{
+		System.out.println("addVariable: " + v.toString());
+	
+		Class cls = (Class)currentClass.peek();
+		cls.addVariable(v, v, 0);
 	}
 	
 	public void reportError(String message, String filename, int line, int column, int severity)

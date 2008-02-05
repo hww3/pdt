@@ -36,13 +36,14 @@ public class Class implements IMultilineElement
     private final int index;
     private final int blockLevel;
     private final String name;
-    private final List methods;
-    private final List inherits;
-    private final List classes;
+    private List methods;
+    private List inherits;
+    private List variables;
+    private List classes;
     private PikeSymbol lastToken;
 	private boolean top = false;
 	private int modifiers;
-    private final List constants;
+    private List constants;
     private PikeSymbol classname = null;
     
     /**
@@ -50,25 +51,21 @@ public class Class implements IMultilineElement
      */
     public Class(String name)
     {
+        this.init();
         this.index = 0;
         this.blockLevel = 0;
         this.name = name;
-        this.methods = new ArrayList();
-        this.inherits = new ArrayList();
-        this.classes = new ArrayList();
-        this.constants = new ArrayList();
+
     }
     
     public Class(PikeSymbol name)
     {
+        init();
     	this.classname = name;
         this.index = 0;
         this.blockLevel = 0;
         this.name = name.getText();
-        this.methods = new ArrayList();
-        this.inherits = new ArrayList();
-        this.classes = new ArrayList();
-        this.constants = new ArrayList();
+
     }
     
     /**
@@ -82,11 +79,18 @@ public class Class implements IMultilineElement
         this.index = index;
         this.blockLevel = blockLevel;
         this.name = name;
-        this.methods = new ArrayList();
-        this.inherits = new ArrayList();
-        this.classes = new ArrayList();
-        this.constants = new ArrayList();
+        init();
     }
+
+    private void init()
+    {
+    	this.methods = new ArrayList();
+    	this.inherits = new ArrayList();
+    	this.classes = new ArrayList();
+    	this.constants = new ArrayList();
+    	this.variables = new ArrayList();
+	}
+
     
     public Method addMethod(
     		PikeSymbol subKeyword,
@@ -113,13 +117,16 @@ public class Class implements IMultilineElement
 
     public int getEndLine()
     {
-        return lastToken.getLine()-1;
+    	if(lastToken != null) 
+          return lastToken.getLine()-1;
+    	else return 0;
     }
 
     public int getStartLine()
     {
+  //  	System.out.println("getStartLine: " + classname.getLine());
     	if(classname != null)
-    		return classname.getLine();
+    		return classname.getLine()-1;
     		
         return 0;
     }
@@ -201,10 +208,20 @@ public class Class implements IMultilineElement
 		return constant;
 	}
 
+	public Variable addVariable(PikeSymbol t, PikeSymbol n, int modifiers2) {
+		Variable v = new Variable(this, t, n, modifiers2);
+		variables.add(v);
+		return v;
+	}
+	
 	public Inherit addInherit(InheritItem in) {
 		Inherit inherit = new Inherit(this, in.ref, in.name, in.modifiers);
 		inherits.add(inherit);
 		return inherit;
+	}
+
+	public Collection getVariables() {
+       return Collections.unmodifiableList(variables);
 	}
 
 

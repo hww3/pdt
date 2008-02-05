@@ -32,7 +32,7 @@ public class PikePluginImages
     public static final String IMG_ICON_EDITOR = NAME_PREFIX
         + "epic.gif"; //$NON-NLS-1$
      public static final String IMG_ICON_VARIABLE = NAME_PREFIX
-        + "variable.gif"; //$NON-NLS-1$
+        + "field_public_obj.gif"; //$NON-NLS-1$
     public static final String IMG_ICON_CONSTRUCTOR = NAME_PREFIX
         + "constructor.gif"; //$NON-NLS-1$
     public static final String IMG_ICON_SEARCH = NAME_PREFIX

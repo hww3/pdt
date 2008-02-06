@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Pike Development Tools
 Bundle-SymbolicName: org.gotpike.pdt; singleton:=true
-Bundle-Version: 1.1.0
+Bundle-Version: 1.2.0
 Bundle-ClassPath: PDT.jar,
  java-cup-11a.jar,
  jdom.jar,

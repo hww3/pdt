@@ -48,27 +48,6 @@
       </toc>
    </extension>
    <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            category="org.gotpike.pdt"
-            class="org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard"
-            finalPerspective="org.gotpike.pdt.Perspective"
-            icon="icons/pike.png"
-            id="org.gotpike.pdt.wizards.newfile"
-            name="Pike File"/>
-      <category
-            id="org.gotpike.pdt.newproject"
-            name="Pike"/>
-      <wizard
-            category="org.gotpike.pdt.newproject"
-            class="org.gotpike.pdt.PikeProjectResourceWizard"
-            finalPerspective="org.gotpike.pdt.PikePerspective"
-            icon="icons/pike.png"
-            id="org.gotpike.pdt.newproject"
-            name="Pike Project"
-            project="true"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="org.eclipse.ui.resourcePerspective">
@@ -152,22 +131,11 @@
 </viewerContribution>      
    </extension>
    <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="org.gotpike.pdt.Perspective"
-            icon="icons/pike.png"
-            id="org.gotpike.pdt.PikePerspective"
-            name="Pike"/>
-   </extension>
-   <extension
          id="pikenature"
          name="Pike Nature"
          point="org.eclipse.core.resources.natures">
       <builder id="org.gotpike.pdt.pikebuilder"/>
-      <runtime>
-         <run class="org.gotpike.pdt.PikeProjectNature"/>
-      </runtime>
-   </extension>
+       </extension>
    <extension
          point="org.eclipse.ui.decorators">
       <decorator
@@ -226,6 +194,34 @@
             class="org.gotpike.pdt.debug.PikeLineTracker"
             id="org.gotpike.pdt.pikelinetracker"
             processType="pike"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.gotpike.pdt.Perspective"
+            icon="icons/project_folder.gif"
+            id="org.gotpike.pdt.Perspective"
+            name="Pike"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+<wizard
+ 	            category="org.gotpike.pdt"
+ 	            class="org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard"
+ 	            finalPerspective="org.gotpike.pdt.Perspective"
+ 	            icon="icons/pike.gif"
+ 	            id="org.gotpike.pdt.wizards.newfile"
+ 	            name="Pike File"/>
+      <category
+            id="org.gotpike.pdt"
+            name="Pike"/>
+      <wizard
+            category="org.gotpike.pdt"
+            class="org.gotpike.pdt.PikeProjectResourceWizard"
+            finalPerspective="org.gotpike.pdt.Perspective"
+            id="org.gotpike.pdt.wizards.newproject"
+            name="Pike Project"
+            project="true"/>
    </extension>
 
 </plugin>

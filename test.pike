@@ -8,7 +8,7 @@ main()
 			foreach(x1;;
 			string          line) {
 				string          q;
-				multiset        a = (<);
+				multiset        a = (<>);
 				multiset        b = (<>);
 				                catch(sscanf(line, "%*s\"%s\"", q));
 				if              (q)

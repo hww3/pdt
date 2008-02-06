@@ -23,7 +23,7 @@ import org.eclipse.ui.dialogs.ContainerSelectionDialog;
 /**
  * The "New" wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
- * OR with the extension that matches the expected one (mpe).
+ * OR with the extension that matches the expected one (pike).
  */
 
 public class SampleNewWizardPage extends WizardPage {
@@ -41,7 +41,7 @@ public class SampleNewWizardPage extends WizardPage {
 	public SampleNewWizardPage(ISelection selection) {
 		super("wizardPage");
 		setTitle("Multi-page Editor File");
-		setDescription("This wizard creates a new file with *.mpe extension that can be opened by a multi-page editor.");
+		setDescription("This wizard creates a new file with *.pike extension that can be opened by a multi-page editor.");
 		this.selection = selection;
 	}
 
@@ -162,8 +162,8 @@ public class SampleNewWizardPage extends WizardPage {
 		int dotLoc = fileName.lastIndexOf('.');
 		if (dotLoc != -1) {
 			String ext = fileName.substring(dotLoc + 1);
-			if (ext.equalsIgnoreCase("mpe") == false) {
-				updateStatus("File extension must be \"mpe\"");
+			if (ext.equalsIgnoreCase("pike") == false) {
+				updateStatus("File extension must be \"pike\"");
 				return;
 			}
 		}

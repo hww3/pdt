@@ -45,12 +45,20 @@ public abstract class AbstractTextAction extends AbstractAction
     protected TextUtil textUtil;
     private boolean isUsedOnSave;
 
-    public AbstractTextAction() {
-        super();
-        init();
+
+    public AbstractTextAction(PikeEditor e) {
+		// TODO Auto-generated constructor stub
+    	super(e);
+    	init();
+	}
+    
+    public AbstractTextAction()
+    {
+    	super();
+    	init();
     }
 
-    protected final void init() {
+	protected final void init() {
          textUtil = TextUtil.getDefaultTextUtilities();
     }
 
@@ -67,8 +75,18 @@ public abstract class AbstractTextAction extends AbstractAction
     /**
      * @see IActionDelegate#run(IAction)
      */
-    public final void run(IAction action) {
-        super.run(action);
+    public void run(IAction action) {
+      run(action.getId());	
+    }
+ 
+    public void run() {
+    	 run(this.getActionDefinitionId());
+    }
+    
+    public void run(String actionId)
+    {
+    	
+        super.run();
         if(getEditor() == null){
             return;
         }
@@ -103,7 +121,7 @@ public abstract class AbstractTextAction extends AbstractAction
         }
 
         try {
-            doTextOperation(doc, action.getId(), result);
+            doTextOperation(doc, actionId, result);
         } catch (Exception ex) {
             PDTPlugin.errorDialog(null, ex);
             return;

@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPart;
 
 
 import org.gotpike.pdt.editors.PikeEditor;
@@ -42,7 +43,7 @@ public abstract class ClearMarkerAction extends PikeEditorAction
     private void scheduleJob(final String markerType)
     {
         Job job =
-            new Job("Clear EPIC Marker(s)")
+            new Job("Clear PDT Marker(s)")
         {
             protected IStatus run(IProgressMonitor monitor)
             {
@@ -78,6 +79,16 @@ public abstract class ClearMarkerAction extends PikeEditorAction
         {
             return PikeEditorActionIds.CLEAR_ALL_MARKERS;
         }
+
+		public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void run(IAction action) {
+			// TODO Auto-generated method stub
+			
+		}
     }
 
     /**
@@ -98,6 +109,16 @@ public abstract class ClearMarkerAction extends PikeEditorAction
         {
             return PikeEditorActionIds.CLEAR_CRITIC_MARKERS;
         }
+
+		public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void run(IAction action) {
+			// TODO Auto-generated method stub
+			
+		}
     }
 
     /**
@@ -118,5 +139,15 @@ public abstract class ClearMarkerAction extends PikeEditorAction
         {
             return PikeEditorActionIds.CLEAR_POD_MARKERS;
         }
+
+		public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		public void run(IAction action) {
+			// TODO Auto-generated method stub
+			
+		}
     }
 }

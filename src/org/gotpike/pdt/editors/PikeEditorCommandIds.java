@@ -43,9 +43,6 @@ public class PikeEditorCommandIds
     /** org.gotpike.pdt.commands.validateSyntax */
     public static final String VALIDATE_SYNTAX = "org.gotpike.pdt.commands.validateSyntax";
 
-    /** org.gotpike.pdt.commands.toggleComment */
-    public static final String TOGGLE_COMMENT = "org.gotpike.pdt.commands.toggleComment";
-
     /** org.gotpike.pdt.commands.openDeclaration */
     public static final String OPEN_DECLARATION = "org.gotpike.pdt.commands.openDeclaration";
 
@@ -62,6 +59,8 @@ public class PikeEditorCommandIds
     /** org.gotpike.pdt.commands.extractSubroutine */
     public static final String EXTRACT_SUBROUTINE =
         "org.gotpike.pdt.commands.extractSubroutine";
+
+	public static final String TOGGLE_COMMENTS = "org.gotpike.pdt.commands.toggleComments";
 
     //~ Constructors
 

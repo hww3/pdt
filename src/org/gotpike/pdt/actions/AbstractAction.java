@@ -9,10 +9,12 @@
 package org.gotpike.pdt.actions;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.gotpike.pdt.editors.PikeEditor;
@@ -23,23 +25,33 @@ import org.gotpike.pdt.util.EclipseUtils;
  * @author Andrei
  * TODO Documentation
  */
-public abstract class AbstractAction implements IActionDelegate, IWorkbenchWindowActionDelegate {
+public abstract class AbstractAction extends Action implements IAction, IObjectActionDelegate {
 
     protected AbstractEditor editor;
     private IFile file;
     private IWorkbenchWindow window;
+    /**
+     * @return a constant from PikeEditorActionIds which identifies this action
+     */
+    protected abstract String getPikeEditorActionId();
 
-    public AbstractAction() {
-        super();
+    protected AbstractAction(PikeEditor editor)
+    {
+        assert editor != null;
+        this.editor = new AbstractEditor(editor);
+
+        setId(getPikeEditorActionId());
     }
 
+    public AbstractAction()
+    {
+        setId(getPikeEditorActionId());    	
+    }
+    
     /* (non-Javadoc)
      * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
      */
-    public void run(IAction action) {
-        if(action == null){
-            return;
-        }
+    public void run() {
 //        isCommand = id.endsWith(IAnyEditConstants.COMMAND_ACTION_FLAG);
         setEditor(new AbstractEditor( EclipseUtils.getActiveEditor() ) );
     }

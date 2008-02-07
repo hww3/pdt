@@ -4,10 +4,9 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPart;
 import org.gotpike.pdt.editors.PikeEditor;
 import org.gotpike.pdt.editors.PikeEditorActionIds;
-
-
 
 
 public class Jump2BracketAction extends PikeEditorAction
@@ -17,7 +16,6 @@ public class Jump2BracketAction extends PikeEditorAction
     public Jump2BracketAction(PikeEditor editor)
     {
         super(editor);
-    	System.out.println("Jump2BracketAction(" + getPikeEditorActionId() + ")");
     	this.setActionDefinitionId(getPikeEditorActionId());
     }
 
@@ -25,7 +23,6 @@ public class Jump2BracketAction extends PikeEditorAction
 
     protected void doRun()
     {
-        System.out.println("Jump2BracketAction.doRun()");
     	getEditor().jumpToMatchingBracket();
     }
 
@@ -33,5 +30,20 @@ public class Jump2BracketAction extends PikeEditorAction
     {
         return PikeEditorActionIds.MATCHING_BRACKET;
     }
+
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void run(IAction action) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void selectionChanged(IAction action, ISelection selection) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

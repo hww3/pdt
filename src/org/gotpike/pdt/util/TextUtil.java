@@ -1060,8 +1060,6 @@ public class TextUtil {
             return "&Uacute;";
         case 'û':
             return "&ucirc;";
-        case 'Û':
-            return "&Ucirc;";
         case 'ü':
             return "&uuml;";
         case 'Ü':

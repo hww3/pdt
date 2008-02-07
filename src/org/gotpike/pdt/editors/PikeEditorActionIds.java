@@ -40,9 +40,6 @@ public class PikeEditorActionIds
     /** org.gotpike.pdt.actions.ValidateSyntaxAction */
     public static final String VALIDATE_SYNTAX = "org.gotpike.pdt.actions.ValidateSyntaxAction";
 
-    /** org.gotpike.pdt.actions.ToggleCommentAction */
-    public static final String TOGGLE_COMMENT = "org.gotpike.pdt.actions.ToggleCommentAction";
-
     /** org.gotpike.pdt.actions.OpenDeclarationAction */
     public static final String OPEN_DECLARATION =
         "org.gotpike.pdt.actions.OpenDeclarationAction";
@@ -51,7 +48,7 @@ public class PikeEditorActionIds
     public static final String PERL_DOC = "org.gotpike.pdt.actions.PerlDocAction";
 
     /** org.gotpike.pdt.actions.Jump2BracketAction */
-    public static final String MATCHING_BRACKET = "org.gotpike.pdt.actions.Jump2BracketAction";
+    public static final String MATCHING_BRACKET = "org.gotpike.pdt.popup.action.editor.Jump2BracketActionmentAction";
 
     /** org.gotpike.pdt.actions.ToggleMarkOccurrencesAction */
     public static final String TOGGLE_MARK_OCCURRENCES =
@@ -60,6 +57,8 @@ public class PikeEditorActionIds
     /** org.gotpike.pdt.commands.extractSubroutine */
     public static final String EXTRACT_SUBROUTINE =
         "org.gotpike.pdt.actions.ExtractSubroutineAction";
+
+	public static final String TOGGLE_COMMENTS = "org.gotpike.pdt.actions.toggleComments";
 
     //~ Constructors
 
@@ -100,7 +99,7 @@ public class PikeEditorActionIds
                 MATCHING_BRACKET,
                 OPEN_DECLARATION,
                 PERL_DOC,
-                TOGGLE_COMMENT,
+                TOGGLE_COMMENTS,
                 VALIDATE_SYNTAX
             };
     }

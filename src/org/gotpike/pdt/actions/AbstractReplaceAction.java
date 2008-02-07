@@ -16,6 +16,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.gotpike.pdt.editors.PikeEditor;
 import org.gotpike.pdt.util.LineReplaceResult;
 import org.gotpike.pdt.util.TextReplaceResultSet;
 
@@ -24,7 +25,16 @@ public abstract class AbstractReplaceAction extends AbstractTextAction {
     /** contains possible error information during replace */
     protected boolean shouldStopReplace;
 
-    protected TextReplaceResultSet estimateActionRange(IDocument doc){
+    public AbstractReplaceAction(PikeEditor e) {
+    	super(e);
+    }
+
+    public AbstractReplaceAction()
+    {
+    	super();
+    }
+    
+	protected TextReplaceResultSet estimateActionRange(IDocument doc){
         TextReplaceResultSet result = new TextReplaceResultSet();
         if (doc == null || getEditor().getSelectionProvider() == null) {
             return result;

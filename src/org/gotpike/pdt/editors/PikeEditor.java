@@ -28,6 +28,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.actions.ClearMarkerAction;
 import org.gotpike.pdt.actions.Jump2BracketAction;
+import org.gotpike.pdt.actions.ToggleCommentsAction;
 import org.gotpike.pdt.model.ISourceElement;
 import org.gotpike.pdt.model.SourceFile;
 import org.gotpike.pdt.preferences.MarkOccurrencesPreferences;
@@ -526,16 +527,19 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
             PikeEditorActionIds.CONTENT_ASSIST);
 */
         // each marker clearing action gets its own wiring
-        wireAction(new ClearMarkerAction.Critic(this), PikeEditorCommandIds.CLEAR_MARKER,
+        /*wireAction(new ClearMarkerAction.Critic(this), PikeEditorCommandIds.CLEAR_MARKER,
             PikeEditorActionIds.CLEAR_CRITIC_MARKERS);
         wireAction(new ClearMarkerAction.PodChecker(this), PikeEditorCommandIds.CLEAR_MARKER,
             PikeEditorActionIds.CLEAR_POD_MARKERS);
         wireAction(new ClearMarkerAction.AllMarkers(this), PikeEditorCommandIds.CLEAR_MARKER,
             PikeEditorActionIds.CLEAR_ALL_MARKERS);
-        
+        */
         wireAction(new Jump2BracketAction(this), PikeEditorCommandIds.MATCHING_BRACKET,
                 PikeEditorActionIds.MATCHING_BRACKET);
-/*
+        wireAction(new ToggleCommentsAction(this), PikeEditorCommandIds.TOGGLE_COMMENTS,
+                PikeEditorActionIds.TOGGLE_COMMENTS);
+
+        /*
         wireAction(new PodCheckerAction(this), PikeEditorCommandIds.POD_CHECKER,
             PikeEditorActionIds.POD_CHECKER);
         wireAction(new ToggleCommentAction(this), PikeEditorCommandIds.TOGGLE_COMMENT,

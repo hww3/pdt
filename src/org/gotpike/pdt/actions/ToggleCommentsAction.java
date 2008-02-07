@@ -1,12 +1,17 @@
-package org.gotpike.pdt.popup.actions;
+package org.gotpike.pdt.actions;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.swt.events.HelpListener;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
@@ -15,8 +20,9 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.gotpike.pdt.actions.AbstractReplaceAction;
 import org.gotpike.pdt.editors.PikeEditor;
+import org.gotpike.pdt.editors.PikeEditorActionIds;
 
-public class CommentAction extends AbstractReplaceAction {
+public class ToggleCommentsAction extends AbstractReplaceAction {
 
 	 private IEditorPart editorPart;
 	 private IViewPart viewPart = null;
@@ -24,10 +30,8 @@ public class CommentAction extends AbstractReplaceAction {
 	/**
 	 * Constructor for Action1.
 	 */
-	public CommentAction() {
-		super();
-		System.out.println("CommentAction()");
-
+	public ToggleCommentsAction(PikeEditor e) {
+		super(e);
 	}
 
 	/**
@@ -38,49 +42,6 @@ public class CommentAction extends AbstractReplaceAction {
 		editorPart = targetPart;
 	
 	}
-	/**
-	 * @see IActionDelegate#run(IAction)
-	 */
-	/*
-	public void run(IAction action) {
-		PikeEditor editor = (PikeEditor)editorPart;
-		String text = null;
-		ITextSelection ts;
-		
-		ISelection selection = editor.getSelectionProvider().getSelection();
-		if (selection instanceof ITextSelection) {
-			ts  = (ITextSelection) selection;
-			text = ts.getText();
-		//	System.out.println(text);
-		}
-
-		if(text != null)
-		{
-			boolean adding = true;
-			StringBuffer buf = new StringBuffer();
-			String[] x = text.split("\n");
-			for(int i = 0; i < x.length; i++)
-			{
-				if(i == 0)
-				{
-					if(x[i].indexOf("//")==0)
-						adding = false;
-				}
-				if(adding)
-  				  buf.append("// " + x[i]);
-			}
-		
-
-
-		}
-		
-		Shell shell = new Shell();
-		MessageDialog.openInformation(
-			shell,
-			"Pike Development Tools",
-			"New Action was executed.");
-	}
-*/
 	
 	/**
 	 * @see IActionDelegate#selectionChanged(IAction, ISelection)
@@ -125,4 +86,13 @@ public class CommentAction extends AbstractReplaceAction {
 		}
 	}
 
+	protected String getPikeEditorActionId() {
+		// TODO Auto-generated method stub
+		return PikeEditorActionIds.TOGGLE_COMMENTS;
+	}
+
+	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+		// TODO Auto-generated method stub
+		
+	}	
 }

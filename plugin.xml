@@ -122,10 +122,11 @@
                   path="Source"
                   id="PDT.editor.menu.Source"/> 
    <action
-         id="org.gotpike.pdt.popup.action.editor.CommentAction" 
+         class="org.gotpike.pdt.popup.actions.CommentAction"
+         definitionId="org.gotpike.pdt.commands.toggleComments"
+         id="org.gotpike.pdt.popup.action.editor.CommentAction"
          label="Toggle Comments"
-         menubarPath="PDT.editor.menu.Source/group1" 
-         class="org.gotpike.pdt.popup.actions.CommentAction"> 
+         menubarPath="PDT.editor.menu.Source/group1"> 
       </action>
    <action
          class="org.gotpike.pdt.popup.actions.Jump2BracketAction"
@@ -176,6 +177,11 @@
             description="Matching Bracket"
             id="org.gotpike.pdt.commands.jump2Bracket"
             name="Matching Bracket"/>
+      <command
+            categoryId="org.gotpike.pdt.popup.actions.CommentAction"
+            description="Toggle Comments"
+            id="org.gotpike.pdt.commands.toggleComments"
+            name="Toggle Comments"/>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
@@ -184,6 +190,11 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             commandId="org.gotpike.pdt.commands.jump2Bracket"
             contextId="org.gotpike.pdt.pikeEditorScope" />
+         <key
+               commandId="org.gotpike.pdt.commands.toggleComments"
+               contextId="org.gotpike.pdt.pikeEditorScope"
+               schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+               sequence="M1+/"/>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">

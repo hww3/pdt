@@ -7,9 +7,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.team.core.IFileTypeInfo;
 import org.eclipse.team.core.Team;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -132,6 +134,49 @@ public class PDTPlugin extends AbstractUIPlugin {
 		
 	}
 	
+    /**
+     * Returns the workspace instance.
+     */
+    public static Shell getShell() {
+        return getDefault().getWorkbench().getActiveWorkbenchWindow().getShell();
+    }
+	
+    public static void errorDialog(String message, Throwable error) {
+        Shell shell = getShell();
+        if (message == null) {
+            message = "An Error Has Occurred.";
+        }
+        message = message + " " + error.getMessage();
+
+        getDefault().getLog().log(
+                new Status(IStatus.ERROR, getPluginId(), IStatus.OK, message, error));
+
+        MessageDialog.openError(shell, "An error has occurred.", message);
+    }
+
+    /**
+     * @param error
+     */
+    public static void logError(String message, Throwable error) {
+        if (message == null) {
+            message = error.getMessage();
+            if (message == null) {
+                message = error.toString();
+            }
+        }
+        getDefault().getLog().log(
+                new Status(IStatus.ERROR, getPluginId(), IStatus.OK, message, error));
+    }
+
+    public static void logInfo(String message) {
+        getDefault().getLog().log(
+                new Status(IStatus.INFO, getPluginId(), IStatus.OK, message, null));
+    }
+
+    public static void errorDialog(String message) {
+        Shell shell = getShell();
+        MessageDialog.openError(shell, "An Error Has Occurred", message);
+    }
 
 
 	public static IWorkbenchWindow getWorkbenchWindow() {

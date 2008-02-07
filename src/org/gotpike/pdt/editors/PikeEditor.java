@@ -1,5 +1,6 @@
 package org.gotpike.pdt.editors;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.*;
 import org.eclipse.jface.action.*;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.*;
 import org.eclipse.ui.editors.text.ILocationProvider;
+import org.eclipse.ui.editors.text.IStorageDocumentProvider;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.internal.ViewerActionBuilder;
 import org.eclipse.ui.internal.Workbench;
@@ -80,6 +82,68 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         setKeyBindingScopes(new String[] { "org.gotpike.pdt.pikeEditorScope" });
     }
 
+    public IDocument getDocument() {
+        IDocumentProvider provider = getDocumentProvider();
+        if (provider != null) {
+            return provider.getDocument(getEditorInput());
+        }
+        return null;
+    }
+
+    /**
+     * Sets the sequential rewrite mode of the viewer's document.
+     */
+    public void stopSequentialRewriteMode(DocumentRewriteSession session) {
+        IDocument document = getDocument();
+        if (document instanceof IDocumentExtension4) {
+            IDocumentExtension4 extension= (IDocumentExtension4) document;
+            extension.stopRewriteSession(session);
+        } else if (document instanceof IDocumentExtension) {
+            IDocumentExtension extension= (IDocumentExtension)document;
+            extension.stopSequentialRewrite();
+        }
+
+        Object adapter = getAdapter(IRewriteTarget.class);
+        if (adapter instanceof IRewriteTarget) {
+            IRewriteTarget target = (IRewriteTarget) adapter;
+            target.endCompoundChange();
+            target.setRedraw(true);
+        }
+    }
+
+    /**
+     * Starts  the sequential rewrite mode of the viewer's document.
+     * @param normalized <code>true</code> if the rewrite is performed
+     * from the start to the end of the document
+     */
+    public DocumentRewriteSession startSequentialRewriteMode(boolean normalized) {
+        DocumentRewriteSession rewriteSession = null;
+        // de/activate listeners etc, prepare multiple replace
+        Object adapter = getAdapter(IRewriteTarget.class);
+        if (adapter instanceof IRewriteTarget) {
+            IRewriteTarget target = (IRewriteTarget) adapter;
+            target.setRedraw(false);
+            target.beginCompoundChange();
+        }
+
+        IDocument document = getDocument();
+        if (document instanceof IDocumentExtension4) {
+            IDocumentExtension4 extension= (IDocumentExtension4) document;
+            if (normalized) {
+                rewriteSession = extension
+                        .startRewriteSession(DocumentRewriteSessionType.STRICTLY_SEQUENTIAL);
+            } else {
+                rewriteSession = extension
+                        .startRewriteSession(DocumentRewriteSessionType.SEQUENTIAL);
+            }
+        } else if (document instanceof IDocumentExtension) {
+            IDocumentExtension extension = (IDocumentExtension) document;
+            extension.startSequentialRewrite(normalized);
+        }
+        return rewriteSession;
+    }
+
+    
     public void createPartControl(Composite parent)
     {
         // Workaround for Eclipse Bug 75440 (to fix it somehow) [LeO]
@@ -810,6 +874,35 @@ public class PikeEditor extends TextEditor implements IPropertyChangeListener
         setAction(pikeActionId, action);
     }
 
+    /**
+     * @return may return null
+     */
+    public IFile getFile(){
+        IEditorInput input = getEditorInput();
+        if(input == null){
+            return null;
+        }
+        Object adapter = input.getAdapter(IFile.class);
+        if(adapter instanceof IFile){
+            return (IFile) adapter;
+        }
+        adapter = getAdapter(IFile.class);
+        if(adapter instanceof IFile){
+            return (IFile) adapter;
+        }
+        return null;
+    }
+
+    public String computeEncoding() {
+        IDocumentProvider provider = getDocumentProvider();
+        if(provider instanceof IStorageDocumentProvider) {
+            IStorageDocumentProvider docProvider = (IStorageDocumentProvider) provider;
+            String encoding = docProvider.getEncoding(getEditorInput());
+            return encoding;
+        }
+        return null;
+    }
+    
     /**
      * Contains methods that provide access to internal workings of PerlEditor
      * intended to be available only to white-box test cases. Other clients

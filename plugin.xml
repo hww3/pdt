@@ -123,11 +123,16 @@
                   id="PDT.editor.menu.Source"/> 
    <action
          id="org.gotpike.pdt.popup.action.editor.CommentAction" 
-         label="Editor Action 1"
-         icon="icons/sample.gif"
+         label="Toggle Comments"
          menubarPath="PDT.editor.menu.Source/group1" 
          class="org.gotpike.pdt.popup.actions.CommentAction"> 
-      </action> 
+      </action>
+   <action
+         class="org.gotpike.pdt.popup.actions.Jump2BracketAction"
+         definitionId="org.gotpike.pdt.commands.jump2Bracket"
+         id="org.gotpike.pdt.commands.jump2Bracket"
+         label="Jump to Matching Bracket"
+         menubarPath="PDT.editor.menu.Source/group1"/> 
 </viewerContribution>      
    </extension>
    <extension
@@ -167,7 +172,7 @@
             id="org.gotpike.pdt.commands.source"
             name="Pike Source"/>
       <command
-            categoryId="org.eclipse.ui.category.navigate"
+            categoryId="org.gotpike.pdt.actions.Jump2BracketAction"
             description="Matching Bracket"
             id="org.gotpike.pdt.commands.jump2Bracket"
             name="Matching Bracket"/>

@@ -486,6 +486,10 @@ public class PreferenceConstants {
 
     public static final String SOURCE_CRITIC_SEVERITY_LEVEL = "sourceCriticLevel";
 
+	public static final String INCLUDE_DERIVED_RESOURCES = null;
+
+	public static final String PREF_ACTIVE_FILTERS_LIST = null;
+
 
 	/**
 		 * Initializes the given preference store with the default values.

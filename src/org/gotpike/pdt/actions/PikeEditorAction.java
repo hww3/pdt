@@ -5,6 +5,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
+import org.eclipse.ui.IEditorActionDelegate;
 
 import org.gotpike.pdt.PDTPlugin;
 import org.gotpike.pdt.editors.PikeEditor;

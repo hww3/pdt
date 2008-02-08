@@ -26,8 +26,8 @@ import java.util.Set;
 
 /**
  *Responsible for keeping folds in sync with a source file's text within a PerlEditor. This class
- *relies on {@link org.epic.core.model.SourceFile} to obtain positions of foldable
- *{@link org.epic.core.model.SourceElement}s.
+ *relies on {@link org.gotpike.pdt.model.SourceFile} to obtain positions of foldable
+ *{@link org.gotpike.pdt.model.SourceElement}s.
  *
  *@author jploski
  */

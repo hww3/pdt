@@ -20,7 +20,7 @@ public class PikePluginImages
 {
     public static final IPath ICONS_PATH = new Path("$nl$/icons"); //$NON-NLS-1$
 
-    private static final String NAME_PREFIX = "org.epic.perleditor."; //$NON-NLS-1$
+    private static final String NAME_PREFIX = "org.gotpike.pdt.pikeeditor."; //$NON-NLS-1$
     private static final int NAME_PREFIX_LENGTH = NAME_PREFIX.length();
 
     private static ImageRegistry fgImageRegistry = null;
@@ -30,7 +30,7 @@ public class PikePluginImages
      * Available cached Images in the Perl plug-in image registry.
      */
     public static final String IMG_ICON_EDITOR = NAME_PREFIX
-        + "epic.gif"; //$NON-NLS-1$
+        + "pike.gif"; //$NON-NLS-1$
      public static final String IMG_ICON_VARIABLE = NAME_PREFIX
         + "field_public_obj.gif"; //$NON-NLS-1$
     public static final String IMG_ICON_CONSTRUCTOR = NAME_PREFIX

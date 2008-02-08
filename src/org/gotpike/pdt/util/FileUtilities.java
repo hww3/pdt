@@ -25,7 +25,7 @@ public class FileUtilities
 
             // not found, let's create a link to its parent folder
             // and search again
-            createFolderLink(fPath, getEpicLinksProject(root));
+            createFolderLink(fPath, getPDTLinksProject(root));
     
     		files = root.findFilesForLocation(fPath);    
             if (files.length > 0) return new FileEditorInput(files[0]); // found
@@ -35,7 +35,7 @@ public class FileUtilities
                 IStatus.ERROR,
                 PDTPlugin.getPluginId(),
                 IStatus.OK,
-                fPath.toOSString() + " could not be found through epic-links", 
+                fPath.toOSString() + " could not be found through pdt-links", 
                 null));
         }
         catch (CoreException e)
@@ -52,7 +52,7 @@ public class FileUtilities
                         IStatus.ERROR,
                         PDTPlugin.getPluginId(),
                         IStatus.OK,
-                        "EPIC cannot access files located in folders on the path " +
+                        "PDT cannot access files located in folders on the path " +
                         "to the workspace folder, nor within the workspace folder itself.",
                         null)
                     };
@@ -94,10 +94,10 @@ public class FileUtilities
 			null);
     }
 
-    private static IProject getEpicLinksProject(IWorkspaceRoot root)
+    private static IProject getPDTLinksProject(IWorkspaceRoot root)
         throws CoreException
     {
-        IProject prj = root.getProject("epic_links");
+        IProject prj = root.getProject("pdt_links");
 
 		if (!prj.exists())
 		{
@@ -105,7 +105,7 @@ public class FileUtilities
             prj.open(null);
             IProjectDescription description = prj.getDescription();
             String[] natures = new String[1];
-            natures[0] = "org.epic.perleditor.perlinkexternalfilesnature";
+            natures[0] = "org.pdt.pikeeditor.pikeinkexternalfilesnature";
             description.setNatureIds(natures);					      
             prj.setDescription(description, null);
 		}

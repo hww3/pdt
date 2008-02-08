@@ -31,7 +31,7 @@ import org.gotpike.pdt.util.StatusFactory;
 
 /**
  * A parsed Pike source file. This class provides access to 
- * {@link org.epic.core.model.ISourceElement}s recognised in a Pike
+ * {@link org.gotpike.pdt.model.ISourceElement}s recognised in a Pike
  * source file.
  * 
  * @author jploski

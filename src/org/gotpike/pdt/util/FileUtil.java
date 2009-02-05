@@ -8,7 +8,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Iterator;
 
 import org.eclipse.core.filebuffers.FileBuffers;
 import org.eclipse.core.filebuffers.ITextFileBuffer;
@@ -18,6 +17,7 @@ import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -27,25 +27,21 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
-import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.editors.text.EditorsUI;
-import org.eclipse.ui.internal.editors.text.JavaFileEditorInput;
-import org.eclipse.ui.internal.editors.text.NonExistingFileEditorInput;
+import org.eclipse.ui.ide.FileStoreEditorInput;
+
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -171,24 +167,26 @@ public class FileUtil
     {
         IEditorPart editorPart = null;
         IWorkbenchWindow window = PDTPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
-        IPath stateLocation = PDTPlugin.getDefault().getStateLocation();
-        IPath path = stateLocation.append("/_" + new Object().hashCode());
-        IFileStore fileStore = EFS.getLocalFileSystem().getStore(path);
-        IEditorInput input = new NonExistingFileEditorInput(fileStore, "Untitled Sunshade File");
         String editorId = EditorsUI.DEFAULT_TEXT_EDITOR_ID;
         IWorkbenchPage page = window.getActivePage();
         try
         {
+        	IStorage storage = new StringStorage(contents);
+        	IStorageEditorInput input = new StringInput(storage);
+        	
+        	if(page != null)
+        		
             editorPart = page.openEditor(input, editorId);
             
             // Mark the document not-dirty so that it can be closed without a
             // prompt
+        	/*
             ITextFileBufferManager manager = FileBuffers.getTextFileBufferManager();
             manager.connect(path, null);
             ITextFileBuffer fileBuffer = manager.getTextFileBuffer(path);
             fileBuffer.getDocument().set(contents);
             fileBuffer.setDirty(false);
-            
+            */
             window.getShell().forceActive();
         }
         catch (Exception e)
@@ -326,7 +324,7 @@ public class FileUtil
             if (file.exists())
             {
                 IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(file.getPath()));
-                result = new JavaFileEditorInput(fileStore);
+                result = new FileStoreEditorInput(fileStore);
             }
         }
         return result;

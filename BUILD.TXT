@@ -1,0 +1,5 @@
+To rebuild the pike parser after editing src/pike.cup, run the following
+command from within the PDT directory:
+
+java -jar java-cup-11a.jar -expect 1 -compact_red 
+  -destdir src\org\gotpike\pdt\parser src\pike.cup

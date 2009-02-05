@@ -360,7 +360,7 @@ optional_rename_inherit::= COLON TOK_IDENTIFIER:ident {: RESULT = ident; :}
 /* NOTE: This rule pushes a string "name" on the stack in addition
  * to resolving the program reference.
  */
-low_program_ref::= string_constant:constant {: RESULT = constant; :}
+low_program_ref::= string_constant:constant {: RESULT = constant; System.out.println("have constant."); :}
   | idents:idents {: RESULT = idents; :}
   ;
 

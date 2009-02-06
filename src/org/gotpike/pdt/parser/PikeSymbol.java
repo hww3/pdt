@@ -9,6 +9,13 @@ public class PikeSymbol extends java_cup.runtime.Symbol {
     this(type, line, column, -1, -1, offset, null);
     
   }
+  
+  // WARNING! This is a terrible kluge to get string concatenation to work.
+  // in fact, it probably doesn't work and definitely breaks when the 
+  public PikeSymbol(PikeSymbol a, PikeSymbol b)
+  {
+	  super(a.sym, a.line, (a.getText().length() + b.getText().length()), a.getText() + b.getText());
+  }
 
   public PikeSymbol(int type, int line, int column, int offset, Object value) {
     this(type, line, column, -1, -1, offset, value);

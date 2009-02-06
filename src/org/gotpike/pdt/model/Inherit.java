@@ -16,7 +16,7 @@ public class Inherit implements IClassElement
     
     public Inherit(Class parent, PikeSymbol className, PikeSymbol name, int modifiers)
     {
-    	System.out.println("classname: " + className);
+    	System.out.println("classname: " + className + ", offset " + className.getOffset());
         this.parent = parent;
         this.modifiers = modifiers;
         this.className = className;

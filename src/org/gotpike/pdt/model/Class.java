@@ -215,6 +215,7 @@ public class Class implements IMultilineElement
 	}
 	
 	public Inherit addInherit(InheritItem in) {
+		System.out.println("addInherit " + in.ref);
 		Inherit inherit = new Inherit(this, in.ref, in.name, in.modifiers);
 		inherits.add(inherit);
 		return inherit;

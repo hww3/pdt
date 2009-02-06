@@ -108,7 +108,7 @@ public class PikeValidator implements Runnable {
 			result = x.invoke("validate", arglist);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e1.getMessage();
+			System.out.println(e1.getMessage());
 		} 
 		
 		if(result instanceof XmlRpcArray)
@@ -117,7 +117,7 @@ public class PikeValidator implements Runnable {
 			for(int i = 0; i < r.size(); i++)
 			{
 				XmlRpcArray e = r.getArray(i);
-			//	System.out.println("marking error " + i + " of "  + r.size() + ": "+ e.toString());
+				System.out.println("marking error " + i + " of "  + r.size() + ": "+ e.toString());
 				sf.reportError(e.getString(2), e.getString(0), Integer.parseInt(e.getString(1)), 0, 0);
 			}
 		

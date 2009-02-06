@@ -347,8 +347,8 @@ program::= program def
   |  /* empty */
   ;
 
-string_constant::= string
-  | string_constant PLUS string
+string_constant::= string:c {: RESULT = c; :}
+  | string_constant:c1 PLUS string:c2 {: RESULT = new PikeSymbol((PikeSymbol)c1, (PikeSymbol)c2); :}
   ;
 
 optional_rename_inherit::= COLON TOK_IDENTIFIER:ident {: RESULT = ident; :}
@@ -360,7 +360,7 @@ optional_rename_inherit::= COLON TOK_IDENTIFIER:ident {: RESULT = ident; :}
 /* NOTE: This rule pushes a string "name" on the stack in addition
  * to resolving the program reference.
  */
-low_program_ref::= string_constant:constant {: RESULT = constant; System.out.println("have constant."); :}
+low_program_ref::= string_constant:constant {: RESULT = constant; :}
   | idents:idents {: RESULT = idents; :}
   ;
 
@@ -1424,8 +1424,8 @@ lvalue_list::= /* empty */
   | COMMA lvalue lvalue_list 
   ;
 
-string::= TOK_STRING 
-  | string TOK_STRING
+string::= TOK_STRING:t {: RESULT = new StringSymbol((PikeSymbol)t); :}
+  | string:t1 TOK_STRING:t2 {: RESULT = new StringSymbol((PikeSymbol)t1, (PikeSymbol)t2); :}
 
   ;
 
